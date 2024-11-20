@@ -38,17 +38,7 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
-      <library name="ArkTS-HarmonyOS-NEXT-B1(hms)" type="ArkUI">
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$APPLICATION_HOME_DIR$/sdk/default/hms/ets/api" />
-          <root url="file://$APPLICATION_HOME_DIR$/sdk/default/hms/ets/kits" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="" scope="PROVIDED">
-      <library name="ArkTS-HarmonyOS-NEXT-B1(openharmony)" type="ArkUI">
+      <library name="ArkTS-HarmonyOS-5.0.1-B3(openharmony)" type="ArkUI">
         <CLASSES />
         <JAVADOC />
         <SOURCES>
@@ -60,10 +50,13 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="" scope="PROVIDED">
-      <library name="libhomogrape.so" type="ArkUI">
+      <library name="ArkTS-HarmonyOS-5.0.1-B3(hms)" type="ArkUI">
         <CLASSES />
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$APPLICATION_HOME_DIR$/sdk/default/hms/ets/api" />
+          <root url="file://$APPLICATION_HOME_DIR$/sdk/default/hms/ets/kits" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

@@ -4,7 +4,7 @@
 
 <h1 align="center">Homogram</h1>
 
-Homogram is a 3rd-party Telegram client for [HarmonyOS Next](https://developer.huawei.com/consumer/cn/), driven by
+Homogram is a 3rd-party Telegram client for [HarmonyOS 5](https://developer.huawei.com/consumer/cn/), driven by
 ArkTS/ArkUI (UI-layer) and Rust (native-layer).
 
 _This project is a hobby project and is not affiliated with either Telegram or Huawei._
@@ -41,7 +41,7 @@ A detailed Roadmap can be found in the [Homogram Project](https://github.com/org
 
 - A Windows or MacOS device which supports [DecEco Studio](https://developer.huawei.com/consumer/cn/deveco-studio/) and
   Rust toolchain.
-- Tested on Mate 60 Pro ALN-AL80 NEXT.0.0.71, OpenHarmony SDK 5.0.0.71 (API 12 Release) and Rust 1.80.0. Other
+- Tested on Mate 60 Pro ALN-AL80 5.0.0.107, OpenHarmony SDK 5.0.1.106 (API 13 Beta 3) and Rust 1.82.0. Other
   configurations may work
   but are not guaranteed.
 
@@ -55,7 +55,7 @@ A detailed Roadmap can be found in the [Homogram Project](https://github.com/org
 4. Setup Rust toolchain and ohos-rs for OpenHarmony: https://ohos.rs/docs/basic/quick-start.html
 5. Build the native library in `features/home/src/main/native/homogrape`:
    ```shell
-   cargo xtask dist ..\..\..\..\libs\arm64-v8a\
+   cargo xtask dist ../../../../libs/arm64-v8a/
    ```
 6. Correctly [configure](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-signing-V5) the signature
    information, and build the project in DevEco Studio.
@@ -68,9 +68,7 @@ if you implement something cool!
 
 - [grammers](https://github.com/Lonami/grammers), a set of Rust libraries to interact with Telegram's API.
 - [ohos-rs](https://github.com/ohos-rs/ohos-rs), a`napi-rs` adaptation for OpenHarmony SDK.
-- [一多开发实例-即时通讯](https://gitee.com/harmonyos_codelabs/MultiDeviceCommunication), a sample project for
-  developing IM APPs on
-  HarmonyOS Next.
+- [一多开发实例-即时通讯](https://gitee.com/harmonyos_codelabs/MultiDeviceCommunication), a sample project for developing IM APPs on HarmonyOS Next.
 
 These projects are the backbone of Homogram and without them, this project would not be possible. Tremendous
 thanks
