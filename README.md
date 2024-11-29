@@ -71,9 +71,7 @@ if you implement something cool!
 - [一多开发实例-即时通讯](https://gitee.com/harmonyos_codelabs/MultiDeviceCommunication), a sample project for developing IM APPs on HarmonyOS Next.
 
 These projects are the backbone of Homogram and without them, this project would not be possible. Tremendous
-thanks
-to [@Lonami](https://github.com/Lonami),
-[@richerfu](https://github.com/richerfu), and all contributors!
+thanks to all contributors!
 
 ## License
 
