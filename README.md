@@ -9,6 +9,8 @@ ArkTS/ArkUI (UI-layer) and Rust (native-layer).
 
 _This project is a hobby project and is not affiliated with either Telegram or Huawei._
 
+**NEWS: Starting from 2nd Dec, 2024, [出境易](https://appgallery.huawei.com/app/detail?id=com.easy.hmos.abroad) provides a full-featured environment to download and use Android Apps. You can use the official Telegram client inside it's Android container.**
+
 ## Branches
 
 - The `main` branch contains the latest most stable version of Homogram, though it may not be the most feature-rich, it
