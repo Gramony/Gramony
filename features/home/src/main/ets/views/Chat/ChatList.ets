@@ -36,6 +36,7 @@ export struct ChatList {
   @Link isFromHideSearchBar: boolean;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @State searchValue: string = '';
+  @State homeTopSearchHeight: Length = 102;
   @Consume isAppFirstLoad: boolean;
   @Consume currentForumId: string;
   @State chatItemTransitionEffect: TransitionEffect | undefined = undefined;
@@ -65,6 +66,10 @@ export struct ChatList {
       })
         .expandSafeArea([SafeAreaType.SYSTEM])
         .zIndex(1)
+        .onAreaChange((oldValue, newValue) => {
+          this.homeTopSearchHeight = newValue.height
+          console.log("homeTopSearchHeight", oldValue.height.toString(), "to", newValue.height)
+        })
 
       List({
         scroller: this.scroller,
@@ -115,6 +120,12 @@ export struct ChatList {
         // })
 
         // .animationStyle() // forbidden, will cause a mass
+
+        ListItem() { // Placeholder to prevent HomeTopSearch from overlapping ChatItems
+          Row()
+            .height(this.homeTopSearchHeight)
+            .width(BaseConstants.FULL_WIDTH)
+        }
 
         LazyForEach(this.chatDataSource, (item: Chat, index: number) => {
           ListItem() {
