@@ -18,6 +18,7 @@ import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } from '@lyb/media-preview';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
+import { promptAction } from '@kit.ArkUI';
 
 enum DefaultMediaType {
   IMAGE,
@@ -111,6 +112,7 @@ export struct MessageBubble {
       }) {
         if ((!this.message?.outgoing) && (this.chatType != ChatType.User)) {
           Image("file://" + this.profilePhotoPath)
+            .alt("用户头像")
             .width(HomeConstants.PROFILE_PHOTO_SIZE_SMALL)
             .height(HomeConstants.PROFILE_PHOTO_SIZE_SMALL)
             .flexShrink(BaseConstants.FLEX_SHRINK_ZERO)
@@ -125,6 +127,14 @@ export struct MessageBubble {
                   this.profilePhotoLoaded = true;
                 });
             })
+            .onClick(() => {
+              this.getUIContext().getPromptAction().showToast({
+                message: `点击头像：${this.message?.senderName} / ${this.message?.senderId}`,
+                duration: 2000,
+                showMode: promptAction.ToastShowMode.DEFAULT,
+                bottom: 80
+              });
+            })
         }
         Column() {
           Stack({ alignContent: !this.message?.outgoing ? Alignment.TopStart : Alignment.TopEnd }) {
@@ -132,7 +142,7 @@ export struct MessageBubble {
               if ((!this.message?.outgoing) && (this.chatType != ChatType.User)) {
                 Row() {
                   Text(this.message?.senderName)
-                    .fontSize(10)// .fontColor(Color.Black)
+                    .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
                     .fontWeight(FontWeight.Bold)
                     .textAlign(TextAlign.Start)
                   Blank()
@@ -212,7 +222,6 @@ export struct MessageBubble {
                           height: 800
                         };
                         let fileInfo: filePreview.PreviewInfo = {
-                          // 该uri仅为参考，需要根据实际业务传入真实uri
                           uri: "file://" + getContext().applicationInfo.name + this.mediaPath,
                           mimeType: 'image/jpeg'
                         };
@@ -234,7 +243,7 @@ export struct MessageBubble {
                     Text(`查看 ${this.message.view_count} 次 `)
                   }
                   Text(DateHelper.getParsedDateString(this.message?.timestamp))
-                    .fontSize(8)
+                    .fontSize(BaseConstants.FONT_SIZE_TWELVE)
                     .fontColor(HomeConstants.MESSAGE_TIME_COLOR)
                   if (this.message?.outgoing) {
                     Text(' ')
@@ -242,7 +251,7 @@ export struct MessageBubble {
                       SymbolSpan($r('sys.symbol.checkmark_circle'))
                     }
                     // .fontColor(HomeConstants.MESSAGE_TIME_COLOR)
-                    .fontSize(8)
+                    .fontSize(BaseConstants.FONT_SIZE_TWELVE)
                   }
                 }
                 .alignSelf(ItemAlign.End)
@@ -317,7 +326,7 @@ export struct MessageBubble {
   @Builder
   MessageContent() {
     Text(this.message?.text)
-      .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+      .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
       .fontFamily(BaseConstants.FONT_FAMILY_NORMAL)
       .fontWeight(BaseConstants.FONT_WEIGHT_FOUR)
       .lineHeight($r('app.float.chat_default_text_line'))
@@ -343,8 +352,9 @@ export struct MessageBubble {
         if (this.mediaLoadFailed) {
           Text("Retry")
             .fontColor(Color.Red)
-            .fontSize(10)
+            .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
             .fontWeight(FontWeight.Bold)
+            .lineHeight(`21fp`)
             .textAlign(TextAlign.Center)
             .layoutWeight(1)
             .onClick(() => {

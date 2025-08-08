@@ -25,7 +25,7 @@ export struct ReplyToPreview {
           .width(30)
           .height(30)
           .objectFit(ImageFit.Auto)
-          .borderRadius(8)
+          .borderRadius(4)
           .margin({ right: 4, })
           .onAppear(() => {
             this.mediaPath =
@@ -48,13 +48,13 @@ export struct ReplyToPreview {
       }
       Column() {
         Text(this.message?.senderName)
-          .fontSize(12)
+          .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
           .fontWeight(FontWeight.Bold)
           .fontColor(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_DIVIDER_COLOR)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.message?.text === "" ? "Photo" : this.message?.text)
-          .fontSize(10)
+          .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
@@ -72,6 +72,5 @@ export struct ReplyToPreview {
     .padding(8)
     .backgroundColor(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_BACKGROUND_COLOR)
     .borderRadius(8)
-    .height(40)
   }
 }
