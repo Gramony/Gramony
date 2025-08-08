@@ -193,7 +193,7 @@ export struct MessageBubble {
                       .id(this.mediaPreviewOptions.idBuilder(item, index))
                       //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
                       .id(`media_${index}`)
-                      .aspectRatio(1)
+                      // .aspectRatio(1)
                       .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
                       //TODO: 仿微信那种资源在预览时原始资源隐藏显示
                       .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
@@ -208,8 +208,13 @@ export struct MessageBubble {
                   }
                 }
                 this.MessageContent()
+                // if (this.message?.mediaType === MediaType.Sticker) {
+                // }
                 Row() {
                   Blank()
+                  if (this.message?.view_count && this.message.view_count > 0) {
+                    Text(`查看 ${this.message.view_count} 次 `)
+                  }
                   Text(DateHelper.getParsedDateString(this.message?.timestamp))
                     .fontSize(8)
                     .fontColor(HomeConstants.MESSAGE_TIME_COLOR)

@@ -27,6 +27,12 @@ export class Message implements NativeMessage, IComparable<Message> {
   groupedId?: number
   @sql.SqlColumn(sql.ColumnType.INTEGER)
   replyToMessageId?: number
+  @sql.SqlColumn(sql.ColumnType.INTEGER)
+  view_count: number
+  @sql.SqlColumn(sql.ColumnType.INTEGER)
+  forward_count: number
+  @sql.SqlColumn(sql.ColumnType.INTEGER)
+  reply_count: number
 
   constructor(chatId: number, messageId: number, outgoing: boolean, pinned: boolean, senderId: number,
     senderName: string, timestamp: number, text: string, mediaType: MediaType, editTimestamp?: number,
@@ -43,6 +49,9 @@ export class Message implements NativeMessage, IComparable<Message> {
     this.editTimestamp = editTimestamp || -1;
     this.groupedId = groupedId || -1;
     this.replyToMessageId = replyToMessageId || -1;
+    this.reply_count = 0;
+    this.forward_count = 0;
+    this.view_count = 0;
   }
 
   public static fromNative(nativeMessage: NativeMessage): Message {
