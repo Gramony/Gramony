@@ -28,6 +28,7 @@ import {
   Vibrator
 } from '@ohos/base';
 import ChatDetailNone from '../views/Chat/ChatDetailNone';
+import { ProfilePage } from './ProfilePage';
 import {
   IncomingMessageCallback,
   UpdateChatCallback,
@@ -272,6 +273,8 @@ export struct Index {
       })
     } else if (name === 'ChatDetailNone') {
       ChatDetailNone();
+    } else if (name === 'Profile' || name === 'ProfilePage') {
+      ProfilePage();
     } else if (name === 'Login/PhoneNumber') {
       PhoneNumber();
     } else if (name === 'Login/VerifyCode') {

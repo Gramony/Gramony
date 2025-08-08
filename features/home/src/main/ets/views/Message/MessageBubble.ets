@@ -55,6 +55,7 @@ export struct MessageBubble {
   @Consume me: NativeSeenChat | undefined;
   @Consume seenChatsMap: HashMap<string, SeenChat>;
   @Consume messagesOfChatMap: HashMap<string, MessageDataSource>;
+  @Consume('pageInfo') pageInfo: NavPathStack;
   @State mediaPath: string = "";
   @State mediaLoaded: boolean = false;
   @State mediaLoadFailed: boolean = false;
@@ -128,12 +129,15 @@ export struct MessageBubble {
                 });
             })
             .onClick(() => {
+              const id = this.message?.senderId;
               this.getUIContext().getPromptAction().showToast({
-                message: `点击头像：${this.message?.senderName} / ${this.message?.senderId}`,
+                message: `点击头像：${this.message?.senderName} / ${id}`,
                 duration: 2000,
                 showMode: promptAction.ToastShowMode.DEFAULT,
                 bottom: 80
               });
+              if (!id) return;
+              this.pageInfo.pushPath({ name: "ProfilePage", param: id });
             })
         }
         Column() {

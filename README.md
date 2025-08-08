@@ -4,7 +4,7 @@
 
 <h1 align="center">Gramony for Telegram</h1>
 
-Homogram is a 3rd-party Telegram client for [HarmonyOS NEXT](https://developer.huawei.com/consumer/cn/), driven by
+**Gramony** is a 3rd-party Telegram client for [HarmonyOS NEXT](https://developer.huawei.com/consumer/cn/), driven by
 ArkTS/ArkUI (UI-layer) and Rust (native-layer). It is a fork of the unmaintained Homogram.
 
 _This project is a hobby project and is not affiliated with either Telegram or Huawei._
@@ -24,6 +24,7 @@ _This project is a hobby project and is not affiliated with either Telegram or H
 - [x] Adaptive dark/light mode
 - [x] Jump to reply in chat
 - [ ] Contacts list
+- [ ] Profile page for chat
 - [ ] Folders
 - [ ] Saved messages
 - [ ] Message prefetching on scroll
@@ -46,9 +47,10 @@ A detailed Roadmap can be found in the [Homogram Project](https://github.com/org
 
 - A Windows or MacOS device which supports [DecEco Studio](https://developer.huawei.com/consumer/cn/deveco-studio/) and
   Rust toolchain.
-- Tested on Mate 60 Pro ALN-AL80 5.0.0.107, OpenHarmony SDK 5.0.1.106 (API 13 Beta 3) and Rust 1.82.0. Other
-  configurations may work
-  but are not guaranteed.
+- Tested on Mate 60 Pro+ & Pura 70 Ultra,
+  HarmonyOS 5.1.0 (API 17),
+  OpenHarmony SDK 5.0.1.106 (API 15) and Rust 1.82.0.
+  Other configurations may work but are not guaranteed.
 
 1. Clone the repository:
    ```shell
