@@ -3,6 +3,8 @@ import { LoginState, login, signOut } from 'libhomogrape.so'
 import { emitter } from '@kit.BasicServicesKit';
 import { EventConstants } from '../../constants/EventConstants';
 
+import { Lottie, LottieController } from "@jjr/lottie_component";
+
 @Entry
 @Component
 export struct PhoneNumber {
@@ -12,11 +14,28 @@ export struct PhoneNumber {
   @State errorMessage: string = '';
   @Consume('pageInfo') pageInfo: NavPathStack;
 
+  private controller = new LottieController()
+
   build() {
     NavDestination() {
       Column() {
+        Lottie({
+          autoPlay: true,
+          controller: this.controller,
+          // animationUri: "https://lottie.host/ab168ead-f877-40cd-90e3-4d09fff05b42/F8ZzJ6R846.json",
+          animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-phone.json",
+          loop: true,
+        })
+          .width(256)
+          .height(256)
         Text('Please input your phone number').margin({ top: 20 })
-        TextInput({ placeholder: 'input your phone number', text: this.phone }).margin({ top: 20 })
+        TextInput({ placeholder: '+86 123 4567 7890', text: this.phone })
+          .type(InputType.PhoneNumber)
+          .placeholderFont({
+            size: 28,
+          })
+          .fontSize(28)
+          .margin({ top: 20 })
           .onChange((value) => {
             this.phone = value;
           })

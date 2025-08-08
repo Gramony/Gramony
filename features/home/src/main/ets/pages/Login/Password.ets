@@ -2,6 +2,7 @@ import { Logger } from '@ohos/base'
 import { LoginState, password, signOut } from 'libhomogrape.so'
 import { emitter } from '@kit.BasicServicesKit';
 import { EventConstants } from '../../constants/EventConstants';
+import { Lottie, LottieController } from "@jjr/lottie_component";
 
 @Entry
 @Component
@@ -12,11 +13,23 @@ export struct Password {
   @State errorMessage: string = '';
   @Consume('pageInfo') pageInfo: NavPathStack;
 
+  private controller = new LottieController()
+
   build() {
     NavDestination() {
       Column() {
+        Lottie({
+          autoPlay: true,
+          controller: this.controller,
+          animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-password-unlock.json",
+          loop: true,
+        })
+          .width(256)
+          .height(256)
         Text('Please input your password').margin({ top: 20 })
-        TextInput({ placeholder: 'input your password', text: this.password }).margin({ top: 20 })
+        TextInput({ placeholder: 'Password', text: this.password })
+          .type(InputType.Password)
+          .margin({ top: 20 })
           .onChange((value) => {
             this.password = value;
           })
