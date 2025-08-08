@@ -9,14 +9,15 @@ import {
 } from 'libhomogrape.so';
 import { HomeConstants } from '../../constants/HomeConstants';
 import { Message } from '../../entities/Message';
-import { fileIo as fs, ReadOptions } from '@kit.CoreFileKit';
-import { image } from '@kit.ImageKit';
+import { fileIo as fs } from '@kit.CoreFileKit';
 import { HashMap } from '@kit.ArkTS';
 import { SeenChat } from '../../entities/SeenChat';
 import { getOrDownloadProfilePhoto, getThumbProfilePhotoPixelMap } from '../../utils';
 import { ReplyToPreview } from './ReplyToPreview'
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } from '@lyb/media-preview';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { filePreview } from '@kit.PreviewKit';
 
 enum DefaultMediaType {
   IMAGE,
@@ -199,10 +200,27 @@ export struct MessageBubble {
                       .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
                       .onClick(() => {
                         Logger.debug("MessageBubble Media onClick: " + index);
-                        this.mediaPreviewOptions
-                          .setInitIndex(index)
-                          .setMedias(this.mediaResources);
-                        MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
+                        // this.mediaPreviewOptions
+                        //   .setInitIndex(index)
+                        //   .setMedias(this.mediaResources);
+                        // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
+                        let uiContext = getContext(this);
+                        let displayInfo: filePreview.DisplayInfo = {
+                          x: 100,
+                          y: 100,
+                          width: 800,
+                          height: 800
+                        };
+                        let fileInfo: filePreview.PreviewInfo = {
+                          // 该uri仅为参考，需要根据实际业务传入真实uri
+                          uri: "file://" + getContext().applicationInfo.name + this.mediaPath,
+                          mimeType: 'image/jpeg'
+                        };
+                        filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
+                          console.info('Succeeded in opening preview');
+                        }).catch((err: BusinessError) => {
+                          console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
+                        });
                       })
                     }, (item: DefaultMediaModel, index: number) => JSON.stringify(item) + index)
                   }

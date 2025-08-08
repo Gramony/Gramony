@@ -2,14 +2,12 @@
   <img src="./assets/logo.png" width="20%" style="border-radius:25%"/>
 </p>
 
-<h1 align="center">Homogram</h1>
+<h1 align="center">Gramony for Telegram</h1>
 
-Homogram is a 3rd-party Telegram client for [HarmonyOS 5](https://developer.huawei.com/consumer/cn/), driven by
-ArkTS/ArkUI (UI-layer) and Rust (native-layer).
+Homogram is a 3rd-party Telegram client for [HarmonyOS NEXT](https://developer.huawei.com/consumer/cn/), driven by
+ArkTS/ArkUI (UI-layer) and Rust (native-layer). It is a fork of the unmaintained Homogram.
 
 _This project is a hobby project and is not affiliated with either Telegram or Huawei._
-
-**NEWS: Starting from 2nd Dec, 2024, [出境易](https://appgallery.huawei.com/app/detail?id=com.easy.hmos.abroad) provides a full-featured environment to download and use Android Apps. You can use the official Telegram client inside it's Android container.**
 
 ## Branches
 
@@ -19,14 +17,19 @@ _This project is a hobby project and is not affiliated with either Telegram or H
 
 ## Roadmap
 
-- [x] Login with phone number, authorizing with verification code and (optionally) password
+- [x] Login with phone number, authorizing with verification code and (optionally) password with animated introduction
 - [x] Loading chats and recent N messages
 - [x] Rendering text and photo preview in messages
 - [x] Sending text messages
 - [x] Adaptive dark/light mode
 - [x] Jump to reply in chat
+- [ ] Contacts list
+- [ ] Folders
+- [ ] Saved messages
 - [ ] Message prefetching on scroll
 - [ ] Full-screen view for medias
+  - [x] Image
+  - [ ] Documents
 - [ ] Sending medias/files
 - [ ] Reply to messages
 - [ ] VOIP integration
