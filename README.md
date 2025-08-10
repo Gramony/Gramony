@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.png" width="20%" style="border-radius:25%"/>
+  <img width="20%" alt="Gramony" src="https://github.com/user-attachments/assets/6d0b6d9d-8e1e-403b-b3d3-6f3189af08f1" />
 </p>
 
 <h1 align="center">Gramony for Telegram</h1>
@@ -8,6 +8,10 @@
 ArkTS/ArkUI (UI-layer) and Rust (native-layer). It is a fork of the unmaintained Homogram.
 
 _This project is a hobby project and is not affiliated with either Telegram or Huawei._
+
+<p align="center">&gt;&gt;&gt;<img src="https://api.iconify.design/logos/telegram.svg" alt="telegram-logo"> <a href="https://t.me/GramonyApp">Telegram channel</a> &lt;&lt;&lt;</p>
+
+* * *
 
 ## Branches
 
@@ -33,6 +37,8 @@ _This project is a hobby project and is not affiliated with either Telegram or H
   - [ ] Documents
 - [ ] Sending medias/files
 - [ ] Reply to messages
+- [ ] Proxy
+  - [ ] Socks5 
 - [ ] VOIP integration
 - [ ] [HMS Push Kit](https://developer.huawei.com/consumer/cn/sdk/push-kit) (depends on Telegram's server-side
   support https://github.com/tdlib/td/issues/3057)
