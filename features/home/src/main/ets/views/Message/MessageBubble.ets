@@ -159,7 +159,7 @@ export struct MessageBubble {
                     })
                     .onClick(() => {
                       Logger.debug("ReplyToPreview onClick: " + this.message?.replyToMessageId + " currentChatId: " +
-                      this.currentChatId);
+                        this.currentChatId);
                       let target_index =
                         this.messagesOfChatMap.get(this.currentChatId)?.indexOf(this.message?.replyToMessageId || -1);
                       Logger.debug("ReplyToPreview onClick: target_index: " + target_index);
@@ -176,14 +176,14 @@ export struct MessageBubble {
                         this.isScrollingDueToReplyToMessage = true;
                         this.scrollToRepliedMessageIndex = target_index;
                         this.messageListScroller?.scrollToIndex(current_index -
-                        BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                        BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
                           true,
                           ScrollAlign.CENTER);
                         Logger.debug("ReplyToPreview onClick: scrollToIndex first step: " +
                           (current_index -
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
+                            BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                            BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
                       } else {
                         Logger.debug("ReplyToPreview onClick: scroll to target in one step");
                         this.messageListScroller?.scrollToIndex(target_index, true, ScrollAlign.CENTER);
@@ -199,35 +199,35 @@ export struct MessageBubble {
                       }
                       //TODO: 设置id，不然不会显示一镜到底效果
                       .id(this.mediaPreviewOptions.idBuilder(item, index))
-                      //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
-                      .id(`media_${index}`)
-                      // .aspectRatio(1)
-                      .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
-                      //TODO: 仿微信那种资源在预览时原始资源隐藏显示
-                      .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
-                      .onClick(() => {
-                        Logger.debug("MessageBubble Media onClick: " + index);
-                        // this.mediaPreviewOptions
-                        //   .setInitIndex(index)
-                        //   .setMedias(this.mediaResources);
-                        // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
-                        let uiContext = getContext(this);
-                        let displayInfo: filePreview.DisplayInfo = {
-                          x: 100,
-                          y: 100,
-                          width: 800,
-                          height: 800
-                        };
-                        let fileInfo: filePreview.PreviewInfo = {
-                          uri: "file://" + getContext().applicationInfo.name + this.mediaPath,
-                          mimeType: 'image/jpeg'
-                        };
-                        filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
-                          console.info('Succeeded in opening preview');
-                        }).catch((err: BusinessError) => {
-                          console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
-                        });
-                      })
+                        //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
+                        .id(`media_${index}`)
+                        // .aspectRatio(1)
+                        .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
+                        //TODO: 仿微信那种资源在预览时原始资源隐藏显示
+                        .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
+                        .onClick(() => {
+                          Logger.debug("MessageBubble Media onClick: " + index);
+                          // this.mediaPreviewOptions
+                          //   .setInitIndex(index)
+                          //   .setMedias(this.mediaResources);
+                          // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
+                          let uiContext = getContext(this);
+                          let displayInfo: filePreview.DisplayInfo = {
+                            x: 100,
+                            y: 100,
+                            width: 800,
+                            height: 800
+                          };
+                          let fileInfo: filePreview.PreviewInfo = {
+                            uri: "file://" + getContext().applicationInfo.name + this.mediaPath,
+                            mimeType: 'image/jpeg'
+                          };
+                          filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
+                            console.info('Succeeded in opening preview');
+                          }).catch((err: BusinessError) => {
+                            console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
+                          });
+                        })
                     }, (item: DefaultMediaModel, index: number) => JSON.stringify(item) + index)
                   }
                 }
@@ -263,9 +263,9 @@ export struct MessageBubble {
               top: 8,
               bottom: 8
             })
-            .backgroundColor(!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
-            HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING)
-            .borderRadius(HomeConstants.PATH_BORDER_RADIUS)
+              .backgroundColor(!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
+                HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING)
+              .borderRadius(HomeConstants.PATH_BORDER_RADIUS)
           }
           .padding({
             top: 5,
@@ -273,7 +273,7 @@ export struct MessageBubble {
             // right: $r('app.float.path_right'),
             bottom: 5
           })
-          .width(BaseConstants.NINETY_WIDTH_PERCENT)
+            .width(BaseConstants.NINETY_WIDTH_PERCENT)
         }
         .width(BaseConstants.NINETY_WIDTH_PERCENT)
 
@@ -363,9 +363,9 @@ export struct MessageBubble {
       }
     }
     .alignSelf(ItemAlign.Start)
-    .onAppear(() => {
-      this.loadMedia();
-    })
+      .onAppear(() => {
+        this.loadMedia();
+      })
   }
 
   loadMedia() {
@@ -407,7 +407,7 @@ export struct MessageBubble {
 }
 
 @Builder
-function Loading() {
+  function Loading() {
   LoadingProgress()
     .color(Color.Blue)
     .layoutWeight(1)

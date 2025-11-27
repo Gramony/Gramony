@@ -103,7 +103,7 @@ export struct ChatDetailBottom {
           text: $text,
           sendMessage: this.sendMessage,
           currentDetents: this.currentDetents,
-          title: $mediaSheetTitle,          
+          title: $mediaSheetTitle,
           selectedMedias: $selectedMedias,
         })
       }
@@ -166,9 +166,7 @@ export struct ChatDetailBottom {
       Column() {
         TextArea({
           text: this.text,
-        })// .placeholderColor($r('app.color.text_input_default_color'))
-          // .caretColor($r('app.color.text_input_default_care_color'))
-          // .backgroundColor($r('app.color.background_color_grey'))
+        })
           .opacity(0.5)
           .borderRadius(HomeConstants.CHAT_DETAIL_BOTTOM_TEXT_RADIUS)
           .flexGrow(BaseConstants.FLEX_GROW_ONE)
@@ -190,24 +188,41 @@ export struct ChatDetailBottom {
       }
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
 
-
-      Column() {
-        StandardIcon({ icon: $r('app.media.ic_public_emoji') })
-      }
-      .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
-        .padding({
-          left: $r('app.float.chat_detail_bottom_padding'),
-          right: $r('app.float.chat_detail_bottom_padding'),
+      if (this.text.length > 0) {
+        Button() {
+          SymbolGlyph($r('sys.symbol.paperplane_right_fill'))
+            .fontSize(32)
+            .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+            .backgroundColor(Color.Transparent)
+        }
+        .onClick(() => {
+          try {
+            this.sendMessage();
+            Logger.debug("sendMessage: " + this.text);
+          } catch (e) {
+            Logger.error("sendMessage error: " + e.message);
+          }
         })
+      } else {
+        Column() {
+          StandardIcon({ icon: $r('app.media.ic_public_emoji') })
+        }
+      .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
+          .padding({
+            left: $r('app.float.chat_detail_bottom_padding'),
+            right: $r('app.float.chat_detail_bottom_padding'),
+          })
 
 
-      Column() {
-        StandardIcon({ icon: $r('app.media.ic_public_add_norm') })
-      }
+        Column() {
+          StandardIcon({ icon: $r('app.media.ic_public_add_norm') })
+        }
       .padding({
-        right: $r('app.float.chat_detail_bottom_padding'),
-        left: $r('app.float.chat_detail_bottom_padding'),
-      })
+          right: $r('app.float.chat_detail_bottom_padding'),
+          left: $r('app.float.chat_detail_bottom_padding'),
+        })
+      }
     }
     .padding({
       top: $r('app.float.chat_detail_bottom_padding'),
