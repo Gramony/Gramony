@@ -238,12 +238,12 @@ export struct ChatList {
       })
       // .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
       .chatListAnimationStyle()
-      .divider({
-        strokeWidth: $r('app.float.chat_list_divider_stroke_width'),
-        color: $r('app.float.chat_list_divider_stroke_width'),
-        startMargin: HomeConstants.CHAT_LIST_DIVIDER_START_MARGIN,
-        endMargin: HomeConstants.CHAT_LIST_DIVIDER_END_MARGIN
-      })
+      // .divider({
+      //   strokeWidth: $r('app.float.chat_list_divider_stroke_width'),
+      //   color: $r('app.float.chat_list_divider_stroke_width'),
+      //   startMargin: HomeConstants.CHAT_LIST_DIVIDER_START_MARGIN,
+      //   endMargin: HomeConstants.CHAT_LIST_DIVIDER_END_MARGIN
+      // })
     }
     .expandSafeArea([SafeAreaType.SYSTEM])
     .onAppear(() => {
