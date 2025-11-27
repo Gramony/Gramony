@@ -206,7 +206,11 @@ export struct ChatDetailBottom {
         })
       } else {
         Column() {
-          StandardIcon({ icon: $r('app.media.ic_public_emoji') })
+          SymbolGlyph($r('sys.symbol.face_smiling'))
+            .fontSize(25)
+            .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+            .backgroundColor(Color.Transparent)
         }
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
           .padding({
@@ -216,7 +220,11 @@ export struct ChatDetailBottom {
 
 
         Column() {
-          StandardIcon({ icon: $r('app.media.ic_public_add_norm') })
+          SymbolGlyph($r('sys.symbol.plus_square'))
+            .fontSize(25)
+            .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+            .backgroundColor(Color.Transparent)
         }
       .padding({
           right: $r('app.float.chat_detail_bottom_padding'),

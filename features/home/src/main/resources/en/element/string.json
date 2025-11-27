@@ -6,67 +6,67 @@
     },
     {
       "name": "message",
-      "value": "消息"
+      "value": "Message"
     },
     {
       "name": "reply",
-      "value": "回复"
+      "value": "Reply"
     },
     {
       "name": "reply_selected",
-      "value": "已选择回复消息"
+      "value": "Reply message selected"
     },
     {
       "name": "unsupported_functionality",
-      "value": "该功能暂未实现"
+      "value": "This feature is not yet implemented"
     },
     {
       "name": "wait_a_minute",
-      "value": "可能需要 5~20 秒的时间初始化……"
+      "value": "Initialization may take 5~20 seconds..."
     },
     {
       "name": "check_connectivity",
-      "value": "请检查是否开启全局代理（VPN）"
+      "value": "Please check if global proxy (VPN) is enabled"
     },
     {
       "name": "forward",
-      "value": "转发"
+      "value": "Forward"
     },
     {
       "name": "contacts",
-      "value": "通讯录"
+      "value": "Contacts"
     },
     {
       "name": "SocialCircle",
-      "value": "朋友圈"
+      "value": "Social Circle"
     },
     {
       "name": "me",
-      "value": "我的"
+      "value": "Me"
     },
     {
       "name": "gallery",
-      "value": "图库"
+      "value": "Gallery"
     },
     {
       "name": "file",
-      "value": "文件"
+      "value": "File"
     },
     {
       "name": "location",
-      "value": "位置"
+      "value": "Location"
     },
     {
       "name": "poll",
-      "value": "投票"
+      "value": "Poll"
     },
     {
       "name": "contact",
-      "value": "联系人"
+      "value": "Contact"
     },
     {
       "name": "search_placeholder",
-      "value": "搜索"
+      "value": "Search"
     }
   ]
 }

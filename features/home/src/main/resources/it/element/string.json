@@ -2,71 +2,71 @@
   "string": [
     {
       "name": "shared_desc",
-      "value": "description"
+      "value": "descrizione"
     },
     {
       "name": "message",
-      "value": "消息"
+      "value": "Messaggio"
     },
     {
       "name": "reply",
-      "value": "回复"
+      "value": "Rispondi"
     },
     {
       "name": "reply_selected",
-      "value": "已选择回复消息"
+      "value": "Messaggio di risposta selezionato"
     },
     {
       "name": "unsupported_functionality",
-      "value": "该功能暂未实现"
+      "value": "Questa funzionalità non è ancora implementata"
     },
     {
       "name": "wait_a_minute",
-      "value": "可能需要 5~20 秒的时间初始化……"
+      "value": "L'inizializzazione potrebbe richiedere 5~20 secondi..."
     },
     {
       "name": "check_connectivity",
-      "value": "请检查是否开启全局代理（VPN）"
+      "value": "Si prega di verificare se il proxy globale (VPN) è abilitato"
     },
     {
       "name": "forward",
-      "value": "转发"
+      "value": "Inoltra"
     },
     {
       "name": "contacts",
-      "value": "通讯录"
+      "value": "Contatti"
     },
     {
       "name": "SocialCircle",
-      "value": "朋友圈"
+      "value": "Circolo Sociale"
     },
     {
       "name": "me",
-      "value": "我的"
+      "value": "Io"
     },
     {
       "name": "gallery",
-      "value": "图库"
+      "value": "Galleria"
     },
     {
       "name": "file",
-      "value": "文件"
+      "value": "File"
     },
     {
       "name": "location",
-      "value": "位置"
+      "value": "Posizione"
     },
     {
       "name": "poll",
-      "value": "投票"
+      "value": "Sondaggio"
     },
     {
       "name": "contact",
-      "value": "联系人"
+      "value": "Contatto"
     },
     {
       "name": "search_placeholder",
-      "value": "搜索"
+      "value": "Cerca"
     }
   ]
 }

@@ -93,22 +93,48 @@ export struct ChatDetail {
 
   @Builder
   replyEnd(messageId: number) {
-    Button({type: ButtonType.Capsule}) {
-      Text("󰣂 回复")
-    }
+    Row({ space: 5 }) {
+      Button() {
+        Row({ space: 4 }) {
+          SymbolGlyph($r("sys.symbol.arrow_left"))
+            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+          Text($r("app.string.reply"))
+        }
+      }
+        .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
+        .height(56)
+        .width(90)
+        .fontSize(44)
+        .onClick((_) => {
+          this.replyToMessageId = messageId;
+          this.getUIContext().getPromptAction().showToast({
+            message: $r("app.string.reply_selected"),
+            duration: 2000,
+            showMode: promptAction.ToastShowMode.DEFAULT,
+            bottom: 100
+          });
+        })
+
+      Button() {
+        Row({ space: 4 }) {
+          SymbolGlyph($r("sys.symbol.arrow_right"))
+            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+          Text($r("app.string.forward"))
+        }
+      }
     .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
-    .height(60)
-    .width(120)
-    .fontSize(48)
-    .onClick((_) => {
-      this.replyToMessageId = messageId;
-      this.getUIContext().getPromptAction().showToast({
-        message: "已选择回复消息",
-        duration: 2000,
-        showMode: promptAction.ToastShowMode.DEFAULT,
-        bottom: 100
-      });
-    })
+        .height(56)
+        .width(90)
+        .fontSize(48)
+        .onClick((_) => {
+          this.getUIContext().getPromptAction().showToast({
+            message: $r("app.string.unsupported_functionality"),
+            duration: 2000,
+            showMode: promptAction.ToastShowMode.DEFAULT,
+            bottom: 100
+          });
+        })
+    }
   }
 
   build() {
@@ -140,16 +166,16 @@ export struct ChatDetail {
             }.swipeAction({
               end: this.replyEnd.bind(this, item.messageId),
               edgeEffect: SwipeEdgeEffect.Spring,
-// onOffsetChange: (offset) => {
-//   const uiCtx = this.getUIContext();
-//   this.replyToMessageId = item.messageId;
-//   uiCtx.showAlertDialog({
-//     title: "回复",
-//     message: `消息 ID： ${(this.replyToMessageId ?? "none").toString()}；
-// Offset: ${offset}`,
-//     autoCancel: true,
-//   })
-// }
+              // onOffsetChange: (offset) => {
+              //   const uiCtx = this.getUIContext();
+              //   this.replyToMessageId = item.messageId;
+              //   uiCtx.showAlertDialog({
+              //     title: "回复",
+              //     message: `消息 ID： ${(this.replyToMessageId ?? "none").toString()}；
+              // Offset: ${offset}`,
+              //     autoCancel: true,
+              //   })
+              // }
             })
               .margin({
                 top: index === 0 ? HomeConstants.NAV_TITLE_TOP_MARGIN_MINI : 0,
