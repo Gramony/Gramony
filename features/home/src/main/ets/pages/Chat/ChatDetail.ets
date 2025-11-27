@@ -16,7 +16,7 @@
 import { Adaptive, BaseConstants, BreakpointConstants, Logger } from '@ohos/base';
 import { ChatDetailBottom } from '../../views/Chat/ChatDetailBottom';
 import ChatDetailItem from '../../views/Chat/ChatDetailItem';
-import { ChatDetailTopSearch } from '../../views/Chat/ChatDetailTopSearch';
+// import { ChatDetailTopSearch } from '../../views/Chat/ChatDetailTopSearch';
 import { HomeConstants } from '../../constants/HomeConstants';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { Message } from '../../entities/Message';
@@ -25,10 +25,10 @@ import { HashMap } from '@kit.ArkTS';
 import { ChatDataSource } from '../../viewmodel/Chat/ChatDataSource';
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { ChatType } from 'libhomogrape.so';
-import { curves } from '@kit.ArkUI';
+import { AlertDialog, curves, promptAction } from '@kit.ArkUI';
 
 @AnimatableExtend(NavDestination)
-function animatableBlur(blurRadius: number) {
+  function animatableBlur(blurRadius: number) {
   .blur(blurRadius)
 }
 
@@ -51,6 +51,8 @@ export struct ChatDetail {
   @Provide isScrollingDueToReplyToMessage: boolean = false;
   @Provide scrollToRepliedMessageIndex: number = -1;
   @State messageTransitionEffect: TransitionEffect | undefined = undefined;
+  @State replyToMessageId?: number = undefined;
+
   private shouldTransferToOnScrollIndex = false;
   private beforeFinalScrollIndex: number = -1;
   private messageListScroller: ListScroller = new ListScroller();
@@ -62,7 +64,7 @@ export struct ChatDetail {
   @Styles
   messageAnimationStyle() {
     .animation({ curve: curves.springMotion(0.6, 0.8) })
-    .transition(this.messageTransitionEffect)
+      .transition(this.messageTransitionEffect)
   }
 
   // @Builder
@@ -89,10 +91,29 @@ export struct ChatDetail {
   //   }
   // }
 
+  @Builder
+  replyEnd(messageId: number) {
+    Button({type: ButtonType.Capsule}) {
+      Text("󰣂 回复")
+    }
+    .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
+    .height(60)
+    .width(120)
+    .fontSize(48)
+    .onClick((_) => {
+      this.replyToMessageId = messageId;
+      this.getUIContext().getPromptAction().showToast({
+        message: "已选择回复消息",
+        duration: 2000,
+        showMode: promptAction.ToastShowMode.DEFAULT,
+        bottom: 100
+      });
+    })
+  }
+
   build() {
     NavDestination() {
       Stack({ alignContent: Alignment.Bottom }) {
-
         // Row() {
         //   ChatDetailTopSearch({
         //     currentChatUserName: this.currentChatUserName,
@@ -116,81 +137,96 @@ export struct ChatDetail {
                 message: item,
                 messageListScroller: this.messageListScroller,
               })
-            }
-            .margin({
-              top: index === 0 ? HomeConstants.NAV_TITLE_TOP_MARGIN_MINI : 0,
-              bottom: index === this.length - 1 ? HomeConstants.NAV_SIGNAL_BAR_HEIGHT : 0
+            }.swipeAction({
+              end: this.replyEnd.bind(this, item.messageId),
+              edgeEffect: SwipeEdgeEffect.Spring,
+// onOffsetChange: (offset) => {
+//   const uiCtx = this.getUIContext();
+//   this.replyToMessageId = item.messageId;
+//   uiCtx.showAlertDialog({
+//     title: "回复",
+//     message: `消息 ID： ${(this.replyToMessageId ?? "none").toString()}；
+// Offset: ${offset}`,
+//     autoCancel: true,
+//   })
+// }
             })
+              .margin({
+                top: index === 0 ? HomeConstants.NAV_TITLE_TOP_MARGIN_MINI : 0,
+                bottom: index === this.length - 1 ? HomeConstants.NAV_SIGNAL_BAR_HEIGHT : 0
+              })
           }, (item: Message, index: number) => index + JSON.stringify(item))
         }
         .height(BaseConstants.FULL_HEIGHT)
-        .width(BaseConstants.FULL_WIDTH)
-        .padding({ bottom: "36vp", })
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-        .messageAnimationStyle()
-        .onAppear(() => {
-          this.messageTransitionEffect = TransitionEffect.move(TransitionEdge.BOTTOM)
-            .animation({ curve: curves.springMotion(0.6, 0.8) });
-        })
-        .cachedCount(BaseConstants.LAZY_FOR_EACH_CACHED_COUNT)
-        .onReachEnd(() => {
-          this.isAtEnd = true;
-        })
-        .onDidScroll((scrollOffset: number, scrollState: ScrollState) => {
-          // Logger.debug('ChatDetail onDidScroll scrollOffset: ' + scrollOffset + ' scrollState: ' + scrollState);
-          if (this.isScrollingDueToReplyToMessage) {
-            if (scrollState === ScrollState.Fling && Math.abs(scrollOffset) < 20) {
-              Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage: ' +
-              this.scrollToRepliedMessageIndex);
-              this.isScrollingDueToReplyToMessage = false;
+          .width(BaseConstants.FULL_WIDTH)
+          .padding({ bottom: "39vp", })
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+          .messageAnimationStyle()
+          .onAppear(() => {
+            this.messageTransitionEffect = TransitionEffect.move(TransitionEdge.BOTTOM)
+              .animation({ curve: curves.springMotion(0.6, 0.8) });
+          })
+          .cachedCount(BaseConstants.LAZY_FOR_EACH_CACHED_COUNT)
+          .onReachEnd(() => {
+            this.isAtEnd = true;
+          })
+          .onDidScroll((scrollOffset: number, scrollState: ScrollState) => {
+            // Logger.debug('ChatDetail onDidScroll scrollOffset: ' + scrollOffset + ' scrollState: ' + scrollState);
+            if (this.isScrollingDueToReplyToMessage) {
+              if (scrollState === ScrollState.Fling && Math.abs(scrollOffset) < 20) {
+                Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage: ' +
+                  this.scrollToRepliedMessageIndex);
+                this.isScrollingDueToReplyToMessage = false;
 
-              Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 1: ' +
-                (this.scrollToRepliedMessageIndex + BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
-              this.messageListScroller.scrollToIndex(this.scrollToRepliedMessageIndex +
-              BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER, false, ScrollAlign.CENTER);
+                Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 1: ' +
+                  (this.scrollToRepliedMessageIndex + BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
+                this.messageListScroller.scrollToIndex(this.scrollToRepliedMessageIndex +
+                  BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER, false, ScrollAlign.CENTER);
 
-              this.shouldTransferToOnScrollIndex = true;
-              this.beforeFinalScrollIndex = this.scrollToRepliedMessageIndex +
-              BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER;
-              Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 1 beforeFinalScrollIndex: ' +
-              this.beforeFinalScrollIndex);
-              this.scrollToRepliedMessageIndex = -1;
+                this.shouldTransferToOnScrollIndex = true;
+                this.beforeFinalScrollIndex = this.scrollToRepliedMessageIndex +
+                  BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER;
+                Logger.debug('ChatDetail onDidScroll isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 1 beforeFinalScrollIndex: ' +
+                  this.beforeFinalScrollIndex);
+                this.scrollToRepliedMessageIndex = -1;
+              }
             }
-          }
-        })
-        .onScrollIndex((start, end, center) => {
-          Logger.debug('ChatDetail onScrollIndex start: ' + start + ' end: ' + end + ' center: ' + center);
-          if (this.shouldTransferToOnScrollIndex) {
-            if (center === this.beforeFinalScrollIndex) {
-              this.shouldTransferToOnScrollIndex = false;
+          })
+          .onScrollIndex((start, end, center) => {
+            Logger.debug('ChatDetail onScrollIndex start: ' + start + ' end: ' + end + ' center: ' + center);
+            if (this.shouldTransferToOnScrollIndex) {
+              if (center === this.beforeFinalScrollIndex) {
+                this.shouldTransferToOnScrollIndex = false;
 
-              Logger.debug('ChatDetail onScrollIndex isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 2: ' +
-              this.beforeFinalScrollIndex);
-              this.messageListScroller.scrollToIndex(this.beforeFinalScrollIndex -
-              BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER, true, ScrollAlign.CENTER);
+                Logger.debug('ChatDetail onScrollIndex isScrollingDueToReplyToMessage smoothly scrollToIndex sub-step 2: ' +
+                  this.beforeFinalScrollIndex);
+                this.messageListScroller.scrollToIndex(this.beforeFinalScrollIndex -
+                  BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER, true, ScrollAlign.CENTER);
 
-              this.beforeFinalScrollIndex = -1;
+                this.beforeFinalScrollIndex = -1;
+              }
             }
-          }
-        })
+          })
 
         Row() {
           ChatDetailBottom({
             isShowMediaSheet: this.isShowMediaSheet,
+            replyToMessageId: this.replyToMessageId,
           })
         }
       }
       .height(BaseConstants.FULL_HEIGHT)
-      .width(BaseConstants.FULL_WIDTH)
+        .width(BaseConstants.FULL_WIDTH)
     }
     .expandSafeArea([SafeAreaType.SYSTEM])
-    .title(this.currentChatUserName, {
-      backgroundColor: this.titleAndTabBarColor,
-      backgroundBlurStyle: this.blurStyle,
-      barStyle: BarStyle.STACK,
-    })
-    // .hideTitleBar(true)
-    .blur(this.isShowMediaSheet ? this.continuousChatDetailBlurRadius : 0)
+      .title(this.currentChatUserName, {
+        backgroundColor: this.titleAndTabBarColor,
+        backgroundBlurStyle: this.blurStyle,
+        barStyle: BarStyle.STACK,
+      })
+      // .hideTitleBar(true)
+      .blur(this.isShowMediaSheet ? this.continuousChatDetailBlurRadius : 0)
 
     // .animatableBlur(this.discreteChatDetailBlurRadius == 0 ? 0 : this.continuousChatDetailBlurRadius)
   }

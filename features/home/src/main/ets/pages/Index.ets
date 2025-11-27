@@ -68,6 +68,7 @@ import { SeenChat } from '../entities/SeenChat';
 import { seenChatDao } from '../dao/SeenChatDao';
 import { ForumTopicList } from './Chat/Group/ForumTopicList';
 import { EventConstants } from '../constants/EventConstants';
+import { Contacts } from './Contacts';
 
 
 @Entry
@@ -264,7 +265,7 @@ export struct Index {
   PageMap(name: string) {
     if (name === 'ChatDetail') {
       ChatDetail({
-        isInChatDetailPage: this.isInChatDetailPage
+        isInChatDetailPage: this.isInChatDetailPage,
       });
     } else if (name === "TopicList") {
       ForumTopicList({
@@ -341,16 +342,7 @@ export struct Index {
           .expandSafeArea([SafeAreaType.SYSTEM])
 
           TabContent() {
-            // Text(HomeConstants.TAB_BAR_TEXTS[1])
-            //   .fontSize(30)
-            List() {
-              ForEach(Array(100).fill("hi"), (item: string) => {
-                ListItem() {
-                  Text(item)
-                    .fontSize(30)
-                }
-              }, (item: string, index) => index + JSON.stringify(item))
-            }
+            Contacts()
           }
           .tabBar(new BottomTabBarStyle({
             normal: HomeConstants.TAB_BAR_ICONS[1],

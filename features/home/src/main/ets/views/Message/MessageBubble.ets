@@ -144,14 +144,7 @@ export struct MessageBubble {
           Stack({ alignContent: !this.message?.outgoing ? Alignment.TopStart : Alignment.TopEnd }) {
             Column() {
               if ((!this.message?.outgoing) && (this.chatType != ChatType.User)) {
-                Row() {
-                  Text(this.message?.senderName)
-                    .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
-                    .fontWeight(FontWeight.Bold)
-                    .textAlign(TextAlign.Start)
-                  Blank()
-                }
-                .alignSelf(ItemAlign.Start)
+                this.SenderName(this.message?.senderName ?? "")
               }
 
               Column() {
@@ -365,13 +358,7 @@ export struct MessageBubble {
               this.loadMedia()
             })
         } else {
-          LoadingProgress()
-            .color(Color.Blue)
-            .layoutWeight(1)
-            .size({
-              width: "10%",
-              height: "10%"
-            })
+          Loading()
         }
       }
     }
@@ -405,4 +392,27 @@ export struct MessageBubble {
       this.mediaLoaded = true;
     }
   }
+
+  @Builder
+  SenderName(senderName: string) {
+    Row() {
+      Text(senderName)
+        .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
+        .fontWeight(FontWeight.Bold)
+        .textAlign(TextAlign.Start)
+      Blank()
+    }
+    .alignSelf(ItemAlign.Start)
+  }
+}
+
+@Builder
+function Loading() {
+  LoadingProgress()
+    .color(Color.Blue)
+    .layoutWeight(1)
+    .size({
+      width: "10%",
+      height: "10%"
+    })
 }

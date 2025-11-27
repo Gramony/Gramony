@@ -30,7 +30,7 @@ import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 const MAX_BLUR_RADIUS = 20;
 
 @AnimatableExtend(Tabs)
-function animatableBarHeight(height: number | string) {
+  function animatableBarHeight(height: number | string) {
   .barHeight(height)
 }
 
@@ -53,6 +53,7 @@ export struct ChatDetailBottom {
   @State mediaSheetTitle: Resource = $r('app.string.gallery');
   @State selectedMedias: Array<string> = [];
   @Consume currentChatId: string;
+  @Link replyToMessageId: number | undefined;
 
   @Builder
   MediaTab() {
@@ -102,7 +103,7 @@ export struct ChatDetailBottom {
           text: $text,
           sendMessage: this.sendMessage,
           currentDetents: this.currentDetents,
-          title: $mediaSheetTitle,
+          title: $mediaSheetTitle,          
           selectedMedias: $selectedMedias,
         })
       }
@@ -112,7 +113,7 @@ export struct ChatDetailBottom {
       })
     }
     .height("100%")
-    .width("100%")
+      .width("100%")
   }
 
   build() {
@@ -121,45 +122,45 @@ export struct ChatDetailBottom {
         StandardIcon({ icon: $r('app.media.ic_public_app') })
       }
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
-      .padding({
-        right: $r('app.float.chat_detail_bottom_padding'),
-        left: $r('app.float.chat_detail_bottom_padding'),
-      })
-      .bindSheet($$this.isShowMediaSheet, this.MediaSheet(), {
-        height: "75%",
-        dragBar: false,
-        detents: [SheetSize.MEDIUM, "100%"],
-        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-        onAppear: () => {
-        },
-        onHeightDidChange: (height: number) => {
-          Logger.debug("MediaSheet onHeightDidChange: " + height);
-          this.continuousChatDetailBlurRadius = height / (700 * 3.25) * MAX_BLUR_RADIUS;
-        },
-        onWillDisappear: () => {
-          Logger.debug("MediaSheet onWillDisappear");
-          this.discreteChatDetailBlurRadius = 0;
-          this.isShowMediaSheet = false;
-        },
-        onDisappear: () => {
-          Logger.debug("MediaSheet onDisappear before unset isShowMediaSheet state: " + this.isShowMediaSheet);
-          this.isShowMediaSheet = false;
-          this.selectedMediaCount = 0;
-          Logger.debug("MediaSheet onDisappear after unset isShowMediaSheet state: " + this.isShowMediaSheet);
-        },
-        onDetentsDidChange: (detents: number) => {
-          Logger.debug("MediaSheet onDetentsDidChange: " + detents);
-          this.currentDetents = detents;
-        },
-        title: {
-          title: this.mediaSheetTitle
-        }
-      })
-      .onClick(() => {
-        Logger.debug("MediaSheet onClick");
-        this.isShowMediaSheet = !this.isShowMediaSheet;
-        Logger.debug("MediaSheet onclick current isShowMediaSheet state: " + this.isShowMediaSheet);
-      })
+        .padding({
+          right: $r('app.float.chat_detail_bottom_padding'),
+          left: $r('app.float.chat_detail_bottom_padding'),
+        })
+        .bindSheet($$this.isShowMediaSheet, this.MediaSheet(), {
+          height: "75%",
+          dragBar: false,
+          detents: [SheetSize.MEDIUM, "100%"],
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          onAppear: () => {
+          },
+          onHeightDidChange: (height: number) => {
+            Logger.debug("MediaSheet onHeightDidChange: " + height);
+            this.continuousChatDetailBlurRadius = height / (700 * 3.25) * MAX_BLUR_RADIUS;
+          },
+          onWillDisappear: () => {
+            Logger.debug("MediaSheet onWillDisappear");
+            this.discreteChatDetailBlurRadius = 0;
+            this.isShowMediaSheet = false;
+          },
+          onDisappear: () => {
+            Logger.debug("MediaSheet onDisappear before unset isShowMediaSheet state: " + this.isShowMediaSheet);
+            this.isShowMediaSheet = false;
+            this.selectedMediaCount = 0;
+            Logger.debug("MediaSheet onDisappear after unset isShowMediaSheet state: " + this.isShowMediaSheet);
+          },
+          onDetentsDidChange: (detents: number) => {
+            Logger.debug("MediaSheet onDetentsDidChange: " + detents);
+            this.currentDetents = detents;
+          },
+          title: {
+            title: this.mediaSheetTitle
+          }
+        })
+        .onClick(() => {
+          Logger.debug("MediaSheet onClick");
+          this.isShowMediaSheet = !this.isShowMediaSheet;
+          Logger.debug("MediaSheet onclick current isShowMediaSheet state: " + this.isShowMediaSheet);
+        })
 
       Blank()
       Column() {
@@ -194,10 +195,10 @@ export struct ChatDetailBottom {
         StandardIcon({ icon: $r('app.media.ic_public_emoji') })
       }
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
-      .padding({
-        left: $r('app.float.chat_detail_bottom_padding'),
-        right: $r('app.float.chat_detail_bottom_padding'),
-      })
+        .padding({
+          left: $r('app.float.chat_detail_bottom_padding'),
+          right: $r('app.float.chat_detail_bottom_padding'),
+        })
 
 
       Column() {
@@ -212,19 +213,19 @@ export struct ChatDetailBottom {
       top: $r('app.float.chat_detail_bottom_padding'),
       bottom: $r('app.float.chat_detail_bottom_padding'),
     })
-    .width(BaseConstants.FULL_WIDTH)
-    // .height($r('app.float.chat_detail_bottom_height'))
-    // .backgroundColor($r('app.color.background_color_grey'))
-    .backgroundBlurStyle(BlurStyle.Thin)
-    .backgroundColor(Color.Transparent)
-    .expandSafeArea([SafeAreaType.SYSTEM])
+      .width(BaseConstants.FULL_WIDTH)
+      // .height($r('app.float.chat_detail_bottom_height'))
+      // .backgroundColor($r('app.color.background_color_grey'))
+      .backgroundBlurStyle(BlurStyle.Thin)
+      .backgroundColor(Color.Transparent)
+      .expandSafeArea([SafeAreaType.SYSTEM])
   }
 
   sendMessage() {
     if (this.currentChatId) {
       // send message
       Logger.debug("sendMessage: " + this.text + " to " + this.currentChatId);
-      sendMessage(parseInt(this.currentChatId), this.text, undefined, this.updateProgress)
+      sendMessage(parseInt(this.currentChatId), this.text, this.replyToMessageId, undefined, this.updateProgress)
         .then((message: NativeMessage[]) => {
           Logger.debug("sendMessage success: " + message[0].text);
           let chat = this.chatDataSource.get(this.currentChatId);
