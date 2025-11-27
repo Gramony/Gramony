@@ -125,6 +125,7 @@ export struct ChatDetail {
         }
         .height(BaseConstants.FULL_HEIGHT)
         .width(BaseConstants.FULL_WIDTH)
+        .padding({ bottom: "36vp", })
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .messageAnimationStyle()
         .onAppear(() => {
