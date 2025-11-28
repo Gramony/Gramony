@@ -14,7 +14,6 @@ export struct ReplyToPreview {
   private message = this.messagesOfChatMap.get(this.currentChatId)?.getMessageById(this.replyToMessageId);
 
   build() {
-
     Row() {
       Blank()
         .color(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_DIVIDER_COLOR)
@@ -72,5 +71,6 @@ export struct ReplyToPreview {
     .padding(8)
     .backgroundColor(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_BACKGROUND_COLOR)
     .borderRadius(8)
+    .width("100%")
   }
 }
