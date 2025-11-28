@@ -67,6 +67,10 @@
     {
       "name": "search_placeholder",
       "value": "Cerca"
+    },
+    {
+      "name": "replying_to_message",
+      "value": "Rispondendo al messaggio"
     }
   ]
 }

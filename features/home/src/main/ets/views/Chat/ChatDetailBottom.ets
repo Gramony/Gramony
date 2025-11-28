@@ -62,6 +62,29 @@ export struct ChatDetailBottom {
   }
 
   @Builder
+  SendMsgBtn() {
+    Column() {
+      Button() {
+        SymbolGlyph($r('sys.symbol.paperplane_right_fill'))
+          .fontSize(32)
+          .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+          .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+      }
+        .backgroundColor(Color.Transparent)
+        .width(36)
+        .height(36)
+        .onClick(() => {
+          try {
+            this.sendMessage();
+            Logger.debug("sendMessage: " + this.text);
+          } catch (e) {
+            Logger.error("sendMessage error: " + e.message);
+          }
+        })
+    }
+  }
+
+  @Builder
   MediaSheet() {
     Flex({ direction: FlexDirection.Column }) {
       Scroll() {
@@ -84,10 +107,11 @@ export struct ChatDetailBottom {
       .width("100%")
   }
 
-  build() {
+  @Builder
+  InputRow() {
     Flex({ alignItems: ItemAlign.Center }) {
       Column() {
-        StandardIcon({ icon: $r('app.media.ic_public_app') })
+        StandardIcon({ icon: $r('sys.symbol.more') })
       }
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
         .padding({
@@ -157,23 +181,7 @@ export struct ChatDetailBottom {
       .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
 
       if (this.text.length > 0) {
-        Button() {
-          SymbolGlyph($r('sys.symbol.paperplane_right_fill'))
-            .fontSize(32)
-            .renderingStrategy(SymbolRenderingStrategy.SINGLE)
-            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
-        }
-        .backgroundColor(Color.Transparent)
-          .width(36)
-          .height(36)
-          .onClick(() => {
-            try {
-              this.sendMessage();
-              Logger.debug("sendMessage: " + this.text);
-            } catch (e) {
-              Logger.error("sendMessage error: " + e.message);
-            }
-          })
+        this.SendMsgBtn()
       } else {
         Column() {
           SymbolGlyph($r('sys.symbol.face_smiling'))
@@ -202,16 +210,54 @@ export struct ChatDetailBottom {
         })
       }
     }
+  }
+
+  build() {
+    Column() {
+      if (this.replyToMessageId) {
+        Row() {
+          Text($r('app.string.replying_to_message'))
+            .fontColor($r('app.color.font_color_black_two'))
+            .padding({
+              left: $r('app.float.chat_detail_bottom_padding'),
+              top: $r('app.float.chat_detail_bottom_padding'),
+              bottom: $r('app.float.chat_detail_bottom_padding'),
+            })
+          Text(this.replyToMessageId.toString())
+            .fontColor($r('app.color.font_color_black_two'))
+            .padding({
+              left: $r('app.float.chat_detail_bottom_padding'),
+              top: $r('app.float.chat_detail_bottom_padding'),
+              bottom: $r('app.float.chat_detail_bottom_padding'),
+            })
+          Blank()
+          Button() {
+            SymbolGlyph($r('sys.symbol.xmark'))
+              .fontSize(24)
+              .renderingStrategy(SymbolRenderingStrategy.SINGLE)
+              .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+          }
+            .width(32)
+            .height(32)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.replyToMessageId = undefined;
+            })
+        }
+        .width("100%")
+        .alignItems(VerticalAlign.Center)
+        .justifyContent(FlexAlign.SpaceBetween)
+      }
+      this.InputRow()
+    }
     .padding({
       top: $r('app.float.chat_detail_bottom_padding'),
       bottom: $r('app.float.chat_detail_bottom_padding'),
     })
-      .width(BaseConstants.FULL_WIDTH)
-      // .height($r('app.float.chat_detail_bottom_height'))
-      // .backgroundColor($r('app.color.background_color_grey'))
-      .backgroundBlurStyle(BlurStyle.Thin)
-      .backgroundColor(Color.Transparent)
-      .expandSafeArea([SafeAreaType.SYSTEM])
+    .width(BaseConstants.FULL_WIDTH)
+    .backgroundBlurStyle(BlurStyle.Thin)
+    .backgroundColor(Color.Transparent)
+    .expandSafeArea([SafeAreaType.SYSTEM])
   }
 
   sendMessage() {

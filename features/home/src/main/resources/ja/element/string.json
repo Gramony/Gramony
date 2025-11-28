@@ -67,6 +67,10 @@
     {
       "name": "search_placeholder",
       "value": "検索"
+    },
+    {
+      "name": "replying_to_message",
+      "value": "メッセージに返信しています"
     }
   ]
 }

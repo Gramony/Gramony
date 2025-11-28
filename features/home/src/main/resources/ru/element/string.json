@@ -1,0 +1,76 @@
+{
+  "string": [
+    {
+      "name": "shared_desc",
+      "value": "Описание"
+    },
+    {
+      "name": "message",
+      "value": "Сообщение"
+    },
+    {
+      "name": "reply",
+      "value": "Ответить"
+    },
+    {
+      "name": "reply_selected",
+      "value": "Выбран ответ на сообщение"
+    },
+    {
+      "name": "unsupported_functionality",
+      "value": "Эта функция пока не реализована"
+    },
+    {
+      "name": "wait_a_minute",
+      "value": "Инициализация может занять 5~20 секунд..."
+    },
+    {
+      "name": "check_connectivity",
+      "value": "Проверьте, включен ли глобальный прокси (VPN)"
+    },
+    {
+      "name": "forward",
+      "value": "Переслать"
+    },
+    {
+      "name": "contacts",
+      "value": "Контакты"
+    },
+    {
+      "name": "SocialCircle",
+      "value": "Круг друзей"
+    },
+    {
+      "name": "me",
+      "value": "Мой"
+    },
+    {
+      "name": "gallery",
+      "value": "Галерея"
+    },
+    {
+      "name": "file",
+      "value": "Файл"
+    },
+    {
+      "name": "location",
+      "value": "Местоположение"
+    },
+    {
+      "name": "poll",
+      "value": "Опрос"
+    },
+    {
+      "name": "contact",
+      "value": "Контакт"
+    },
+    {
+      "name": "search_placeholder",
+      "value": "Поиск"
+    },
+    {
+      "name": "replying_to_message",
+      "value": "Ответ на сообщение"
+    }
+  ]
+}

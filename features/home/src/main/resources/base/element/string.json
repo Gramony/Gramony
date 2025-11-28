@@ -67,6 +67,10 @@
     {
       "name": "search_placeholder",
       "value": "搜索"
+    },
+    {
+      "name": "replying_to_message",
+      "value": "正在回复消息"
     }
   ]
 }
