@@ -113,7 +113,7 @@ export struct MessageBubble {
       }) {
         if ((!this.message?.outgoing) && (this.chatType != ChatType.User)) {
           Image("file://" + this.profilePhotoPath)
-            .alt("用户头像")
+            .alt("用户头像 / User avatar [i18n]")
             .width(HomeConstants.PROFILE_PHOTO_SIZE_SMALL)
             .height(HomeConstants.PROFILE_PHOTO_SIZE_SMALL)
             .flexShrink(BaseConstants.FLEX_SHRINK_ZERO)
@@ -338,8 +338,15 @@ export struct MessageBubble {
       Image("file://" + item.thumbSrc)
         .objectFit(ImageFit.Auto)
         .margin({ bottom: $r('app.float.applet_image_bottom') })
-        .borderRadius(6)
+        .borderRadius(5)
         .clip(true)
+        .alt("媒体缩略图 / Media thumbnail [i18n]")
+        .onError((e) => {
+          this.mediaLoaded = false;
+          this.mediaLoadFailed = true;
+        })
+        .draggable(true)
+        .allowDrop(null)
       Image($r('app.media.play'))
         .width('30vp')
         .height('30vp')
@@ -376,7 +383,7 @@ export struct MessageBubble {
     Logger.debug("Media onAppear: " + this.mediaPath);
     // download the image if not exists
     if (!fs.accessSync(this.mediaPath)) {
-      Logger.debug("Media onAppear: media not exists, downloading media");
+      Logger.debug("Media onAppear: media " + this.mediaPath + " not exists, downloading media");
       downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
         .then((path) => {
           Logger.debug("Media onAppear: media downloaded: " + path);

@@ -33,6 +33,7 @@ export struct ChatDetailBottomMediaSheet {
   @Link title: Resource;
   @Link selectedMedias: Array<string>;
   @Prop currentDetents: number;
+  @Link shouldSendMessage: boolean;
   private controller: TabsController = new TabsController();
   private tabsWidth: number = 0;
 
@@ -56,7 +57,7 @@ export struct ChatDetailBottomMediaSheet {
           })
           .onSubmit((enterKey: EnterKeyType) => {
             if (enterKey == EnterKeyType.Send) {
-              this.sendMessage();
+              this.shouldSendMessage = true;
             }
           })
       }
@@ -70,7 +71,7 @@ export struct ChatDetailBottomMediaSheet {
         right: $r('app.float.chat_detail_bottom_padding'),
       })
       .onClick(() => {
-        this.sendMessage();
+        this.shouldSendMessage = true;
       })
     }
     .margin({
@@ -193,9 +194,6 @@ export struct ChatDetailBottomMediaSheet {
     }
     .height('100%')
   }
-
-  private sendMessage: () => void = () => {
-  }; // placeholder
 
   // 获取组件大小、位置、平移缩放旋转及仿射矩阵属性信息。
   private getTextInfo(index: number): Record<string, number> {

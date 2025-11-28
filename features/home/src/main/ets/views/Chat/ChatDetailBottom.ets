@@ -54,6 +54,7 @@ export struct ChatDetailBottom {
   @State selectedMedias: Array<string> = [];
   @Consume currentChatId: string;
   @Link replyToMessageId: number | undefined;
+  @State @Watch('sendMessage') shouldSendMessage: boolean = false;
 
   @Builder
   MediaTab() {
@@ -101,7 +102,7 @@ export struct ChatDetailBottom {
           selectedMediaCount: $selectedMediaCount,
           animate: $animate,
           text: $text,
-          sendMessage: this.sendMessage,
+          shouldSendMessage: $shouldSendMessage,
           currentDetents: this.currentDetents,
           title: $mediaSheetTitle,
           selectedMedias: $selectedMedias,
@@ -194,16 +195,18 @@ export struct ChatDetailBottom {
             .fontSize(32)
             .renderingStrategy(SymbolRenderingStrategy.SINGLE)
             .fontColor([$r('sys.color.ohos_id_color_text_primary')])
-            .backgroundColor(Color.Transparent)
         }
-        .onClick(() => {
-          try {
-            this.sendMessage();
-            Logger.debug("sendMessage: " + this.text);
-          } catch (e) {
-            Logger.error("sendMessage error: " + e.message);
-          }
-        })
+        .backgroundColor(Color.Transparent)
+          .width(48)
+          .height(48)
+          .onClick(() => {
+            try {
+              this.sendMessage();
+              Logger.debug("sendMessage: " + this.text);
+            } catch (e) {
+              Logger.error("sendMessage error: " + e.message);
+            }
+          })
       } else {
         Column() {
           SymbolGlyph($r('sys.symbol.face_smiling'))
@@ -244,11 +247,20 @@ export struct ChatDetailBottom {
       .expandSafeArea([SafeAreaType.SYSTEM])
   }
 
-  sendMessage() {
+  sendMessage(_: boolean = true) {
     if (this.currentChatId) {
       // send message
       Logger.debug("sendMessage: " + this.text + " to " + this.currentChatId);
-      sendMessage(parseInt(this.currentChatId), this.text, this.replyToMessageId, undefined, this.updateProgress)
+      Logger.debug("sendMessage Medias: " + JSON.stringify(this.selectedMedias));
+      const pureArray: string[] = [];
+      this.selectedMedias?.forEach(x => pureArray.push(x));
+      sendMessage(
+        parseInt(this.currentChatId),
+        this.text,
+        this.replyToMessageId,
+        pureArray,
+        this.updateProgress
+      )
         .then((message: NativeMessage[]) => {
           Logger.debug("sendMessage success: " + message[0].text);
           let chat = this.chatDataSource.get(this.currentChatId);

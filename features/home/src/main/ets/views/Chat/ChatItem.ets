@@ -100,6 +100,7 @@ export struct ChatItem {
       top: HomeConstants.CHAT_LIST_ITEM_MARGIN,
       bottom: HomeConstants.CHAT_LIST_ITEM_MARGIN,
     })
+    .hoverEffect(HoverEffect.Highlight)
   }
 
   async aboutToAppear(): Promise<void> {
