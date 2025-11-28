@@ -54,7 +54,7 @@ export struct ChatDetailBottom {
   @State selectedMedias: Array<string> = [];
   @Consume currentChatId: string;
   @Link replyToMessageId: number | undefined;
-  @State @Watch('sendMessage') shouldSendMessage: boolean = false;
+  @State shouldSendMessage: boolean = false;
 
   @Builder
   MediaTab() {
@@ -63,39 +63,6 @@ export struct ChatDetailBottom {
 
   @Builder
   MediaSheet() {
-    // Flex() {
-    //   Tabs({ barPosition: BarPosition.End }) {
-    //     TabContent() {
-    //       Flex({ direction: FlexDirection.Column }) {
-    //         ChatDetailBottomPhotoPicker({
-    //           selectedMediaCount: $selectedMediaCount,
-    //           animate: $animate,
-    //         })
-    //       }
-    //     }
-    //     .tabBar("Photo")
-    //
-    //     TabContent() {
-    //       // Text("Files").fontSize(30)
-    //       // ChatDetailBottomMediaSheet()
-    //     }
-    //     .tabBar("Files")
-    //   }
-    //   .barOverlap(true)
-    //   .barBackgroundBlurStyle(BlurStyle.BACKGROUND_THIN)
-    //   .barHeight(0)
-    //   // .animatableBarHeight(this.selectedMediaCount != 0 ? 0 : 80)
-    //   .onAnimationStart(() => {
-    //     Logger.debug("MediaSheet onAnimationStart");
-    //   })
-    //   .onAnimationEnd(() => {
-    //     Logger.debug("MediaSheet onAnimationEnd");
-    //   })
-    //   .animation({ curve: curves.springMotion() })
-    // }
-    // .height("100%")
-    // .width("100%")
-
     Flex({ direction: FlexDirection.Column }) {
       Scroll() {
         ChatDetailBottomMediaSheet({
@@ -197,8 +164,8 @@ export struct ChatDetailBottom {
             .fontColor([$r('sys.color.ohos_id_color_text_primary')])
         }
         .backgroundColor(Color.Transparent)
-          .width(48)
-          .height(48)
+          .width(36)
+          .height(36)
           .onClick(() => {
             try {
               this.sendMessage();
@@ -247,18 +214,18 @@ export struct ChatDetailBottom {
       .expandSafeArea([SafeAreaType.SYSTEM])
   }
 
-  sendMessage(_: boolean = true) {
+  sendMessage() {
     if (this.currentChatId) {
       // send message
       Logger.debug("sendMessage: " + this.text + " to " + this.currentChatId);
       Logger.debug("sendMessage Medias: " + JSON.stringify(this.selectedMedias));
-      const pureArray: string[] = [];
-      this.selectedMedias?.forEach(x => pureArray.push(x));
+      // const pureArray: string[] = [];
+      // this.selectedMedias?.forEach(x => pureArray.push(x));
       sendMessage(
         parseInt(this.currentChatId),
         this.text,
         this.replyToMessageId,
-        pureArray,
+        undefined,
         this.updateProgress
       )
         .then((message: NativeMessage[]) => {

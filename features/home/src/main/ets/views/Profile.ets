@@ -1,3 +1,5 @@
+import { promptAction } from "@kit.ArkUI"
+
 @ComponentV2
 export struct Profile {
   @Param name: string = ""
@@ -19,19 +21,29 @@ export struct Profile {
         Button('Call')
           .width(100)
           .height(40)
-          .backgroundColor('#2196F3')
-          .fontColor(Color.White)
+          .backgroundColor($r('app.color.background_color_grey'))
+          .onClick(() => {
+            try {
+              promptAction.showToast({
+                message: $r('app.string.unsupported_functionality'),
+                duration: 2000
+              });
+            } catch (e) { }
+          })
         Button('Chat')
           .width(100)
           .height(40)
           .backgroundColor('#4CAF50')
           .fontColor(Color.White)
+          .onClick(() => {
+            try {
+              promptAction.showToast({
+                message: $r('app.string.unsupported_functionality'),
+                duration: 2000
+              });
+            } catch (e) { }
+          })
       }
-
-      Text('Joined: January 2023')
-        .fontSize(14)
-        .fontColor(Color.Gray)
-        .margin({ top: 20 })
 
       Text(this.bio)
         .fontSize(16)

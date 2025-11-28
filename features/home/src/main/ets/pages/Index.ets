@@ -69,6 +69,7 @@ import { seenChatDao } from '../dao/SeenChatDao';
 import { ForumTopicList } from './Chat/Group/ForumTopicList';
 import { EventConstants } from '../constants/EventConstants';
 import { Contacts } from './Contacts';
+import { Me } from './Me';
 
 
 @Entry
@@ -352,9 +353,7 @@ export struct Index {
           )
 
           TabContent() {
-            Text(HomeConstants.TAB_BAR_TEXTS[2])
-              .fontSize(30)
-
+            Me()
           }
           .tabBar(new BottomTabBarStyle({
             normal: HomeConstants.TAB_BAR_ICONS[2],
