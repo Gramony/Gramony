@@ -24,7 +24,7 @@ import { Chat } from '../../entities/Chat';
 import { HashMap } from '@kit.ArkTS';
 import { ChatDataSource } from '../../viewmodel/Chat/ChatDataSource';
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
-import { ChatType } from 'libhomogrape.so';
+import { ChatType, loadHistoryMessages, NativeMessage } from 'libhomogrape.so';
 import { AlertDialog, curves, promptAction } from '@kit.ArkUI';
 
 @AnimatableExtend(NavDestination)
@@ -52,6 +52,7 @@ export struct ChatDetail {
   @Provide scrollToRepliedMessageIndex: number = -1;
   @State messageTransitionEffect: TransitionEffect | undefined = undefined;
   @State replyToMessageId?: number = undefined;
+  @State isLoadingHistory: boolean = false;
 
   private shouldTransferToOnScrollIndex = false;
   private beforeFinalScrollIndex: number = -1;
@@ -99,10 +100,11 @@ export struct ChatDetail {
           SymbolGlyph($r("sys.symbol.arrow_left"))
             .fontColor([$r('sys.color.ohos_id_color_text_primary')])
           Text($r("app.string.reply"))
+            .fontFamily("HarmonyOS Sans Condensed")
         }
       }
         .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
-        .height(56)
+        .height(62)
         .width(90)
         .fontSize(44)
         .onClick((_) => {
@@ -120,10 +122,11 @@ export struct ChatDetail {
           SymbolGlyph($r("sys.symbol.arrow_right"))
             .fontColor([$r('sys.color.ohos_id_color_text_primary')])
           Text($r("app.string.forward"))
+            .fontFamily("HarmonyOS Sans Condensed")
         }
       }
     .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
-        .height(56)
+        .height(62)
         .width(90)
         .fontSize(48)
         .onClick((_) => {
@@ -198,7 +201,7 @@ export struct ChatDetail {
             this.isAtEnd = true;
           })
           .onReachStart(() => {
-            
+            this.loadHistoryMessagesIfNeeded();
           })
           .onDidScroll((scrollOffset: number, scrollState: ScrollState) => {
             // Logger.debug('ChatDetail onDidScroll scrollOffset: ' + scrollOffset + ' scrollState: ' + scrollState);
@@ -271,5 +274,52 @@ export struct ChatDetail {
   }
 
   aboutToDisappear(): void {
+  }
+
+  private async loadHistoryMessagesIfNeeded(): Promise<void> {
+    if (this.isLoadingHistory) {
+      Logger.debug('ChatDetail loadHistoryMessages: already loading, skip');
+      return;
+    }
+
+    const messageDataSource = this.messagesOfChatMap.get(this.currentChatId);
+    if (!messageDataSource || messageDataSource.totalCount() === 0) {
+      Logger.debug('ChatDetail loadHistoryMessages: no messages in current chat');
+      return;
+    }
+
+    // 获取当前最早的消息 ID
+    const oldestMessage = messageDataSource.get(0);
+    const oldestMessageId = oldestMessage?.messageId;
+
+    if (!oldestMessageId) {
+      Logger.debug('ChatDetail loadHistoryMessages: cannot get oldest message id');
+      return;
+    }
+
+    this.isLoadingHistory = true;
+    Logger.debug('ChatDetail loadHistoryMessages: loading history before message ' + oldestMessageId);
+
+    try {
+      const chatId = parseInt(this.currentChatId);
+      const historyMessages: NativeMessage[] = await loadHistoryMessages(chatId, oldestMessageId, 20);
+
+      if (historyMessages.length > 0) {
+        Logger.debug('ChatDetail loadHistoryMessages: loaded ' + historyMessages.length + ' history messages');
+
+        // 将 NativeMessage 转换为 Message 并添加到数据源
+        const messages = historyMessages.map((nativeMsg: NativeMessage) => Message.fromNative(nativeMsg));
+        messageDataSource.append(messages);
+
+        // 更新长度
+        this.length = messageDataSource.totalCount();
+      } else {
+        Logger.debug('ChatDetail loadHistoryMessages: no more history messages');
+      }
+    } catch (error) {
+      Logger.error('ChatDetail loadHistoryMessages: failed to load history: ' + (error as Error).message);
+    } finally {
+      this.isLoadingHistory = false;
+    }
   }
 }
