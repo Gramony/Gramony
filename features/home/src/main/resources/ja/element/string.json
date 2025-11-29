@@ -5,6 +5,10 @@
       "value": "description"
     },
     {
+      "name": "loading",
+      "value": "読み込み中..."
+    },
+    {
       "name": "message",
       "value": "メッセージ"
     },

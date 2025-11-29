@@ -5,6 +5,10 @@
       "value": "Описание"
     },
     {
+      "name": "loading",
+      "value": "Загрузка..."
+    },
+    {
       "name": "message",
       "value": "Сообщение"
     },

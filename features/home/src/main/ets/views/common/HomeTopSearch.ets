@@ -40,7 +40,7 @@ export struct HomeTopSearch {
           this.searchBar()
         }
         .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
-        .margin({ right: $r('app.float.icon_margin_two') })
+          .margin({ right: $r('app.float.icon_margin_two') })
       } else {
         Blank()
         StandardIcon({ icon: $r('app.media.ic_public_search') })
@@ -48,16 +48,21 @@ export struct HomeTopSearch {
       }
       Column() {
         // StandardIcon({ icon: $r('app.media.ic_public_add_norm') })
-        CircleButton({icon: $r('sys.symbol.search_things')})
+        CircleButton({ icon: $r('sys.symbol.search_things') })
           .flexBasis(HomeConstants.FLEX_BASIS_AUTO)
       }
       .margin({ right: $r('app.float.phone_icon_right') })
     }
     .expandSafeArea([SafeAreaType.SYSTEM])
-    .width(BaseConstants.FULL_WIDTH)
-    .backgroundBlurStyle(BlurStyle.Thin)
-    .backgroundColor(Color.Transparent)
-    .padding({ left: $r('app.float.phone_icon_left'),top: deviceInfo.deviceType === BaseConstants.DEVICE_2IN1 ? $r('app.float.zero') : $r('app.float.device_padding_top') })
+      .width(BaseConstants.FULL_WIDTH)
+      .backgroundBlurStyle(BlurStyle.Thin)
+      .backgroundColor(Color.Transparent)
+      .padding({
+        left: $r('app.float.phone_icon_left'),
+        top: /* deviceInfo.deviceType === BaseConstants.DEVICE_2IN1 ?
+          $r('app.float.zero') : */ $r('app.float.device_padding_top'),
+        bottom: $r('app.float.top_nav_pad_btm'),
+      })
   }
 
   @Builder
@@ -87,10 +92,10 @@ export struct HomeTopSearch {
           .margin({ left: $r('app.float.add_icon_left') })
       }
       .alignSelf(ItemAlign.Center)
-      .layoutWeight(BaseConstants.LAYOUT_WEIGHT_ONE)
+        .layoutWeight(BaseConstants.LAYOUT_WEIGHT_ONE)
     }
     .justifyContent(FlexAlign.Center)
-    .width(BaseConstants.FULL_WIDTH)
+      .width(BaseConstants.FULL_WIDTH)
     // .height(BaseConstants.FULL_HEIGHT)
   }
 }

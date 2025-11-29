@@ -5,6 +5,10 @@
       "value": "descrizione"
     },
     {
+      "name": "loading",
+      "value": "Caricamento in corso..."
+    },
+    {
       "name": "message",
       "value": "Messaggio"
     },

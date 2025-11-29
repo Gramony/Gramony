@@ -490,7 +490,11 @@
     },
     {
       "name": "device_padding_top",
-      "value": "36vp"
+      "value": "28vp"
+    },
+    {
+      "name": "top_nav_pad_btm",
+      "value": "12vp"
     },
     {
       "name": "chat_list_divider_stroke_width",

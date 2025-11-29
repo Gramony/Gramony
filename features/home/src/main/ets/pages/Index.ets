@@ -179,7 +179,7 @@ export struct Index {
             width: HomeConstants.NAV_TITLE_FONT_SIZE_LARGE,
             height: HomeConstants.NAV_TITLE_FONT_SIZE_LARGE
           })
-        Text('加载中...')
+        Text($r('app.string.loading'))
           .fontColor('#182431')
           .fontSize(HomeConstants.NAV_TITLE_FONT_SIZE_LARGE)
           .lineHeight(41)
@@ -337,9 +337,6 @@ export struct Index {
             normal: HomeConstants.TAB_BAR_ICONS[0],
             selected: HomeConstants.TAB_BAR_SELECTED_ICONS[0],
           }, HomeConstants.TAB_BAR_TEXTS[0]))
-          .margin({
-            // top: 56
-          })
           .expandSafeArea([SafeAreaType.SYSTEM])
 
           TabContent() {
