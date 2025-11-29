@@ -177,6 +177,11 @@ export struct ProfilePage {
       .width('100%').height('100%').padding(16)
     }
     .title(this.user?.fullName ?? this.title, { barStyle: BarStyle.STACK })
+    .onAppear(() => {
+      if (!this.user) {
+        
+      }
+    })
     .onReady((context: NavDestinationContext) => {
       this.pathStack = context.pathStack;
       this.pageParam = context.pathInfo.param as string;

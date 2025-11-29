@@ -130,14 +130,30 @@ export struct MessageBubble {
             })
             .onClick(() => {
               const id = this.message?.senderId;
-              this.getUIContext().getPromptAction().showToast({
-                message: `点击头像：${this.message?.senderName} / ${id}`,
-                duration: 2000,
-                showMode: promptAction.ToastShowMode.DEFAULT,
-                bottom: 80
-              });
               if (!id) return;
-              this.pageInfo.pushPath({ name: "ProfilePage", param: id });
+
+              this.getUIContext().showActionSheet({
+                title: this.message?.senderName ?? '用户',
+                message: '',
+                autoCancel: true,
+                alignment: DialogAlignment.Bottom,
+                sheets: [
+                  {
+                    title: '发送消息',
+                    action: () => {
+                      // 跳转到与该用户的聊天页面
+                      this.currentChatId = id.toString();
+                      this.pageInfo.pushPath({ name: 'ChatDetail' });
+                    }
+                  },
+                  {
+                    title: '查看资料',
+                    action: () => {
+                      this.pageInfo.pushPath({ name: "ProfilePage", param: id });
+                    }
+                  }
+                ],
+              });
             })
         }
         Column() {

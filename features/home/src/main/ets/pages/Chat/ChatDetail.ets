@@ -197,6 +197,9 @@ export struct ChatDetail {
           .onReachEnd(() => {
             this.isAtEnd = true;
           })
+          .onReachStart(() => {
+            
+          })
           .onDidScroll((scrollOffset: number, scrollState: ScrollState) => {
             // Logger.debug('ChatDetail onDidScroll scrollOffset: ' + scrollOffset + ' scrollState: ' + scrollState);
             if (this.isScrollingDueToReplyToMessage) {
