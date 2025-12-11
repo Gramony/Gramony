@@ -5,10 +5,11 @@ import {
   getProfilePhotoPathAndCount,
   NativeSeenChat,
   downloadProfilePhoto,
-  ChatType
+  ChatType,
+  MessageEntityType
 } from 'libhomogrape.so';
 import { HomeConstants } from '../../constants/HomeConstants';
-import { Message } from '../../entities/Message';
+import { Message, MessageEntity } from '../../entities/Message';
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { HashMap } from '@kit.ArkTS';
 import { SeenChat } from '../../entities/SeenChat';
@@ -18,7 +19,7 @@ import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } from '@lyb/media-preview';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, LengthMetrics } from '@kit.ArkUI';
 
 enum DefaultMediaType {
   IMAGE,
@@ -65,6 +66,7 @@ export struct MessageBubble {
   @State profilePhotoPixelMap: PixelMap | undefined = undefined;
   @State mediaPreviewIndex: number = -1;
   @State mediaResources: DefaultMediaModel[] = [];
+  @State styledString: StyledString | undefined = undefined;
   @Consume currentChatId: string;
   @Consume isScrollingDueToReplyToMessage: boolean;
   @Consume scrollToRepliedMessageIndex: number;
@@ -73,6 +75,7 @@ export struct MessageBubble {
   private content: string = "";
   private isAppletMsg?: boolean = false;
   private isDocumentMsg?: boolean = false;
+  private textController: TextController = new TextController();
   private message? = new Message(
     1,
     1,
@@ -252,12 +255,16 @@ export struct MessageBubble {
                 // }
                 Row() {
                   Blank()
-                  if (this.message?.view_count && this.message.view_count > 0) {
-                    Text(`查看 ${this.message.view_count} 次 `)
+                  if (this.message?.viewCount && this.message.viewCount > 0) {
+                    Text(`󰄠 ${this.message.viewCount}  `)
+                    .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+                    .fontColor(HomeConstants.MESSAGE_TIME_COLOR)
+                    .fontFamily("HarmonyOS Sans Condensed")
                   }
                   Text(DateHelper.getParsedDateString(this.message?.timestamp))
                     .fontSize(BaseConstants.FONT_SIZE_TWELVE)
                     .fontColor(HomeConstants.MESSAGE_TIME_COLOR)
+                    .fontFamily("HarmonyOS Sans Condensed")
                   if (this.message?.outgoing) {
                     Text(' ')
                     Text() {
@@ -334,18 +341,280 @@ export struct MessageBubble {
         new DefaultMediaModel(this.mediaPath, this.mediaPath)
       ];
     }
+    // 构建 StyledString 用于富文本渲染
+    this.buildStyledString();
+  }
+
+  /**
+   * 根据 fmtEntities 构建 StyledString 用于富文本显示
+   */
+  private buildStyledString(): void {
+    const text = this.message?.text ?? '';
+    if (text.length === 0) {
+      this.styledString = undefined;
+      return;
+    }
+
+    const entities = this.message?.fmtEntities;
+    if (!entities || entities.length === 0) {
+      // 没有格式化实体，不使用 StyledString，直接使用普通文本
+      this.styledString = undefined;
+      return;
+    }
+
+    // 创建可变属性字符串
+    const mutableStyledString = new MutableStyledString(text);
+
+    // 遍历所有格式化实体并应用样式
+    for (const entity of entities) {
+      this.applyEntityStyle(mutableStyledString, entity);
+    }
+
+    this.styledString = mutableStyledString;
+  }
+
+  /**
+   * 根据实体类型应用对应的样式
+   */
+  private applyEntityStyle(styledString: MutableStyledString, entity: MessageEntity): void {
+    const start = entity.offset;
+    const length = entity.length;
+
+    // 确保范围有效
+    const text = this.message?.text ?? '';
+    if (start < 0 || start >= text.length || length <= 0) {
+      return;
+    }
+
+    const actualLength = Math.min(length, text.length - start);
+
+    try {
+      switch (entity.entityType) {
+        case MessageEntityType.Bold:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontWeight: FontWeight.Bold })
+          });
+          break;
+
+        case MessageEntityType.Italic:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontStyle: FontStyle.Italic })
+          });
+          break;
+
+        case MessageEntityType.Underline:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.DECORATION,
+            styledValue: new DecorationStyle({ type: TextDecorationType.Underline, color: Color.Black })
+          });
+          break;
+
+        case MessageEntityType.Strike:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.DECORATION,
+            styledValue: new DecorationStyle({ type: TextDecorationType.LineThrough, color: Color.Black })
+          });
+          break;
+
+        case MessageEntityType.Code:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontFamily: 'monospace' })
+          });
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.BACKGROUND_COLOR,
+            styledValue: new BackgroundColorStyle({ color: '#E8E8E8', radius: 4 })
+          });
+          break;
+
+        case MessageEntityType.Pre:
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontFamily: 'monospace' })
+          });
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.BACKGROUND_COLOR,
+            styledValue: new BackgroundColorStyle({ color: '#F0F0F0', radius: 4 })
+          });
+          break;
+
+        case MessageEntityType.TextUrl:
+          // 超链接样式：蓝色 + 下划线
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7' })
+          });
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.DECORATION,
+            styledValue: new DecorationStyle({ type: TextDecorationType.Underline, color: '#0A59F7' })
+          });
+          // 如果有 URL，设置点击事件
+          if (entity.url) {
+            styledString.setStyle({
+              start: start,
+              length: actualLength,
+              styledKey: StyledStringKey.URL,
+              styledValue: new UrlStyle(entity.url)
+            });
+          }
+          break;
+
+        case MessageEntityType.Url:
+        case MessageEntityType.Email:
+          // URL 和邮箱样式：蓝色
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7' })
+          });
+          break;
+
+        case MessageEntityType.Mention:
+        case MessageEntityType.MentionName:
+          // @ 提及样式：蓝色
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7', fontWeight: FontWeight.Medium })
+          });
+          break;
+
+        case MessageEntityType.Hashtag:
+        case MessageEntityType.Cashtag:
+          // 标签样式：蓝色
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7' })
+          });
+          break;
+
+        case MessageEntityType.BotCommand:
+          // Bot 命令样式：蓝色
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7' })
+          });
+          break;
+
+        case MessageEntityType.Spoiler:
+          // 剧透样式：灰色背景（模糊效果需要特殊处理）
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.BACKGROUND_COLOR,
+            styledValue: new BackgroundColorStyle({ color: '#808080', radius: 4 })
+          });
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#808080' })
+          });
+          break;
+
+        case MessageEntityType.Blockquote:
+          // 引用块样式：灰色背景 + 左边距
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.BACKGROUND_COLOR,
+            styledValue: new BackgroundColorStyle({ color: '#F5F5F5', radius: 4 })
+          });
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#666666' })
+          });
+          break;
+
+        case MessageEntityType.Phone:
+          // 电话号码样式
+          styledString.setStyle({
+            start: start,
+            length: actualLength,
+            styledKey: StyledStringKey.FONT,
+            styledValue: new TextStyle({ fontColor: '#0A59F7' })
+          });
+          break;
+
+        case MessageEntityType.CustomEmoji:
+          // 自定义表情：暂不处理，需要加载表情图片
+          break;
+
+        default:
+          // 未知类型，不处理
+          break;
+      }
+    } catch (e) {
+      Logger.error(`Failed to apply entity style: ${JSON.stringify(entity)}, error: ${e}`);
+    }
   }
 
   @Builder
   MessageContent() {
-    Text(this.message?.text)
-      .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
-      .fontFamily(BaseConstants.FONT_FAMILY_NORMAL)
-      .fontWeight(BaseConstants.FONT_WEIGHT_FOUR)
-      .lineHeight($r('app.float.chat_default_text_line'))
-      .fontColor($r('sys.color.ohos_id_color_text_primary'))
-      .copyOption(CopyOptions.LocalDevice)
-      .alignSelf(ItemAlign.Start)
+    if (this.styledString && this.message?.text && this.message.text.length > 0) {
+      // 使用 StyledString 渲染富文本
+      // 先显示原始文本，然后通过 controller 应用样式
+      Text(this.message.text, { controller: this.textController })
+        .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
+        .fontFamily(BaseConstants.FONT_FAMILY_NORMAL)
+        .fontWeight(BaseConstants.FONT_WEIGHT_FOUR)
+        .lineHeight($r('app.float.chat_default_text_line'))
+        .fontColor($r('sys.color.ohos_id_color_text_primary'))
+        .copyOption(CopyOptions.LocalDevice)
+        .alignSelf(ItemAlign.Start)
+        .onAppear(() => {
+          // 延迟执行以确保布局完成
+          setTimeout(() => {
+            if (this.styledString) {
+              try {
+                this.textController.setStyledString(this.styledString);
+              } catch (e) {
+                Logger.error(`Failed to set styled string: ${e}`);
+              }
+            }
+          }, 16); // 等待一帧
+        })
+    } else {
+      // 普通文本渲染
+      Text(this.message?.text)
+        .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
+        .fontFamily(BaseConstants.FONT_FAMILY_NORMAL)
+        .fontWeight(BaseConstants.FONT_WEIGHT_FOUR)
+        .lineHeight($r('app.float.chat_default_text_line'))
+        .fontColor($r('sys.color.ohos_id_color_text_primary'))
+        .copyOption(CopyOptions.LocalDevice)
+        .alignSelf(ItemAlign.Start)
+    }
   }
 
   @Builder

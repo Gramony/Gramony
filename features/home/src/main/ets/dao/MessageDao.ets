@@ -20,6 +20,10 @@ class MessageDao {
     editTimestamp INTEGER,
     groupedId INTEGER,
     replyToMessageId INTEGER,
+    viewCount INTEGER DEFAULT 0,
+    forwardCount INTEGER DEFAULT 0,
+    replyCount INTEGER DEFAULT 0,
+    fmtEntitiesJson TEXT,
   	PRIMARY KEY (chatId, messageId),
     FOREIGN KEY (chatId) REFERENCES chats(chatId) DEFERRABLE INITIALLY DEFERRED
     FOREIGN KEY (senderId) REFERENCES seen_chats(chatId) DEFERRABLE INITIALLY DEFERRED
@@ -34,9 +38,10 @@ class MessageDao {
     return sql.PromiseNull();
   }
 
-  @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, mediaType) " +
+  @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) " +
     "VALUES (#{chatId}, #{messageId}, #{outgoing}, #{pinned}, #{senderId}, #{senderName}, #{timestamp}, #{text}, #{mediaType}," +
-    " #{editTimestamp}, #{groupedId}, #{replyToMessageId})")
+    " #{editTimestamp}, #{groupedId}, #{replyToMessageId}, #{viewCount}, #{forwardCount}, #{replyCount}, #{fmtEntitiesJson})")
   insert(@sql.Param("chatId") chatId: number, @sql.Param("messageId") messageId: number,
     @sql.Param("outgoing") outgoing: boolean,
     @sql.Param("pinned") pinned: boolean, @sql.Param("senderId") senderId: number,
@@ -45,44 +50,60 @@ class MessageDao {
     @sql.Param("mediaType") mediaType: number,
     @sql.Param("editTimestamp") editTimestamp: number,
     @sql.Param("groupedId") groupedId: number,
-    @sql.Param("replyToMessageId") replyToMessageId: number): Promise<void> {
+    @sql.Param("replyToMessageId") replyToMessageId: number,
+    @sql.Param("viewCount") viewCount: number,
+    @sql.Param("forwardCount") forwardCount: number,
+    @sql.Param("replyCount") replyCount: number,
+    @sql.Param("fmtEntitiesJson") fmtEntitiesJson: string): Promise<void> {
     return sql.PromiseNull();
   }
 
   @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
-    "mediaType, editTimestamp, groupedId, replyToMessageId) " +
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) " +
     "VALUES (#{message.chatId}, #{message.messageId}, #{message.outgoing}, #{message.pinned}, #{message.senderId}," +
     "#{message.senderName}, #{message.timestamp}, #{message.text}, #{message.mediaType}, " +
-    "#{message.editTimestamp}, #{message.groupedId}, #{message.replyToMessageId})")
+    "#{message.editTimestamp}, #{message.groupedId}, #{message.replyToMessageId}, " +
+    "#{message.viewCount}, #{message.forwardCount}, #{message.replyCount}, #{message.fmtEntitiesJson})")
   insertMessage(@sql.Param("message") message: Message): Promise<void> {
     return sql.PromiseNull();
   }
 
   @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
-    "mediaType, editTimestamp, groupedId, replyToMessageId) VALUES #{messagesSql}")
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) VALUES #{messagesSql}")
   _insertMessages(@sql.Param("messagesSql", true) messagesSql: string): Promise<void> {
     return sql.PromiseNull();
   }
 
   async insertMessages(messages: Array<Message>): Promise<void> {
     let messagesSql = messages.map((message) => {
+      const fmtJson = message.fmtEntitiesJson ? `"${escapeString(message.fmtEntitiesJson)}"` : 'NULL';
       return `(${message.chatId}, ${message.messageId}, ${message.outgoing}, ${message.pinned}, ${message.senderId},
       "${escapeString(message.senderName)}", ${message.timestamp}, "${escapeString(message.text)}", ${message.mediaType},
-      ${message.editTimestamp || 0}, ${message.groupedId || 0}, ${message.replyToMessageId || 0})`;
+      ${message.editTimestamp || 0}, ${message.groupedId || 0}, ${message.replyToMessageId || 0},
+      ${message.viewCount || 0}, ${message.forwardCount || 0}, ${message.replyCount || 0}, ${fmtJson})`;
     }).join(", ");
     return this._insertMessages(messagesSql);
   }
 
   @sql.SqlQuery("SELECT * FROM messages WHERE chatId = #{chatId} AND messageId = #{messageId}")
   @sql.ReturnType(Message)
-  getMessageById(@sql.Param("chatId") chatId: number, @sql.Param("messageId") messageId: number): Promise<Message> {
-    return sql.PromiseNull();
+  async getMessageById(@sql.Param("chatId") chatId: number, @sql.Param("messageId") messageId: number): Promise<Message> {
+    const msg: Message = await sql.PromiseNull();
+    if (msg) {
+      msg.deserializeFmtEntities();
+    }
+    return msg;
   }
 
   @sql.SqlQuery("SELECT * FROM messages WHERE chatId = #{chatId}")
   @sql.ReturnType([Message])
-  getMessagesByChatId(@sql.Param("chatId") chatId: number): Promise<Array<Message>> {
-    return sql.PromiseNull();
+  async getMessagesByChatId(@sql.Param("chatId") chatId: number): Promise<Array<Message>> {
+    const messages: Array<Message> = await sql.PromiseNull();
+    // 反序列化格式化实体
+    for (const msg of messages) {
+      msg.deserializeFmtEntities();
+    }
+    return messages;
   }
 }
 
