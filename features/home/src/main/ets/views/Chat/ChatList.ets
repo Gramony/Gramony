@@ -134,29 +134,43 @@ export struct ChatList {
               isInTopicPage: this.isInTopicPage
             })
               .onClick(() => {
-                if (this.pageInfo.size() > 1) {
-                  this.pageInfo.pop();
-                }
                 this.currentChatId = item.chatId.toString();
                 let chat = this.chatDataSource.get(this.currentChatId);
                 Logger.debug('ChatList ChatItem onClick chatType: ' + chat?.chatType + ' forum: ' + chat?.forum);
+                
+                // 判断是否为 Split 模式（非 sm 断点）
+                const isSplitMode = this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM;
+                // 判断当前是否已有 ChatDetail 页面
+                const hasChatDetail = this.pageInfo.size() >= 1 && 
+                  this.pageInfo.getParamByName('ChatDetail').length > 0;
+                
                 if (chat?.chatType === ChatType.Group && chat?.forum) {
                   if (this.isInTopicPage) {
                     if (this.currentForumId !== this.currentChatId) {
-                      // this.pageInfo.replacePath({ name: 'TopicList' });
-                      this.pageInfo.pushPath({ name: 'ChatDetail' });
+                      if (isSplitMode && hasChatDetail) {
+                        this.pageInfo.replacePath({ name: 'ChatDetail' });
+                      } else {
+                        this.pageInfo.pushPath({ name: 'ChatDetail' });
+                      }
                     } else {
                       this.currentForumId = "";
                       this.pageInfo.pop();
                       return;
                     }
                   } else {
-                    // this.pageInfo.pushPath({ name: 'TopicList' });
-                    this.pageInfo.pushPath({ name: 'ChatDetail' });
+                    if (isSplitMode && hasChatDetail) {
+                      this.pageInfo.replacePath({ name: 'ChatDetail' });
+                    } else {
+                      this.pageInfo.pushPath({ name: 'ChatDetail' });
+                    }
                   }
                   this.currentForumId = this.currentChatId;
                 } else {
-                  this.pageInfo.pushPath({ name: 'ChatDetail' });
+                  if (isSplitMode && hasChatDetail) {
+                    this.pageInfo.replacePath({ name: 'ChatDetail' });
+                  } else {
+                    this.pageInfo.pushPath({ name: 'ChatDetail' });
+                  }
                 }
               })
               .animation({ curve: curves.springMotion(0.6, 0.8) })
