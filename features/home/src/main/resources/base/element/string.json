@@ -34,7 +34,7 @@
     },
     {
       "name": "login_code_hint",
-      "value": "请输入验证码"
+      "value": "请输入你在已登录的官方客户端上收到的由 Telegram 发来的验证码"
     },
     {
       "name": "login_code_placeholder",

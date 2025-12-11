@@ -20,24 +20,28 @@ export struct VerifyCode {
   build() {
     NavDestination() {
       Column() {
-        Lottie({
-          autoPlay: true,
-          controller: this.controller,
-          animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-passcode-notification.json",
-          loop: true,
-        })
-          .width(256)
-          .height(256)
-        Text($r('app.string.login_code_hint')).margin({ top: 20 })
-        TextInput({ placeholder: $r('app.string.login_code_placeholder'), text: this.code })
-          .type(InputType.Number)
-          .margin({ top: 20 })
-          .onChange((value) => {
-            this.code = value;
+        Column() {
+          Lottie({
+            autoPlay: true,
+            controller: this.controller,
+            animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-passcode-notification.json",
+            loop: true,
           })
-        Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
-          .enabled(!this.isLoading)
-          .onClick(async () => {
+            .width(256)
+            .height(256)
+          Text($r('app.string.login_code_hint')).margin({ top: 20 })
+          TextInput({ placeholder: $r('app.string.login_code_placeholder'), text: this.code })
+            .type(InputType.Number)
+            .margin({ top: 20 })
+            .onChange((value) => {
+              this.code = value;
+            })
+            .fontFamily("HarmonyOS Sans Digit")
+            .fontSize(32)
+
+          Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
+            .enabled(!this.isLoading)
+            .onClick(async () => {
             if (this.code.length == 0) {
               this.errorMessage = 'Please input your verify code';
               this.isError = true;
@@ -76,10 +80,18 @@ export struct VerifyCode {
 
             return;
           })
-          .bindPopup(this.isError, {
-            message: this.errorMessage,
-          })
-      }.padding(20)
+            .bindPopup(this.isError, {
+              message: this.errorMessage,
+            })
+        }
+        .padding(20)
+        .constraintSize({ maxWidth: 400 })
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
     }
+    .hideTitleBar(true)
   }
 }

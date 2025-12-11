@@ -21,29 +21,31 @@ export struct PhoneNumber {
   build() {
     NavDestination() {
       Column() {
-        Lottie({
-          autoPlay: true,
-          controller: this.controller,
-          // animationUri: "https://lottie.host/ab168ead-f877-40cd-90e3-4d09fff05b42/F8ZzJ6R846.json",
-          animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-phone.json",
-          loop: true,
-        })
-          .width(256)
-          .height(256)
-        Text($r('app.string.login_phone_hint')).margin({ top: 20 })
-        TextInput({ placeholder: $r('app.string.login_phone_placeholder'), text: this.phone })
-          .type(InputType.PhoneNumber)
-          .placeholderFont({
-            size: 28,
+        Column() {
+          Lottie({
+            autoPlay: true,
+            controller: this.controller,
+            // animationUri: "https://lottie.host/ab168ead-f877-40cd-90e3-4d09fff05b42/F8ZzJ6R846.json",
+            animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-phone.json",
+            loop: true,
           })
-          .fontSize(28)
-          .margin({ top: 20 })
-          .onChange((value) => {
-            this.phone = value;
-          })
-        Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
-          .enabled(!this.isLoading)
-          .onClick(async () => {
+            .width(256)
+            .height(256)
+          Text($r('app.string.login_phone_hint')).margin({ top: 20 })
+          TextInput({ placeholder: $r('app.string.login_phone_placeholder'), text: this.phone })
+            .type(InputType.PhoneNumber)
+            .placeholderFont({
+              size: 28,
+            })
+            .fontFamily("HarmonyOS Sans Digit")
+            .fontSize(28)
+            .margin({ top: 20 })
+            .onChange((value) => {
+              this.phone = value;
+            })
+          Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
+            .enabled(!this.isLoading)
+            .onClick(async () => {
             if (this.phone.length == 0) {
               this.errorMessage = 'Phone number is empty';
               Logger.error(this.errorMessage);
@@ -82,10 +84,18 @@ export struct PhoneNumber {
 
             return;
           })
-          .bindPopup(this.isError, {
-            message: this.errorMessage,
-          })
-      }.padding(20)
+            .bindPopup(this.isError, {
+              message: this.errorMessage,
+            })
+        }
+        .padding(20)
+        .constraintSize({ maxWidth: 400 })
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
     }
+    .hideTitleBar(true)
   }
 }

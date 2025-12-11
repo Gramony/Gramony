@@ -20,24 +20,25 @@ export struct Password {
   build() {
     NavDestination() {
       Column() {
-        Lottie({
-          autoPlay: true,
-          controller: this.controller,
-          animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-password-unlock.json",
-          loop: true,
-        })
-          .width(256)
-          .height(256)
-        Text($r('app.string.login_password_hint')).margin({ top: 20 })
-        TextInput({ placeholder: $r('app.string.login_password_placeholder'), text: this.password })
-          .type(InputType.Password)
-          .margin({ top: 20 })
-          .onChange((value) => {
-            this.password = value;
+        Column() {
+          Lottie({
+            autoPlay: true,
+            controller: this.controller,
+            animationUri: "https://cdn.jsdelivr.net/npm/tgs-collection/duck-password-unlock.json",
+            loop: true,
           })
-        Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
-          .enabled(!this.isLoading)
-          .onClick(async () => {
+            .width(256)
+            .height(256)
+          Text($r('app.string.login_password_hint')).margin({ top: 20 })
+          TextInput({ placeholder: $r('app.string.login_password_placeholder'), text: this.password })
+            .type(InputType.Password)
+            .margin({ top: 20 })
+            .onChange((value) => {
+              this.password = value;
+            })
+          Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
+            .enabled(!this.isLoading)
+            .onClick(async () => {
             if (this.password.length == 0) {
               this.errorMessage = 'Password is empty';
               Logger.error(this.errorMessage);
@@ -76,7 +77,15 @@ export struct Password {
           .bindPopup(this.isError, {
             message: this.errorMessage,
           })
-      }.padding(20)
+        }
+        .padding(20)
+        .constraintSize({ maxWidth: 400 })
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
     }
+    .hideTitleBar(true)
   }
 }
