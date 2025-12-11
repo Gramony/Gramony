@@ -320,7 +320,7 @@ export struct Index {
         //   scrollBackward: NestedScrollMode.SELF_FIRST
         // })
         Tabs({
-          barPosition: this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
+          barPosition: this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ?
           BarPosition.Start : BarPosition.End
         }) {
           TabContent() {
@@ -338,9 +338,15 @@ export struct Index {
             selected: HomeConstants.TAB_BAR_SELECTED_ICONS[0],
           }, HomeConstants.TAB_BAR_TEXTS[0]))
           .expandSafeArea([SafeAreaType.SYSTEM])
+          .padding({
+            left: this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? $r('app.float.bar_width') : 0
+          })
 
           TabContent() {
             Contacts()
+              .padding({
+                left: this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? $r('app.float.bar_width') : 0
+              })
           }
           .tabBar(new BottomTabBarStyle({
             normal: HomeConstants.TAB_BAR_ICONS[1],
@@ -351,6 +357,9 @@ export struct Index {
 
           TabContent() {
             Me()
+              .padding({
+                left: this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ? $r('app.float.bar_width') : 0
+              })
           }
           .tabBar(new BottomTabBarStyle({
             normal: HomeConstants.TAB_BAR_ICONS[2],
@@ -361,8 +370,8 @@ export struct Index {
         }
         .expandSafeArea([SafeAreaType.SYSTEM])
         .scrollable(false)
-        .vertical(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG)
-        .barWidth(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
+        .vertical(this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
+        .barWidth(this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ?
         $r('app.float.bar_width') : BaseConstants.FULL_PERCENT)
         // .barHeight(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ? BaseConstants.FULL_PERCENT :
         //   (deviceInfo.deviceType === BaseConstants.DEVICE_TYPES[0] ? $r('app.float.tab_size_lg') :
@@ -400,11 +409,13 @@ export struct Index {
         })
       .hideToolBar(true)
       .hideBackButton(true)
-      .navBarWidth(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
+      .navBarWidth(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_XL ?
+      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_XL :
+      (this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
       HomeConstants.NAVIGATION_NAV_BAR_WIDTH_LG :
-      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_MD)
+      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_MD))
       .navDestination(this.PageMap)
-      .mode(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? NavigationMode.Stack :
+      .mode((this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM || !this.isLoggedIn) ? NavigationMode.Stack :
       NavigationMode.Split)
       .width(BaseConstants.FULL_WIDTH)
       .onAppear(async () => {

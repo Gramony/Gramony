@@ -101,6 +101,7 @@ export class HomeConstants {
    */
   static readonly NAVIGATION_NAV_BAR_WIDTH_MD = '50%'
   static readonly NAVIGATION_NAV_BAR_WIDTH_LG = '44.5%'
+  static readonly NAVIGATION_NAV_BAR_WIDTH_XL = '35%'
   /**
    * Home Tab Bar icons and texts
    */

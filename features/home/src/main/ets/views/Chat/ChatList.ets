@@ -178,7 +178,7 @@ export struct ChatList {
 
         ListItem() {
           Row()
-            .height(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ? BaseConstants.FULL_PERCENT :
+            .height((this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG || this.currentBreakpoint === BreakpointConstants.BREAKPOINT_XL) ? BaseConstants.FULL_PERCENT :
               (deviceInfo.deviceType === BaseConstants.DEVICE_TYPES[0] ? $r('app.float.tab_size_lg') :
               $r('app.float.tab_size')))// .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
             .width(BaseConstants.FULL_WIDTH)
@@ -192,7 +192,7 @@ export struct ChatList {
       .cachedCount(BaseConstants.LAZY_FOR_EACH_CACHED_COUNT)
       .padding({
         bottom: deviceInfo.deviceType !== BaseConstants.DEVICE_2IN1 &&
-          this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
+          (this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG || this.currentBreakpoint === BreakpointConstants.BREAKPOINT_XL) ?
         $r('app.float.tab_content_pb') : $r('app.float.zero')
       })
       .onScrollIndex((start, end, center) => {
