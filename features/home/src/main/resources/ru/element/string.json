@@ -9,6 +9,50 @@
       "value": "Загрузка..."
     },
     {
+      "name": "login_phone_hint",
+      "value": "Введите номер телефона"
+    },
+    {
+      "name": "login_phone_placeholder",
+      "value": "+7 912 345 6789"
+    },
+    {
+      "name": "login_phone_empty",
+      "value": "Номер телефона пуст"
+    },
+    {
+      "name": "login_password_hint",
+      "value": "Введите пароль"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "Пароль"
+    },
+    {
+      "name": "login_password_empty",
+      "value": "Пароль пуст"
+    },
+    {
+      "name": "login_code_hint",
+      "value": "Введите код подтверждения"
+    },
+    {
+      "name": "login_code_placeholder",
+      "value": "Введите код"
+    },
+    {
+      "name": "login_code_empty",
+      "value": "Введите код подтверждения"
+    },
+    {
+      "name": "login_sign_in",
+      "value": "Войти"
+    },
+    {
+      "name": "login_failed_retry",
+      "value": "Ошибка входа, попробуйте снова"
+    },
+    {
       "name": "message",
       "value": "Сообщение"
     },

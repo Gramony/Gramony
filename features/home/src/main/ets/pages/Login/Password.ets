@@ -28,14 +28,14 @@ export struct Password {
         })
           .width(256)
           .height(256)
-        Text('Please input your password').margin({ top: 20 })
-        TextInput({ placeholder: 'Password', text: this.password })
+        Text($r('app.string.login_password_hint')).margin({ top: 20 })
+        TextInput({ placeholder: $r('app.string.login_password_placeholder'), text: this.password })
           .type(InputType.Password)
           .margin({ top: 20 })
           .onChange((value) => {
             this.password = value;
           })
-        Button('Sign in').width(150).margin({ top: 20 })
+        Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
           .enabled(!this.isLoading)
           .onClick(async () => {
             if (this.password.length == 0) {
@@ -45,7 +45,7 @@ export struct Password {
               return;
             }
             this.isLoading = true;
-            promptAction.showToast({ message: 'Loading...', duration: 2000 });
+            promptAction.showToast({ message: $r('app.string.loading'), duration: 2000 });
             Logger.debug('Login/Password: ' + this.password);
             let result = await password(this.password);
             if (result == LoginState.LoggedIn) {
@@ -56,7 +56,7 @@ export struct Password {
                 Logger.error(this.errorMessage);
                 this.isError = true;
                 this.isLoading = false;
-                promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
+                promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return; // TODO: should we clear pageInfo here?
@@ -68,7 +68,7 @@ export struct Password {
               Logger.error(this.errorMessage);
               this.isError = true;
               this.isLoading = false;
-              promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
+              promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
             }
 
             return;

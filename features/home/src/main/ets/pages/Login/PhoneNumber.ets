@@ -30,8 +30,8 @@ export struct PhoneNumber {
         })
           .width(256)
           .height(256)
-        Text('Please input your phone number').margin({ top: 20 })
-        TextInput({ placeholder: '+86 123 4567 7890', text: this.phone })
+        Text($r('app.string.login_phone_hint')).margin({ top: 20 })
+        TextInput({ placeholder: $r('app.string.login_phone_placeholder'), text: this.phone })
           .type(InputType.PhoneNumber)
           .placeholderFont({
             size: 28,
@@ -41,7 +41,7 @@ export struct PhoneNumber {
           .onChange((value) => {
             this.phone = value;
           })
-        Button('Sign in').width(150).margin({ top: 20 })
+        Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
           .enabled(!this.isLoading)
           .onClick(async () => {
             if (this.phone.length == 0) {
@@ -51,7 +51,7 @@ export struct PhoneNumber {
               return;
             }
             this.isLoading = true;
-            promptAction.showToast({ message: 'Loading...', duration: 2000 });
+            promptAction.showToast({ message: $r('app.string.loading'), duration: 2000 });
             Logger.debug('Login/Phone number: ' + this.phone);
             let result = await login(this.phone);
             if (result == LoginState.LoggedIn) {
@@ -62,7 +62,7 @@ export struct PhoneNumber {
                 Logger.error(this.errorMessage);
                 this.isError = true;
                 this.isLoading = false;
-                promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
+                promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return;
@@ -77,7 +77,7 @@ export struct PhoneNumber {
               Logger.error(this.errorMessage);
               this.isError = true;
               this.isLoading = false;
-              promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
+              promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
             }
 
             return;

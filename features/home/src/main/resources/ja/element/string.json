@@ -9,6 +9,50 @@
       "value": "読み込み中..."
     },
     {
+      "name": "login_phone_hint",
+      "value": "電話番号を入力してください"
+    },
+    {
+      "name": "login_phone_placeholder",
+      "value": "+81 90 1234 5678"
+    },
+    {
+      "name": "login_phone_empty",
+      "value": "電話番号が空です"
+    },
+    {
+      "name": "login_password_hint",
+      "value": "パスワードを入力してください"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "パスワード"
+    },
+    {
+      "name": "login_password_empty",
+      "value": "パスワードが空です"
+    },
+    {
+      "name": "login_code_hint",
+      "value": "認証コードを入力してください"
+    },
+    {
+      "name": "login_code_placeholder",
+      "value": "コードを入力"
+    },
+    {
+      "name": "login_code_empty",
+      "value": "認証コードを入力してください"
+    },
+    {
+      "name": "login_sign_in",
+      "value": "ログイン"
+    },
+    {
+      "name": "login_failed_retry",
+      "value": "ログイン失敗、再試行してください"
+    },
+    {
       "name": "message",
       "value": "メッセージ"
     },

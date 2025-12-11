@@ -9,6 +9,50 @@
       "value": "Loading..."
     },
     {
+      "name": "login_phone_hint",
+      "value": "Please input your phone number"
+    },
+    {
+      "name": "login_phone_placeholder",
+      "value": "+86 123 4567 7890"
+    },
+    {
+      "name": "login_phone_empty",
+      "value": "Phone number is empty"
+    },
+    {
+      "name": "login_password_hint",
+      "value": "Please input your password"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "Password"
+    },
+    {
+      "name": "login_password_empty",
+      "value": "Password is empty"
+    },
+    {
+      "name": "login_code_hint",
+      "value": "Please input your verify code"
+    },
+    {
+      "name": "login_code_placeholder",
+      "value": "Input your code"
+    },
+    {
+      "name": "login_code_empty",
+      "value": "Please input your verify code"
+    },
+    {
+      "name": "login_sign_in",
+      "value": "Sign in"
+    },
+    {
+      "name": "login_failed_retry",
+      "value": "Failed, please try again"
+    },
+    {
       "name": "message",
       "value": "Message"
     },

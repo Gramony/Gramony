@@ -9,6 +9,50 @@
       "value": "Caricamento in corso..."
     },
     {
+      "name": "login_phone_hint",
+      "value": "Inserisci il tuo numero di telefono"
+    },
+    {
+      "name": "login_phone_placeholder",
+      "value": "+39 123 456 7890"
+    },
+    {
+      "name": "login_phone_empty",
+      "value": "Il numero di telefono è vuoto"
+    },
+    {
+      "name": "login_password_hint",
+      "value": "Inserisci la tua password"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "Password"
+    },
+    {
+      "name": "login_password_empty",
+      "value": "La password è vuota"
+    },
+    {
+      "name": "login_code_hint",
+      "value": "Inserisci il codice di verifica"
+    },
+    {
+      "name": "login_code_placeholder",
+      "value": "Inserisci il codice"
+    },
+    {
+      "name": "login_code_empty",
+      "value": "Inserisci il codice di verifica"
+    },
+    {
+      "name": "login_sign_in",
+      "value": "Accedi"
+    },
+    {
+      "name": "login_failed_retry",
+      "value": "Accesso fallito, riprova"
+    },
+    {
       "name": "message",
       "value": "Messaggio"
     },

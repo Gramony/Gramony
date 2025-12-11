@@ -9,6 +9,50 @@
       "value": "加载中…"
     },
     {
+      "name": "login_phone_hint",
+      "value": "请输入您的手机号码"
+    },
+    {
+      "name": "login_phone_placeholder",
+      "value": "+86 123 4567 7890"
+    },
+    {
+      "name": "login_phone_empty",
+      "value": "手机号码不能为空"
+    },
+    {
+      "name": "login_password_hint",
+      "value": "请输入您的密码"
+    },
+    {
+      "name": "login_password_placeholder",
+      "value": "密码"
+    },
+    {
+      "name": "login_password_empty",
+      "value": "密码不能为空"
+    },
+    {
+      "name": "login_code_hint",
+      "value": "请输入验证码"
+    },
+    {
+      "name": "login_code_placeholder",
+      "value": "输入验证码"
+    },
+    {
+      "name": "login_code_empty",
+      "value": "请输入验证码"
+    },
+    {
+      "name": "login_sign_in",
+      "value": "登录"
+    },
+    {
+      "name": "login_failed_retry",
+      "value": "登录失败，请重试"
+    },
+    {
       "name": "message",
       "value": "消息"
     },
