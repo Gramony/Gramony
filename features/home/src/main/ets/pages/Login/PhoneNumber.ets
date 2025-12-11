@@ -1,6 +1,7 @@
 import { Logger } from '@ohos/base'
 import { LoginState, login, signOut } from 'libhomogrape.so'
 import { emitter } from '@kit.BasicServicesKit';
+import { promptAction } from '@kit.ArkUI';
 import { EventConstants } from '../../constants/EventConstants';
 
 import { Lottie, LottieController } from "@jjr/lottie_component";
@@ -11,6 +12,7 @@ export struct PhoneNumber {
   @State phone: string = '';
   @State isError: boolean = false;
   @State isSignOut: boolean = false;
+  @State isLoading: boolean = false;
   @State errorMessage: string = '';
   @Consume('pageInfo') pageInfo: NavPathStack;
 
@@ -40,6 +42,7 @@ export struct PhoneNumber {
             this.phone = value;
           })
         Button('Sign in').width(150).margin({ top: 20 })
+          .enabled(!this.isLoading)
           .onClick(async () => {
             if (this.phone.length == 0) {
               this.errorMessage = 'Phone number is empty';
@@ -47,6 +50,8 @@ export struct PhoneNumber {
               this.isError = true;
               return;
             }
+            this.isLoading = true;
+            promptAction.showToast({ message: 'Loading...', duration: 2000 });
             Logger.debug('Login/Phone number: ' + this.phone);
             let result = await login(this.phone);
             if (result == LoginState.LoggedIn) {
@@ -56,6 +61,8 @@ export struct PhoneNumber {
                   'Login/PhoneNumber LoggedIn but pageInfo size is not 1 (is ' + this.pageInfo.size().toString() + ')';
                 Logger.error(this.errorMessage);
                 this.isError = true;
+                this.isLoading = false;
+                promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return;
@@ -63,11 +70,14 @@ export struct PhoneNumber {
               this.pageInfo.clear();
               emitter.emit(EventConstants.onLoginEvent);
             } else if (result == LoginState.CodeRequired) {
+              this.isLoading = false;
               this.pageInfo.pushPath({ name: 'Login/VerifyCode' });
             } else {
               this.errorMessage = 'VerifyCode failed: ' + result.toString();
               Logger.error(this.errorMessage);
               this.isError = true;
+              this.isLoading = false;
+              promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
             }
 
             return;

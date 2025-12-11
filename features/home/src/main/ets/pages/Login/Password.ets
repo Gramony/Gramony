@@ -1,6 +1,7 @@
 import { Logger } from '@ohos/base'
 import { LoginState, password, signOut } from 'libhomogrape.so'
 import { emitter } from '@kit.BasicServicesKit';
+import { promptAction } from '@kit.ArkUI';
 import { EventConstants } from '../../constants/EventConstants';
 import { Lottie, LottieController } from "@jjr/lottie_component";
 
@@ -10,6 +11,7 @@ export struct Password {
   @State password: string = '';
   @State isError: boolean = false;
   @State isSignOut: boolean = false;
+  @State isLoading: boolean = false;
   @State errorMessage: string = '';
   @Consume('pageInfo') pageInfo: NavPathStack;
 
@@ -34,6 +36,7 @@ export struct Password {
             this.password = value;
           })
         Button('Sign in').width(150).margin({ top: 20 })
+          .enabled(!this.isLoading)
           .onClick(async () => {
             if (this.password.length == 0) {
               this.errorMessage = 'Password is empty';
@@ -41,6 +44,8 @@ export struct Password {
               this.isError = true;
               return;
             }
+            this.isLoading = true;
+            promptAction.showToast({ message: 'Loading...', duration: 2000 });
             Logger.debug('Login/Password: ' + this.password);
             let result = await password(this.password);
             if (result == LoginState.LoggedIn) {
@@ -50,6 +55,8 @@ export struct Password {
                   'Login/Password LoggedIn but pageInfo size is not 3 (is ' + this.pageInfo.size().toString() + ')';
                 Logger.error(this.errorMessage);
                 this.isError = true;
+                this.isLoading = false;
+                promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return; // TODO: should we clear pageInfo here?
@@ -60,6 +67,8 @@ export struct Password {
               this.errorMessage = 'Password failed: ' + result.toString();
               Logger.error(this.errorMessage);
               this.isError = true;
+              this.isLoading = false;
+              promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
             }
 
             return;

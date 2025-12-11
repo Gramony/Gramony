@@ -1,6 +1,7 @@
 import { Logger } from '@ohos/base'
 import { LoginState, verifyCode, signOut } from 'libhomogrape.so'
 import { emitter } from '@kit.BasicServicesKit';
+import { promptAction } from '@kit.ArkUI';
 import { EventConstants } from '../../constants/EventConstants';
 import { Lottie, LottieController } from "@jjr/lottie_component";
 
@@ -10,6 +11,7 @@ export struct VerifyCode {
   @State code: string = '';
   @State isError: boolean = false;
   @State isSignOut: boolean = false;
+  @State isLoading: boolean = false;
   @State errorMessage: string = '';
   @Consume('pageInfo') pageInfo: NavPathStack;
 
@@ -34,12 +36,15 @@ export struct VerifyCode {
             this.code = value;
           })
         Button('Sign in').width(150).margin({ top: 20 })
+          .enabled(!this.isLoading)
           .onClick(async () => {
             if (this.code.length == 0) {
               this.errorMessage = 'Please input your verify code';
               this.isError = true;
               return;
             }
+            this.isLoading = true;
+            promptAction.showToast({ message: 'Loading...', duration: 2000 });
             Logger.debug('Login/VerifyCode submit code: ' + this.code);
             let result = await verifyCode(this.code);
             if (result == LoginState.LoggedIn) {
@@ -49,6 +54,8 @@ export struct VerifyCode {
                   'Login/VerifyCode LoggedIn but pageInfo size is not 2 (is ' + this.pageInfo.size().toString() + ')';
                 Logger.error(this.errorMessage);
                 this.isError = true;
+                this.isLoading = false;
+                promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return
@@ -57,11 +64,14 @@ export struct VerifyCode {
               emitter.emit(EventConstants.onLoginEvent);
             } else if (result == LoginState.PasswordRequired) {
               Logger.debug('Login/VerifyCode PasswordRequired');
+              this.isLoading = false;
               this.pageInfo.pushPath({ name: 'Login/Password' });
             } else {
               this.errorMessage = 'Login/VerifyCode failed: ' + result.toString();
               Logger.error(this.errorMessage);
               this.isError = true;
+              this.isLoading = false;
+              promptAction.showToast({ message: 'Failed, please try again', duration: 2000 });
             }
 
             return;
