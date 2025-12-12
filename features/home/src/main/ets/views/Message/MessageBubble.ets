@@ -19,6 +19,7 @@ import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } 
 import { BusinessError } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
 import { applyEntityStyle } from './FmtEntities';
+import { LengthMetrics, LengthUnit } from '@ohos.arkui.node';
 
 enum DefaultMediaType {
   IMAGE,
@@ -69,6 +70,18 @@ export struct MessageBubble {
   @Consume currentChatId: string;
   @Consume isScrollingDueToReplyToMessage: boolean;
   @Consume scrollToRepliedMessageIndex: number;
+  private incomingBorderRadius: LocalizedBorderRadiuses = {
+    topStart: new LengthMetrics(0, LengthUnit.VP),
+    topEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+    bottomStart: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+    bottomEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+  };
+  private outgoingBorderRadius: LocalizedBorderRadiuses = {
+    topEnd: new LengthMetrics(0, LengthUnit.VP),
+    topStart: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+    bottomStart: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+    bottomEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
+  };
   private messageListScroller?: ListScroller;
   private chatType: ChatType = ChatType.User;
   private content: string = "";
@@ -285,7 +298,7 @@ export struct MessageBubble {
             })
               .backgroundColor(!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
                 HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING)
-              .borderRadius(HomeConstants.PATH_BORDER_RADIUS)
+              .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
           }
           .padding({
             top: 5,

@@ -58,14 +58,6 @@ export struct ReplyToPreview {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .alignItems(HorizontalAlign.Start)
-
-      // Divider()
-      //   .vertical(true)
-      //   .strokeWidth(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_DIVIDER_WIDTH)
-      //   .color(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_DIVIDER_COLOR)
-      //   .borderRadius(8)
-      //   .outlineRadius(8)
-      //   .height(40)
     }
     .alignItems(VerticalAlign.Center)
     .padding(8)
