@@ -9,6 +9,10 @@
       "value": "Gramony"
     },
     {
+      "name": "message_code_copied",
+      "value": "Copied to clipboard"
+    },
+    {
       "name": "loading",
       "value": "Loading..."
     },

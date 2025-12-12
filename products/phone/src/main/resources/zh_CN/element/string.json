@@ -9,6 +9,10 @@
       "value": "Gramony"
     },
     {
+      "name": "message_code_copied",
+      "value": "已复制到剪贴板"
+    },
+    {
       "name": "EntryAbility_desc",
       "value": "description"
     },
