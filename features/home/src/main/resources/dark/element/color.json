@@ -19,6 +19,34 @@
     {
       "name": "message_time_color",
       "value": "#66E3E3E3"
+    },
+    {
+      "name": "message_code_background_color",
+      "value": "#3C3C3C"
+    },
+    {
+      "name": "message_pre_background_color",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "message_link_color",
+      "value": "#4DA6FF"
+    },
+    {
+      "name": "message_spoiler_color",
+      "value": "#A0A0A0"
+    },
+    {
+      "name": "message_blockquote_background_color",
+      "value": "#3A3A3A"
+    },
+    {
+      "name": "message_blockquote_text_color",
+      "value": "#B0B0B0"
+    },
+    {
+      "name": "message_decoration_color",
+      "value": "#FFFFFF"
     }
   ]
 }

@@ -8,11 +8,11 @@ export struct Contacts {
 
   build(): void {
     List() {
-      ForEach(Array(10).fill("联系人"), (item: string) => {
+      ForEach(Array(1).fill("本功能仍在鸿蒙化\n适配中，敬请期待！"), (item: string) => {
         ListItem() {
           Text(item)
             .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
-        }
+        }.padding({ left: 20 })
       }, (item: string, index) => index + JSON.stringify(item))
     }
   }

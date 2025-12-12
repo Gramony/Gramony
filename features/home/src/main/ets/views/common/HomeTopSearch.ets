@@ -28,9 +28,9 @@ export struct HomeTopSearch {
     Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
       Column() {
         Text(this.title)
-          .fontWeight(BaseConstants.FONT_WEIGHT_FIVE)
+          .fontWeight(800)
           .fontSize(BaseConstants.FONT_SIZE_TWENTY_FOUR)
-          .fontFamily(BaseConstants.FONT_FAMILY_MEDIUM)
+          .fontFamily("HarmonyOS Sans Condensed")
           .width(BaseConstants.FULL_WIDTH)
       }
       .flexBasis(HomeConstants.SEARCH_TEXT_FLEX_BASIS)

@@ -71,6 +71,6 @@ export struct ReplyToPreview {
     .padding(8)
     .backgroundColor(HomeConstants.MESSAGE_REPLY_TO_PREVIEW_BACKGROUND_COLOR)
     .borderRadius(8)
-    .width("100%")
+    .width("90%")
   }
 }

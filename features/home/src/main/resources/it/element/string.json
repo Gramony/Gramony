@@ -5,6 +5,10 @@
       "value": "descrizione"
     },
     {
+      "name": "app_name",
+      "value": "Armogram"
+    },
+    {
       "name": "loading",
       "value": "Caricamento in corso..."
     },

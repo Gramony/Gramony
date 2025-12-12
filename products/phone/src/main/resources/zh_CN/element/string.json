@@ -5,6 +5,10 @@
       "value": "模块描述"
     },
     {
+      "name": "app_name",
+      "value": "Gramony"
+    },
+    {
       "name": "EntryAbility_desc",
       "value": "description"
     },

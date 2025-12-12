@@ -5,6 +5,10 @@
       "value": "description"
     },
     {
+      "name": "app_name",
+      "value": "Gramony"
+    },
+    {
       "name": "loading",
       "value": "Loading..."
     },

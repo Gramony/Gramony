@@ -5,6 +5,10 @@
       "value": "Описание"
     },
     {
+      "name": "app_name",
+      "value": "Грэмони"
+    },
+    {
       "name": "loading",
       "value": "Загрузка..."
     },

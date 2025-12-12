@@ -16,3 +16,5 @@
 /.appanalyzer
 .DS_store
 /signing
+
+docs

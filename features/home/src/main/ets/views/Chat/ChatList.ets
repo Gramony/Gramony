@@ -62,7 +62,7 @@ export struct ChatList {
   build() {
     Stack({ alignContent: Alignment.Top }) {
       HomeTopSearch({
-        title: HomeConstants.TAB_BAR_TEXTS[0]
+        title: $r('app.string.app_name'),
       })
         .expandSafeArea([SafeAreaType.SYSTEM])
         .zIndex(1)
