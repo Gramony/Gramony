@@ -127,6 +127,18 @@
     {
       "name": "replying_to_message",
       "value": "Replying to message"
+    },
+    {
+      "name": "retry",
+      "value": "Retry"
+    },
+    {
+      "name": "role_creator",
+      "value": "Owner"
+    },
+    {
+      "name": "role_admin",
+      "value": "Admin"
     }
   ]
 }

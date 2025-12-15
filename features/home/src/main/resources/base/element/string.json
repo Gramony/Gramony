@@ -119,6 +119,18 @@
     {
       "name": "replying_to_message",
       "value": "正在回复消息"
+    },
+    {
+      "name": "retry",
+      "value": "重试"
+    },
+    {
+      "name": "role_creator",
+      "value": "群主"
+    },
+    {
+      "name": "role_admin",
+      "value": "管理员"
     }
   ]
 }

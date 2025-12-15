@@ -123,6 +123,18 @@
     {
       "name": "replying_to_message",
       "value": "Rispondendo al messaggio"
+    },
+    {
+      "name": "retry",
+      "value": "Riprova"
+    },
+    {
+      "name": "role_creator",
+      "value": "Proprietario"
+    },
+    {
+      "name": "role_admin",
+      "value": "Amministratore"
     }
   ]
 }

@@ -350,6 +350,7 @@ export struct MessageBubble {
       ];
     }
     // 构建 StyledString 用于富文本渲染
+    Logger.debug(`MessageBubble aboutToAppear: messageId=${this.message?.messageId}, text="${this.message?.text?.substring(0, 50)}", fmtEntities count=${this.message?.fmtEntities?.length ?? 0}`);
     this.buildStyledString();
   }
 
@@ -360,6 +361,7 @@ export struct MessageBubble {
     const text = this.message?.text ?? '';
     if (text.length === 0) {
       this.styledString = undefined;
+      Logger.debug(`buildStyledString: empty text, skipping`);
       return;
     }
 
@@ -367,8 +369,11 @@ export struct MessageBubble {
     if (!entities || entities.length === 0) {
       // 没有格式化实体，不使用 StyledString，直接使用普通文本
       this.styledString = undefined;
+      Logger.debug(`buildStyledString: no entities for message ${this.message?.messageId}`);
       return;
     }
+
+    Logger.debug(`buildStyledString: creating StyledString for message ${this.message?.messageId}, entities: ${JSON.stringify(entities)}`);
 
     // 创建可变属性字符串
     const mutableStyledString = new MutableStyledString(text);
@@ -383,6 +388,7 @@ export struct MessageBubble {
     }
 
     this.styledString = mutableStyledString;
+    Logger.debug(`buildStyledString: StyledString created successfully for message ${this.message?.messageId}`);
   }
 
   @Builder

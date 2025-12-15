@@ -67,6 +67,7 @@ import { curves, SymbolGlyphModifier } from '@kit.ArkUI';
 import { SeenChat } from '../entities/SeenChat';
 import { seenChatDao } from '../dao/SeenChatDao';
 import { ForumTopicList } from './Chat/Group/ForumTopicList';
+import { ParticipantList } from './Chat/Group/ParticipantList';
 import { EventConstants } from '../constants/EventConstants';
 import { Contacts } from './Contacts';
 import { Me } from './Me';
@@ -273,6 +274,8 @@ export struct Index {
         isShowChatListTopPadding: this.isShowChatListTopPadding,
         isShowSearchIcon: this.isShowSearchIcon,
       })
+    } else if (name === 'ParticipantList') {
+      ParticipantList()
     } else if (name === 'ChatDetailNone') {
       ChatDetailNone();
     } else if (name === 'Profile' || name === 'ProfilePage') {

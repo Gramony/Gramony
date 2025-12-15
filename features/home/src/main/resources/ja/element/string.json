@@ -123,6 +123,18 @@
     {
       "name": "replying_to_message",
       "value": "メッセージに返信しています"
+    },
+    {
+      "name": "retry",
+      "value": "再試行"
+    },
+    {
+      "name": "role_creator",
+      "value": "オーナー"
+    },
+    {
+      "name": "role_admin",
+      "value": "管理者"
     }
   ]
 }

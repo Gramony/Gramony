@@ -61,6 +61,28 @@ export struct ChatDetail {
   private isAtEnd: boolean = false;
   private length: number = 0;
   private chatType: ChatType = ChatType.User;
+  private isGroupOrChannel: boolean = false;
+
+  @Builder
+  TitleBuilder() {
+    Column() {
+      Text(this.currentChatUserName)
+        .fontColor($r('sys.color.font_primary'))
+        .fontSize(HomeConstants.NAV_TITLE_FONT_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+    }
+    .alignItems(HorizontalAlign.Start)
+    .justifyContent(FlexAlign.Center)
+    .height('100%')
+    .onClick(() => {
+      if (this.isGroupOrChannel) {
+        Logger.debug('ChatDetail title clicked, navigating to ParticipantList');
+        this.pageInfo.pushPath({ name: 'ParticipantList' });
+      }
+    })
+  }
 
   @Styles
   messageAnimationStyle() {
@@ -252,7 +274,7 @@ export struct ChatDetail {
         .width(BaseConstants.FULL_WIDTH)
     }
     .expandSafeArea([SafeAreaType.SYSTEM])
-      .title(this.currentChatUserName, {
+      .title(this.TitleBuilder, {
         backgroundColor: this.titleAndTabBarColor,
         backgroundBlurStyle: this.blurStyle,
         barStyle: BarStyle.STACK,
@@ -267,6 +289,7 @@ export struct ChatDetail {
     // this.navTitleMode = NavigationTitleMode.Mini;
     let chat = this.chatDataSource.get(this.currentChatId);
     this.chatType = chat?.chatType || ChatType.User;
+    this.isGroupOrChannel = this.chatType === ChatType.Group || this.chatType === ChatType.Channel;
     this.currentChatUserName = chat?.name || '';
     this.length = this.messagesOfChatMap.get(this.currentChatId)?.totalCount() || 0;
     // this.messages = (this.currentChatPinned ? this.pinnedChatsMap :

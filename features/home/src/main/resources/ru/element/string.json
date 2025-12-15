@@ -123,6 +123,18 @@
     {
       "name": "replying_to_message",
       "value": "Ответ на сообщение"
+    },
+    {
+      "name": "retry",
+      "value": "Повторить"
+    },
+    {
+      "name": "role_creator",
+      "value": "Владелец"
+    },
+    {
+      "name": "role_admin",
+      "value": "Администратор"
     }
   ]
 }
