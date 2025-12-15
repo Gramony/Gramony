@@ -90,7 +90,9 @@ class MessageDao {
   async getMessageById(@sql.Param("chatId") chatId: number, @sql.Param("messageId") messageId: number): Promise<Message> {
     const msg: Message = await sql.PromiseNull();
     if (msg) {
+      console.warn(`[FMTENTITIES] MessageDao.getMessageById: before deserialize, fmtEntitiesJson=${msg.fmtEntitiesJson}`);
       msg.deserializeFmtEntities();
+      console.warn(`[FMTENTITIES] MessageDao.getMessageById: after deserialize, fmtEntities count=${msg.fmtEntities?.length ?? 0}`);
     }
     return msg;
   }
@@ -99,9 +101,12 @@ class MessageDao {
   @sql.ReturnType([Message])
   async getMessagesByChatId(@sql.Param("chatId") chatId: number): Promise<Array<Message>> {
     const messages: Array<Message> = await sql.PromiseNull();
+    console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: loaded ${messages.length} messages for chatId=${chatId}`);
     // 反序列化格式化实体
     for (const msg of messages) {
+      console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: processing messageId=${msg.messageId}, fmtEntitiesJson=${msg.fmtEntitiesJson}`);
       msg.deserializeFmtEntities();
+      console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: after deserialize, fmtEntities count=${msg.fmtEntities?.length ?? 0}`);
     }
     return messages;
   }

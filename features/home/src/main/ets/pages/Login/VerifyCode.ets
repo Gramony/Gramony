@@ -36,8 +36,12 @@ export struct VerifyCode {
             .onChange((value) => {
               this.code = value;
             })
+            .height(72)
             .fontFamily("HarmonyOS Sans Digit")
-            .fontSize(32)
+            .fontSize(48)
+            .fontWeight(700)
+            .letterSpacing(8)
+            .textAlign(TextAlign.Center)
 
           Button($r('app.string.login_sign_in')).width(150).margin({ top: 20 })
             .enabled(!this.isLoading)

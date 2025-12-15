@@ -350,7 +350,10 @@ export struct MessageBubble {
       ];
     }
     // 构建 StyledString 用于富文本渲染
-    Logger.debug(`MessageBubble aboutToAppear: messageId=${this.message?.messageId}, text="${this.message?.text?.substring(0, 50)}", fmtEntities count=${this.message?.fmtEntities?.length ?? 0}`);
+    console.warn(`[FMTENTITIES] MessageBubble messageId=${this.message?.messageId} || count: ${this.message?.fmtEntities?.length ?? 0} || text: "${this.message?.text?.substring(0, 50)}"`);
+    if (this.message?.fmtEntities && this.message.fmtEntities.length > 0) {
+      console.warn(`[FMTENTITIES] MessageBubble fmtEntities: ${JSON.stringify(this.message.fmtEntities)}`);
+    }
     this.buildStyledString();
   }
 
@@ -361,7 +364,7 @@ export struct MessageBubble {
     const text = this.message?.text ?? '';
     if (text.length === 0) {
       this.styledString = undefined;
-      Logger.debug(`buildStyledString: empty text, skipping`);
+      console.warn(`[FMTENTITIES] buildStyledString: empty text, skipping`);
       return;
     }
 
@@ -369,26 +372,30 @@ export struct MessageBubble {
     if (!entities || entities.length === 0) {
       // 没有格式化实体，不使用 StyledString，直接使用普通文本
       this.styledString = undefined;
-      Logger.debug(`buildStyledString: no entities for message ${this.message?.messageId}`);
+      console.warn(`[FMTENTITIES] buildStyledString: no entities for message ${this.message?.messageId}`);
       return;
     }
 
-    Logger.debug(`buildStyledString: creating StyledString for message ${this.message?.messageId}, entities: ${JSON.stringify(entities)}`);
+    console.warn(`[FMTENTITIES] buildStyledString: creating StyledString for message ${this.message?.messageId}`);
+    console.warn(`[FMTENTITIES] buildStyledString: entities count=${entities.length}, entities: ${JSON.stringify(entities)}`);
 
     // 创建可变属性字符串
     const mutableStyledString = new MutableStyledString(text);
 
     // 遍历所有格式化实体并应用样式
-    for (const entity of entities) {
+    for (let i = 0; i < entities.length; i++) {
+      const entity = entities[i];
       try {
+        console.warn(`[FMTENTITIES] buildStyledString: applying entity ${i}: ${JSON.stringify(entity)}`);
         applyEntityStyle(this.message?.text ?? "", mutableStyledString, entity);
+        console.warn(`[FMTENTITIES] buildStyledString: entity ${i} applied successfully`);
       } catch (e) {
-        Logger.error(`Failed to apply entity style: ${JSON.stringify(entity)}, error: ${e}`);
+        console.warn(`[FMTENTITIES] buildStyledString: failed to apply entity ${i}: ${JSON.stringify(entity)}, error: ${e}`);
       }
     }
 
     this.styledString = mutableStyledString;
-    Logger.debug(`buildStyledString: StyledString created successfully for message ${this.message?.messageId}`);
+    console.warn(`[FMTENTITIES] buildStyledString: StyledString created successfully for message ${this.message?.messageId}`);
   }
 
   @Builder

@@ -104,6 +104,7 @@ export class Message implements NativeMessage, IComparable<Message> {
     // 序列化为 JSON 存储
     if (fmtEntities && fmtEntities.length > 0) {
       this.fmtEntitiesJson = JSON.stringify(fmtEntities);
+      console.warn(`[FMTENTITIES] Message constructor: serialized ${fmtEntities.length} entities to JSON: ${this.fmtEntitiesJson}`);
     }
   }
 
@@ -111,7 +112,12 @@ export class Message implements NativeMessage, IComparable<Message> {
     // 转换格式化实体
     let fmtEntities: MessageEntity[] | undefined;
     if (nativeMessage.fmtEntities && nativeMessage.fmtEntities.length > 0) {
+      console.warn(`[FMTENTITIES] fromNative: converting ${nativeMessage.fmtEntities.length} entities from NAPI`);
+      console.warn(`[FMTENTITIES] fromNative: first entity raw: ${JSON.stringify(nativeMessage.fmtEntities[0])}`);
       fmtEntities = nativeMessage.fmtEntities.map(e => MessageEntity.fromNative(e));
+      console.warn(`[FMTENTITIES] fromNative: first entity converted: ${JSON.stringify(fmtEntities[0])}`);
+    } else {
+      console.warn(`[FMTENTITIES] fromNative: no fmtEntities in nativeMessage`);
     }
 
     const msg = new Message(
@@ -134,6 +140,13 @@ export class Message implements NativeMessage, IComparable<Message> {
     msg.forwardCount = nativeMessage.forwardCount ?? 0;
     msg.replyCount = nativeMessage.replyCount ?? 0;
 
+    // 确保 fmtEntitiesJson 被正确设置,以便 ORM 能保存它
+    // 注意:构造函数已经设置了 fmtEntitiesJson,但为了确保,这里再次显式赋值
+    if (fmtEntities && fmtEntities.length > 0) {
+      msg.fmtEntitiesJson = JSON.stringify(fmtEntities);
+      console.warn(`[FMTENTITIES] fromNative: explicitly set fmtEntitiesJson for ORM: ${msg.fmtEntitiesJson}`);
+    }
+
     return msg;
   }
 
@@ -141,14 +154,24 @@ export class Message implements NativeMessage, IComparable<Message> {
    * 从数据库加载后，反序列化 fmtEntities
    */
   public deserializeFmtEntities(): void {
+    console.warn(`[FMTENTITIES] deserializeFmtEntities: messageId=${this.messageId}, fmtEntitiesJson=${this.fmtEntitiesJson}`);
+
     if (this.fmtEntitiesJson && this.fmtEntitiesJson.length > 0) {
       try {
-        const parsed = JSON.parse(this.fmtEntitiesJson) as NativeMessageEntity[];
-        this.fmtEntities = parsed.map(e => MessageEntity.fromNative(e));
+        // JSON 中的字段名已经是 camelCase（因为序列化时就是 MessageEntity 对象）
+        // 直接解析为 MessageEntity 数组，不需要 fromNative 转换
+        this.fmtEntities = JSON.parse(this.fmtEntitiesJson) as MessageEntity[];
+        console.warn(`[FMTENTITIES] deserializeFmtEntities: successfully parsed ${this.fmtEntities.length} entities`);
+        if (this.fmtEntities.length > 0) {
+          console.warn(`[FMTENTITIES] deserializeFmtEntities: first entity: ${JSON.stringify(this.fmtEntities[0])}`);
+        }
       } catch (e) {
         // 解析失败，忽略
+        console.warn(`[FMTENTITIES] deserializeFmtEntities: failed to parse JSON: ${e}`);
         this.fmtEntities = undefined;
       }
+    } else {
+      console.warn(`[FMTENTITIES] deserializeFmtEntities: no fmtEntitiesJson to deserialize`);
     }
   }
 
