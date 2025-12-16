@@ -20,6 +20,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
 import { applyEntityStyle } from './FmtEntities';
 import { LengthMetrics, LengthUnit } from '@ohos.arkui.node';
+import { Lottie } from '@jjr/lottie_component';
 
 enum DefaultMediaType {
   IMAGE,
@@ -174,7 +175,7 @@ export struct MessageBubble {
         Column() {
           Stack({ alignContent: !this.message?.outgoing ? Alignment.TopStart : Alignment.TopEnd }) {
             Column() {
-              if ((!this.message?.outgoing) && (this.chatType != ChatType.User)) {
+              if ((!this.message?.outgoing) && (this.chatType != ChatType.User) && (this.message?.mediaType !== MediaType.Sticker)) {
                 this.SenderName(this.message?.senderName ?? "")
               }
 
@@ -262,9 +263,14 @@ export struct MessageBubble {
                     }, (item: DefaultMediaModel, index: number) => JSON.stringify(item) + index)
                   }
                 }
+
+                // Sticker 显示
+                if (this.message?.mediaType === MediaType.Sticker) {
+                  this.StickerView()
+                }
+
                 this.MessageContent()
-                // if (this.message?.mediaType === MediaType.Sticker) {
-                // }
+
                 Row() {
                   Blank()
                   if (this.message?.viewCount && this.message.viewCount > 0) {
@@ -296,8 +302,9 @@ export struct MessageBubble {
               top: 8,
               bottom: 8
             })
-              .backgroundColor(!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
-                HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING)
+              .backgroundColor(this.message?.mediaType === MediaType.Sticker ? Color.Transparent :
+                (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
+                  HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
               .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
           }
           .padding({
@@ -399,6 +406,77 @@ export struct MessageBubble {
   }
 
   @Builder
+  StickerOnlyView() {
+    Flex({
+      justifyContent: !this.message?.outgoing ? FlexAlign.Start : FlexAlign.End,
+      direction: FlexDirection.Row
+    }) {
+      this.StickerView()
+    }
+    .margin({ left: 5, right: 5, top: 2, bottom: 2 })
+  }
+
+  @Builder
+  StickerView() {
+    Stack() {
+      if (this.message?.stickerInfo?.isAnimated) {
+        // 动画 Sticker (TGS 格式 - Lottie)
+        // TGS 文件需要先读取为字符串
+        Lottie({
+          autoPlay: true,
+          animationUri: "file://" + this.mediaPath,
+          loop: true,
+        })
+          .width(160)
+          .height(160)
+      } else if (this.message?.stickerInfo?.isVideo) {
+        // 视频 Sticker (WEBM)
+        Video({
+          src: "file://" + this.mediaPath
+        })
+          .width(150)
+          .height(150)
+          .autoPlay(true)
+          .loop(true)
+          .muted(true)
+          .controls(false)
+          .objectFit(ImageFit.Contain)
+      } else {
+        // 静态 Sticker (WEBP)
+        Image("file://" + this.mediaPath)
+          .width(150)
+          .height(150)
+          .objectFit(ImageFit.Contain)
+          .interpolation(ImageInterpolation.High)
+          .alt(this.message?.stickerInfo?.emoji ?? "Sticker")
+      }
+
+      // 加载状态
+      if (!this.mediaLoaded && !this.mediaLoadFailed) {
+        Loading()
+      }
+
+      // 错误状态
+      if (this.mediaLoadFailed) {
+        Column() {
+          Text("加载失败")
+            .fontColor(Color.Red)
+            .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+          Text("点击重试")
+            .fontSize(BaseConstants.FONT_SIZE_TEN)
+            .fontColor(Color.Gray)
+        }
+        .onClick(() => this.loadMedia())
+      }
+    }
+    .width(150)
+      .height(150)
+      .onAppear(() => {
+        this.loadMedia();
+      })
+  }
+
+  @Builder
   MessageContent() {
     if (this.styledString && this.message?.text && this.message.text.length > 0) {
       // 使用 StyledString 渲染富文本
@@ -482,10 +560,24 @@ export struct MessageBubble {
   loadMedia() {
     this.mediaLoaded = false;
     this.mediaLoadFailed = false;
+
+    // 根据媒体类型确定文件扩展名
+    let extension = ".jpg";
+    if (this.message?.mediaType === MediaType.Sticker) {
+      if (this.message?.stickerInfo?.isVideo) {
+        extension = ".webm";
+      } else if (this.message?.stickerInfo?.isAnimated) {
+        extension = ".tgs";
+      } else {
+        extension = ".webp";
+      }
+    }
+
     this.mediaPath =
-      BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString() + ".jpg";
+      BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString() + extension;
     Logger.debug("Media onAppear: " + this.mediaPath);
-    // download the image if not exists
+
+    // download the media if not exists
     try {
       if (!fs.accessSync(this.mediaPath)) {
         Logger.debug("Media onAppear: media " + this.mediaPath + " not exists, downloading media");

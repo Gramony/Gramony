@@ -8,7 +8,7 @@ export struct ParticipantItem {
   @StorageProp('currentBreakpoint') currentBreakpoint: string = BreakpointConstants.BREAKPOINT_SM;
   @State isPixelMapReady: boolean = false;
   @State profilePhotoPixelMap: PixelMap | undefined = undefined;
-  private participant?: NativeParticipant;
+  participant?: NativeParticipant;
 
   build() {
     Flex({ alignItems: ItemAlign.Center }) {

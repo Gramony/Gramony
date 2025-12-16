@@ -3,6 +3,19 @@ import { MediaType, NativeMessage, NativeMessageEntity, MessageEntityType } from
 import { IComparable } from '@ohos/base'
 
 /**
+ * Sticker 信息
+ */
+export interface StickerInfo {
+  emoji?: string;         // 关联的 emoji
+  isAnimated: boolean;    // 是否为动画 sticker (TGS)
+  isVideo: boolean;       // 是否为视频 sticker (WEBM)
+  mimeType?: string;      // MIME 类型
+  fileSize?: number;      // 文件大小
+  width?: number;         // 宽度
+  height?: number;        // 高度
+}
+
+/**
  * 消息格式化实体（粗体、斜体、链接等）
  */
 export class MessageEntity implements NativeMessageEntity {
@@ -81,10 +94,15 @@ export class Message implements NativeMessage, IComparable<Message> {
   fmtEntitiesJson?: string
   /// 运行时使用的格式化实体数组
   fmtEntities?: MessageEntity[]
+  /// Sticker 信息 - 存储为 JSON 字符串
+  @sql.SqlColumn(sql.ColumnType.TEXT)
+  stickerInfoJson?: string
+  /// 运行时使用的 Sticker 信息
+  stickerInfo?: StickerInfo
 
   constructor(chatId: number, messageId: number, outgoing: boolean, pinned: boolean, senderId: number,
     senderName: string, timestamp: number, text: string, mediaType: MediaType, editTimestamp?: number,
-    groupedId?: number, replyToMessageId?: number, fmtEntities?: MessageEntity[]) {
+    groupedId?: number, replyToMessageId?: number, fmtEntities?: MessageEntity[], stickerInfo?: StickerInfo) {
     this.chatId = chatId;
     this.messageId = messageId;
     this.outgoing = outgoing;
@@ -101,10 +119,14 @@ export class Message implements NativeMessage, IComparable<Message> {
     this.forwardCount = 0;
     this.viewCount = 0;
     this.fmtEntities = fmtEntities;
+    this.stickerInfo = stickerInfo;
     // 序列化为 JSON 存储
     if (fmtEntities && fmtEntities.length > 0) {
       this.fmtEntitiesJson = JSON.stringify(fmtEntities);
       console.warn(`[FMTENTITIES] Message constructor: serialized ${fmtEntities.length} entities to JSON: ${this.fmtEntitiesJson}`);
+    }
+    if (stickerInfo) {
+      this.stickerInfoJson = JSON.stringify(stickerInfo);
     }
   }
 
@@ -130,7 +152,8 @@ export class Message implements NativeMessage, IComparable<Message> {
       nativeMessage.editTimestamp,
       nativeMessage.groupedId,
       nativeMessage.replyToMessageId,
-      fmtEntities
+      fmtEntities,
+      nativeMessage.stickerInfo as StickerInfo | undefined
     );
 
     msg.viewCount = nativeMessage.viewCount ?? 0;
@@ -143,12 +166,15 @@ export class Message implements NativeMessage, IComparable<Message> {
       msg.fmtEntitiesJson = JSON.stringify(fmtEntities);
       console.warn(`[FMTENTITIES] fromNative: explicitly set fmtEntitiesJson for ORM: ${msg.fmtEntitiesJson}`);
     }
+    if (nativeMessage.stickerInfo) {
+      msg.stickerInfoJson = JSON.stringify(nativeMessage.stickerInfo);
+    }
 
     return msg;
   }
 
   /**
-   * 从数据库加载后，反序列化 fmtEntities
+   * 从数据库加载后，反序列化 fmtEntities 和 stickerInfo
    */
   public deserializeFmtEntities(): void {
     console.warn(`[FMTENTITIES] deserializeFmtEntities: messageId=${this.messageId}, fmtEntitiesJson=${this.fmtEntitiesJson}`);
@@ -169,6 +195,16 @@ export class Message implements NativeMessage, IComparable<Message> {
       }
     } else {
       console.warn(`[FMTENTITIES] deserializeFmtEntities: no fmtEntitiesJson to deserialize`);
+    }
+
+    // 反序列化 stickerInfo
+    if (this.stickerInfoJson && this.stickerInfoJson.length > 0) {
+      try {
+        this.stickerInfo = JSON.parse(this.stickerInfoJson) as StickerInfo;
+      } catch (e) {
+        console.warn(`[STICKER] deserializeFmtEntities: failed to parse stickerInfo JSON: ${e}`);
+        this.stickerInfo = undefined;
+      }
     }
   }
 
