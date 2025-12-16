@@ -337,8 +337,8 @@ export struct Index {
             // .height(BaseConstants.FULL_HEIGHT)
           }
           .tabBar(new BottomTabBarStyle({
-            normal: HomeConstants.TAB_BAR_ICONS[0],
-            selected: HomeConstants.TAB_BAR_SELECTED_ICONS[0],
+            normal: new SymbolGlyphModifier($r('sys.symbol.message_on_message')),
+            selected: new SymbolGlyphModifier($r('sys.symbol.message_on_message_fill')),
           }, HomeConstants.TAB_BAR_TEXTS[0]))
           .expandSafeArea([SafeAreaType.SYSTEM])
           .padding({
@@ -352,8 +352,8 @@ export struct Index {
               })
           }
           .tabBar(new BottomTabBarStyle({
-            normal: HomeConstants.TAB_BAR_ICONS[1],
-            selected: HomeConstants.TAB_BAR_SELECTED_ICONS[1],
+            normal: new SymbolGlyphModifier($r('sys.symbol.person_2')),
+            selected: new SymbolGlyphModifier($r('sys.symbol.person_2_fill')),
           }, HomeConstants.TAB_BAR_TEXTS[1])
             // .padding({ bottom: HomeConstants.TAB_BAR_PADDING })
           )
@@ -365,8 +365,8 @@ export struct Index {
               })
           }
           .tabBar(new BottomTabBarStyle({
-            normal: HomeConstants.TAB_BAR_ICONS[2],
-            selected: HomeConstants.TAB_BAR_SELECTED_ICONS[2],
+            normal: new SymbolGlyphModifier($r('sys.symbol.person')),
+            selected: new SymbolGlyphModifier($r('sys.symbol.person_fill')),
           }, HomeConstants.TAB_BAR_TEXTS[2])
             // .padding({ bottom: HomeConstants.TAB_BAR_PADDING })
           )

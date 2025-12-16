@@ -77,7 +77,6 @@ export struct ChatList {
         // if (this.isShowTopPadding) {
         //   ListItem() {
         //     Row()
-        //       .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
         //       .width(BaseConstants.FULL_WIDTH)
         //       .height(BaseConstants.NAV_TITLE_BAR_HEIGHT)
         //       .backgroundColor(Color.Black)
@@ -114,7 +113,6 @@ export struct ChatList {
         //       .animationStyle()
         //   }
         // }
-        // // .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
         // .margin({
         //   bottom: this.isShowSearchIcon ? 30 : 0
         // })
@@ -174,7 +172,6 @@ export struct ChatList {
                 }
               })
               .animation({ curve: curves.springMotion(0.6, 0.8) })
-            // .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
           }
 
           // .height(Adaptive.ContactItemHeight(this.currentBreakpoint))
@@ -194,7 +191,7 @@ export struct ChatList {
           Row()
             .height((this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG || this.currentBreakpoint === BreakpointConstants.BREAKPOINT_XL) ? BaseConstants.FULL_PERCENT :
               (deviceInfo.deviceType === BaseConstants.DEVICE_TYPES[0] ? $r('app.float.tab_size_lg') :
-              $r('app.float.tab_size')))// .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
+              $r('app.float.tab_size')))
             .width(BaseConstants.FULL_WIDTH)
         }
       }
@@ -250,7 +247,6 @@ export struct ChatList {
         // this.isShowSearchIcon = false;
         // this.homeNavTitleBarStyle = BarStyle.STANDARD;
       })
-      // .backgroundColor(HomeConstants.CHAT_LIST_MAIN_COLOR)
       .chatListAnimationStyle()
       // .divider({
       //   strokeWidth: $r('app.float.chat_list_divider_stroke_width'),

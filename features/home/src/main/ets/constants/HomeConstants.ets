@@ -103,29 +103,18 @@ export class HomeConstants {
   static readonly NAVIGATION_NAV_BAR_WIDTH_LG = '44.5%'
   static readonly NAVIGATION_NAV_BAR_WIDTH_XL = '35%'
   /**
-   * Home Tab Bar icons and texts
+   * Home Tab Bar texts
    */
-  static readonly TAB_BAR_ICONS = [
-    new SymbolGlyphModifier($r('sys.symbol.message_on_message')),
-    new SymbolGlyphModifier($r('sys.symbol.person_2')),
-    new SymbolGlyphModifier($r('sys.symbol.person')),
-  ];
-  static readonly TAB_BAR_SELECTED_ICONS = [
-    new SymbolGlyphModifier($r('sys.symbol.message_on_message_fill')),
-    new SymbolGlyphModifier($r('sys.symbol.person_2_fill')),
-    new SymbolGlyphModifier($r('sys.symbol.person_fill')),
-  ];
   static readonly TAB_BAR_TEXTS = [
     $r('app.string.message'),
     $r('app.string.contacts'),
     $r('app.string.me'),
   ];
-  static readonly TAB_BAR_NEW_MESSAGE_ICON = new SymbolGlyphModifier($r('sys.symbol.paintbrush_pointed_circle_fill'));
+  static readonly TAB_BAR_NEW_MESSAGE_ICON = new SymbolGlyphModifier($r('sys.symbol.paintbrush_pointed_circle_fill')); // unused
   static readonly TAB_BAR_PADDING = 10;
   static readonly CHAT_ITEM_PROFILE_PHOTO_SIZE = 48;
   static readonly CHAT_ITEM_PROFILE_PHOTO_MARGIN_LEFT = 24;
   static readonly CHAT_ITEM_PROFILE_PHOTO_MARGIN_RIGHT = 12;
-  static readonly CHAT_LIST_MAIN_COLOR = $r('sys.color.black');
   static readonly CHAT_LIST_SCROLLER = "chatListScroller";
   static readonly CHAT_LIST_DIVIDER_START_MARGIN =
     HomeConstants.CHAT_ITEM_PROFILE_PHOTO_SIZE + HomeConstants.CHAT_ITEM_PROFILE_PHOTO_MARGIN_LEFT +
