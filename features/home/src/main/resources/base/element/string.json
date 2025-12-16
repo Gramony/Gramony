@@ -9,6 +9,10 @@
       "value": "加载中…"
     },
     {
+      "name": "load_failed",
+      "value": "加载失败"
+    },
+    {
       "name": "login_phone_hint",
       "value": "请输入您的手机号码"
     },

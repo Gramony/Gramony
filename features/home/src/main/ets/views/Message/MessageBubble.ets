@@ -2,9 +2,9 @@ import { BaseConstants, BreakpointConstants, DateHelper, Logger, NormalText } fr
 import {
   MediaType,
   downloadMediaFromMessage,
-  getProfilePhotoPathAndCount,
+  // getProfilePhotoPathAndCount,
   NativeSeenChat,
-  downloadProfilePhoto,
+  // downloadProfilePhoto,
   ChatType,
 } from 'libhomogrape.so';
 import { HomeConstants } from '../../constants/HomeConstants';
@@ -16,11 +16,11 @@ import { getOrDownloadProfilePhoto, getThumbProfilePhotoPixelMap } from '../../u
 import { ReplyToPreview } from './ReplyToPreview'
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } from '@lyb/media-preview';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, zlib } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
 import { applyEntityStyle } from './FmtEntities';
 import { LengthMetrics, LengthUnit } from '@ohos.arkui.node';
-import { Lottie } from '@jjr/lottie_component';
+import { Lottie, LottieController } from '@jjr/lottie_component';
 
 enum DefaultMediaType {
   IMAGE,
@@ -59,6 +59,7 @@ export struct MessageBubble {
   @Consume messagesOfChatMap: HashMap<string, MessageDataSource>;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @State mediaPath: string = "";
+  @State decompressedMediaPath: string = "";  // 解压后的文件路径（TGS -> JSON）
   @State mediaLoaded: boolean = false;
   @State mediaLoadFailed: boolean = false;
   @State profilePhotoPath: string | undefined = undefined;
@@ -71,6 +72,8 @@ export struct MessageBubble {
   @Consume currentChatId: string;
   @Consume isScrollingDueToReplyToMessage: boolean;
   @Consume scrollToRepliedMessageIndex: number;
+  @State lottieJson: string = "{}";
+  private lottieController: LottieController = new LottieController();
   private incomingBorderRadius: LocalizedBorderRadiuses = {
     topStart: new LengthMetrics(0, LengthUnit.VP),
     topEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
@@ -264,6 +267,12 @@ export struct MessageBubble {
                   }
                 }
 
+                // Video 显示（Document 类型且 MIME 类型为 video/*）
+                if (this.message?.mediaType === MediaType.Document && 
+                    this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+                  this.VideoView()
+                }
+
                 // Sticker 显示
                 if (this.message?.mediaType === MediaType.Sticker) {
                   this.StickerView()
@@ -302,7 +311,7 @@ export struct MessageBubble {
               top: 8,
               bottom: 8
             })
-              .backgroundColor(this.message?.mediaType === MediaType.Sticker ? Color.Transparent :
+              .backgroundColor(this.shouldHideBubble() ? Color.Transparent :
                 (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
                   HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
               .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
@@ -417,14 +426,59 @@ export struct MessageBubble {
   }
 
   @Builder
+  VideoView() {
+    Stack() {
+      Video({
+        src: "file://" + this.mediaPath
+      })
+        .width(300)
+        .height(200)
+        .autoPlay(false)
+        .controls(true)
+        .objectFit(ImageFit.Contain)
+        .onError(() => {
+          Logger.error(`Video load error: ${this.mediaPath}`);
+          this.mediaLoadFailed = true;
+        })
+        .onStart(() => {
+          Logger.debug(`Video started playing: ${this.mediaPath}`);
+        })
+
+      // 加载状态
+      if (!this.mediaLoaded && !this.mediaLoadFailed) {
+        Loading()
+      }
+
+      // 错误状态
+      if (this.mediaLoadFailed) {
+        Column() {
+          Text($r('app.string.load_failed'))
+            .fontColor(Color.Red)
+            .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+          Text($r('app.string.retry'))
+            .fontSize(BaseConstants.FONT_SIZE_TEN)
+            .fontColor(Color.Gray)
+        }
+        .onClick(() => this.loadMedia())
+      }
+    }
+    .width(300)
+      .height(200)
+      .onAppear(() => {
+        this.loadMedia();
+      })
+  }
+
+  @Builder
   StickerView() {
     Stack() {
-      if (this.message?.stickerInfo?.isAnimated) {
+      if (this.message?.stickerInfo?.isAnimated && this.lottieJson.length > 7) {
         // 动画 Sticker (TGS 格式 - Lottie)
-        // TGS 文件需要先读取为字符串
+        // TGS 文件已解压为 JSON
         Lottie({
           autoPlay: true,
-          animationUri: "file://" + this.mediaPath,
+          controller: this.lottieController,
+          animationData: JSON.parse(this.lottieJson) as Object,
           loop: true,
         })
           .width(160)
@@ -459,10 +513,10 @@ export struct MessageBubble {
       // 错误状态
       if (this.mediaLoadFailed) {
         Column() {
-          Text("加载失败")
+          Text($r('app.string.load_failed'))
             .fontColor(Color.Red)
             .fontSize(BaseConstants.FONT_SIZE_TWELVE)
-          Text("点击重试")
+          Text($r('app.string.retry'))
             .fontSize(BaseConstants.FONT_SIZE_TEN)
             .fontColor(Color.Gray)
         }
@@ -561,44 +615,242 @@ export struct MessageBubble {
     this.mediaLoaded = false;
     this.mediaLoadFailed = false;
 
-    // 根据媒体类型确定文件扩展名
-    let extension = ".jpg";
+    Logger.warn(`[MEDIA] loadMedia called for messageId=${this.message?.messageId}, mediaType=${this.message?.mediaType}`);
+
+    // 根据 mediaInfo 或 stickerInfo 确定文件扩展名
+    let extension = ".jpg";  // 默认扩展名
+    
+    // Sticker 类型优先使用 stickerInfo 判断
     if (this.message?.mediaType === MediaType.Sticker) {
       if (this.message?.stickerInfo?.isVideo) {
         extension = ".webm";
+        Logger.warn(`[MEDIA] Sticker is video, using .webm`);
       } else if (this.message?.stickerInfo?.isAnimated) {
         extension = ".tgs";
+        Logger.warn(`[MEDIA] Sticker is animated (TGS), using .tgs`);
       } else {
         extension = ".webp";
+        Logger.warn(`[MEDIA] Sticker is static, using .webp`);
       }
+    } else if (this.message?.mediaInfo?.mimeType) {
+      // 使用 mediaInfo 中的 MIME 类型
+      extension = this.getExtensionFromMimeType(this.message.mediaInfo.mimeType);
+      Logger.warn(`[MEDIA] Using extension from mimeType: ${this.message.mediaInfo.mimeType} -> ${extension}`);
+    } else if (this.message?.mediaInfo?.fileName) {
+      // 使用文件名中的扩展名
+      extension = this.getExtensionFromFileName(this.message.mediaInfo.fileName);
+      Logger.warn(`[MEDIA] Using extension from fileName: ${this.message.mediaInfo.fileName} -> ${extension}`);
     }
 
     this.mediaPath =
       BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString() + extension;
-    Logger.debug("Media onAppear: " + this.mediaPath);
+    Logger.warn(`[MEDIA] Computed mediaPath: ${this.mediaPath}`);
 
     // download the media if not exists
     try {
       if (!fs.accessSync(this.mediaPath)) {
-        Logger.debug("Media onAppear: media " + this.mediaPath + " not exists, downloading media");
+        Logger.warn(`[MEDIA] File not exists, downloading: ${this.mediaPath}`);
         downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
           .then((path) => {
-            Logger.debug("Media onAppear: media downloaded: " + path);
+            Logger.warn(`[MEDIA] Download succeeded: ${path}`);
             this.mediaPath = path;
-            this.mediaLoaded = true;
+            // 验证文件是否存在
+            if (fs.accessSync(path)) {
+              const stat = fs.statSync(path);
+              Logger.warn(`[MEDIA] File exists, size: ${stat.size} bytes`);
+            } else {
+              Logger.error(`[MEDIA] Downloaded file not found: ${path}`);
+            }
+            // 如果是 TGS 文件，需要解压为 JSON
+            if (extension === ".tgs") {
+              this.decompressTgsFile(path);
+            } else {
+              this.mediaLoaded = true;
+            }
           })
           .catch((error: Error) => {
-            Logger.debug("Media onAppear Failed to download media: " + error.message);
+            Logger.error(`[MEDIA] Download failed: ${error.message}`);
             // this.mediaLoadFailed = true;
             this.mediaLoaded = true; // TODO: 临时忽略下载成功仍然返回失败的问题
           });
       } else {
-        Logger.debug("Media onAppear: media exists");
-        this.mediaLoaded = true;
+        const stat = fs.statSync(this.mediaPath);
+        Logger.warn(`[MEDIA] File already exists: ${this.mediaPath}, size: ${stat.size} bytes`);
+        // 如果是 TGS 文件，检查是否已解压
+        if (extension === ".tgs") {
+          const jsonPath = this.mediaPath.replace(".tgs", ".json");
+          if (fs.accessSync(jsonPath)) {
+            Logger.debug("TGS already decompressed: " + jsonPath);
+            this.decompressedMediaPath = jsonPath;
+            
+            // 读取 JSON 文件内容
+            try {
+              const file = fs.openSync(jsonPath, fs.OpenMode.READ_ONLY);
+              const stat = fs.statSync(jsonPath);
+              const buffer = new ArrayBuffer(stat.size);
+              fs.readSync(file.fd, buffer);
+              fs.closeSync(file);
+              
+              // 转换为字符串
+              const bytes = new Uint8Array(buffer);
+              let jsonContent = '';
+              for (let i = 0; i < bytes.length; i++) {
+                jsonContent += String.fromCharCode(bytes[i]);
+              }
+              
+              Logger.warn(`[TGSJSON] Loaded existing JSON (${jsonContent.length} bytes)`);
+              this.lottieJson = jsonContent;
+              this.mediaLoaded = true;
+            } catch (readErr) {
+              Logger.error(`[TGSJSON] Failed to read existing JSON: ${readErr}`);
+              // 读取失败，尝试重新解压
+              this.decompressTgsFile(this.mediaPath);
+            }
+          } else {
+            this.decompressTgsFile(this.mediaPath);
+          }
+        } else {
+          this.mediaLoaded = true;
+        }
       }
     } catch (error) {
       console.error(error);
     }
+  }
+
+  /**
+   * 解压 TGS 文件为 JSON
+   * TGS 文件是 gzip 压缩的 Lottie JSON 动画
+   */
+  private async decompressTgsFile(tgsPath: string): Promise<void> {
+    const jsonPath = tgsPath.replace(".tgs", ".json");
+    
+    Logger.warn(`[TGSJSON] Decompressing TGS (gzip): ${tgsPath} -> ${jsonPath}`);
+    
+    try {
+      // 创建 Checksum 实例用于 gzip 操作
+      const checksum = await zlib.createGZip();
+
+      // 打开 gzip 文件进行读取 (mode: "rb" = read binary)
+      await checksum.gzopen(tgsPath, "rb");
+      Logger.warn(`[TGSJSON] Gzip file opened successfully`);
+
+      // 预分配一个足够大的缓冲区（TGS 文件通常小于 1MB）
+      const bufferSize = 1024 * 1024; // 1MB
+      const buffer = new ArrayBuffer(bufferSize);
+
+      // 读取并解压数据
+      const bytesRead = await checksum.gzread(buffer);
+      Logger.warn(`[TGSJSON] Gzip read ${bytesRead} bytes`);
+
+      // 关闭 gzip 文件
+      await checksum.gzcloser();
+      Logger.warn(`[TGSJSON] Gzip file closed`);
+      
+      if (bytesRead > 0) {
+        // 将解压后的数据转换为字符串
+        const bytes = new Uint8Array(buffer, 0, bytesRead);
+        let jsonContent = '';
+        for (let i = 0; i < bytes.length; i++) {
+          jsonContent += String.fromCharCode(bytes[i]);
+        }
+        
+        const contentPreview = jsonContent.length > 200 ? jsonContent.substring(0, 200) + '...' : jsonContent;
+        Logger.warn(`[TGSJSON] JSON content (${jsonContent.length} bytes): ${contentPreview}`);
+
+        // 将 JSON 内容写入文件
+        const file = await fs.open(jsonPath, fs.OpenMode.CREATE | fs.OpenMode.TRUNC | fs.OpenMode.WRITE_ONLY);
+        await fs.write(file.fd, jsonContent);
+        await fs.close(file);
+
+        Logger.warn(`[TGSJSON] JSON written to file: ${jsonPath}`);
+        Logger.warn(`[TGSJSON] TGS decompression completed!! ${jsonContent.slice(0, 150)}`);
+
+        this.lottieJson = jsonContent;
+        this.decompressedMediaPath = jsonPath;
+        this.mediaLoaded = true;
+      } else {
+        Logger.error(`[TGSJSON] No data read from gzip file`);
+        this.mediaLoadFailed = true;
+      }
+    } catch (err) {
+      const error = err as BusinessError;
+      Logger.error(`[TGSJSON] Exception during gzip decompression: code=${error.code}, msg=${error.message}`);
+      this.mediaLoadFailed = true;
+    }
+  }
+
+  /**
+   * 判断是否应该隐藏气泡背景
+   * Sticker 和无文本的视频不显示气泡
+   */
+  private shouldHideBubble(): boolean {
+    // Sticker 总是无气泡
+    if (this.message?.mediaType === MediaType.Sticker) {
+      return true;
+    }
+    
+    // 视频：如果没有文本，则不显示气泡
+    if (this.message?.mediaType === MediaType.Document && 
+        this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+      const hasText = this.message?.text && this.message.text.trim().length > 0;
+      return !hasText;
+    }
+    
+    return false;
+  }
+
+  /**
+   * 从 MIME 类型推断文件扩展名
+   */
+  private getExtensionFromMimeType(mimeType: string): string {
+    const mimeMap: Record<string, string> = {
+      'image/jpeg': '.jpg',
+      'image/jpg': '.jpg',
+      'image/png': '.png',
+      'image/gif': '.gif',
+      'image/webp': '.webp',
+      'video/mp4': '.mp4',
+      'video/webm': '.webm',
+      'video/quicktime': '.mov',
+      'video/x-matroska': '.mkv',
+      'audio/mpeg': '.mp3',
+      'audio/mp3': '.mp3',
+      'audio/ogg': '.ogg',
+      'audio/wav': '.wav',
+      'audio/aac': '.aac',
+      'application/pdf': '.pdf',
+      'application/x-tgsticker': '.tgs',
+      'application/zip': '.zip',
+      'application/x-rar-compressed': '.rar',
+    };
+    
+    // 直接匹配
+    if (mimeMap[mimeType]) {
+      return mimeMap[mimeType];
+    }
+    
+    // 按前缀匹配
+    if (mimeType.startsWith('video/')) return '.mp4';
+    if (mimeType.startsWith('audio/')) return '.mp3';
+    if (mimeType.startsWith('image/')) return '.jpg';
+    
+    return '.bin';  // 未知类型
+  }
+
+  /**
+   * 从文件名中提取扩展名
+   */
+  private getExtensionFromFileName(fileName: string): string {
+    const parts = fileName.split('.');
+    if (parts.length > 1) {
+      const ext = parts[parts.length - 1];
+      // 验证扩展名长度合理
+      if (ext.length > 0 && ext.length < 10) {
+        return '.' + ext;
+      }
+    }
+    return '.bin';
   }
 
   @Builder
@@ -623,7 +875,7 @@ export struct MessageBubble {
     .color(Color.Blue)
     .layoutWeight(1)
     .size({
-      width: "10%",
-      height: "10%"
+      width: "18vp",
+      height: "18vp"
     })
 }

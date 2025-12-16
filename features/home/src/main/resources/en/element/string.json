@@ -17,6 +17,10 @@
       "value": "Loading..."
     },
     {
+      "name": "load_failed",
+      "value": "Load failed"
+    },
+    {
       "name": "login_phone_hint",
       "value": "Please input your phone number"
     },

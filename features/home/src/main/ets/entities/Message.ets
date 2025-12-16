@@ -5,14 +5,26 @@ import { IComparable } from '@ohos/base'
 /**
  * Sticker 信息
  */
-export interface StickerInfo {
+export class StickerInfo {
   emoji?: string;         // 关联的 emoji
-  isAnimated: boolean;    // 是否为动画 sticker (TGS)
-  isVideo: boolean;       // 是否为视频 sticker (WEBM)
+  isAnimated: boolean = false;    // 是否为动画 sticker (TGS)
+  isVideo: boolean = false;       // 是否为视频 sticker (WEBM)
   mimeType?: string;      // MIME 类型
   fileSize?: number;      // 文件大小
   width?: number;         // 宽度
   height?: number;        // 高度
+}
+
+/**
+ * 通用媒体信息（Photo、Document、Video 等）
+ */
+export class MediaInfo {
+  mimeType?: string;      // MIME 类型
+  fileName?: string;      // 原始文件名
+  fileSize?: number;      // 文件大小（字节）
+  width?: number;         // 宽度（图片/视频）
+  height?: number;        // 高度（图片/视频）
+  duration?: number;      // 时长（视频/音频，秒）
 }
 
 /**
@@ -99,6 +111,11 @@ export class Message implements NativeMessage, IComparable<Message> {
   stickerInfoJson?: string
   /// 运行时使用的 Sticker 信息
   stickerInfo?: StickerInfo
+  /// 通用媒体信息 - 存储为 JSON 字符串
+  @sql.SqlColumn(sql.ColumnType.TEXT)
+  mediaInfoJson?: string
+  /// 运行时使用的媒体信息
+  mediaInfo?: MediaInfo
 
   constructor(chatId: number, messageId: number, outgoing: boolean, pinned: boolean, senderId: number,
     senderName: string, timestamp: number, text: string, mediaType: MediaType, editTimestamp?: number,
@@ -128,6 +145,7 @@ export class Message implements NativeMessage, IComparable<Message> {
     if (stickerInfo) {
       this.stickerInfoJson = JSON.stringify(stickerInfo);
     }
+    // Note: mediaInfo 会在 fromNative 时设置
   }
 
   public static fromNative(nativeMessage: NativeMessage): Message {
@@ -169,6 +187,19 @@ export class Message implements NativeMessage, IComparable<Message> {
     if (nativeMessage.stickerInfo) {
       msg.stickerInfoJson = JSON.stringify(nativeMessage.stickerInfo);
     }
+    // 序列化媒体信息
+    if (nativeMessage.mediaInfo) {
+      // 创建 MediaInfo 实例而不是直接赋值，避免结构化类型问题
+      const mediaInfo = new MediaInfo();
+      mediaInfo.mimeType = nativeMessage.mediaInfo.mimeType;
+      mediaInfo.fileName = nativeMessage.mediaInfo.fileName;
+      mediaInfo.fileSize = nativeMessage.mediaInfo.fileSize;
+      mediaInfo.width = nativeMessage.mediaInfo.width;
+      mediaInfo.height = nativeMessage.mediaInfo.height;
+      mediaInfo.duration = nativeMessage.mediaInfo.duration;
+      msg.mediaInfo = mediaInfo;
+      msg.mediaInfoJson = JSON.stringify(mediaInfo);
+    }
 
     return msg;
   }
@@ -204,6 +235,16 @@ export class Message implements NativeMessage, IComparable<Message> {
       } catch (e) {
         console.warn(`[STICKER] deserializeFmtEntities: failed to parse stickerInfo JSON: ${e}`);
         this.stickerInfo = undefined;
+      }
+    }
+
+    // 反序列化 mediaInfo
+    if (this.mediaInfoJson && this.mediaInfoJson.length > 0) {
+      try {
+        this.mediaInfo = JSON.parse(this.mediaInfoJson) as MediaInfo;
+      } catch (e) {
+        console.warn(`[MEDIA] deserializeFmtEntities: failed to parse mediaInfo JSON: ${e}`);
+        this.mediaInfo = undefined;
       }
     }
   }

@@ -24,6 +24,8 @@ class MessageDao {
     forwardCount INTEGER DEFAULT 0,
     replyCount INTEGER DEFAULT 0,
     fmtEntitiesJson TEXT,
+    stickerInfoJson TEXT,
+    mediaInfoJson TEXT,
   	PRIMARY KEY (chatId, messageId),
     FOREIGN KEY (chatId) REFERENCES chats(chatId) DEFERRABLE INITIALLY DEFERRED
     FOREIGN KEY (senderId) REFERENCES seen_chats(chatId) DEFERRABLE INITIALLY DEFERRED
@@ -39,9 +41,9 @@ class MessageDao {
   }
 
   @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
-    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) " +
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson, stickerInfoJson, mediaInfoJson) " +
     "VALUES (#{chatId}, #{messageId}, #{outgoing}, #{pinned}, #{senderId}, #{senderName}, #{timestamp}, #{text}, #{mediaType}," +
-    " #{editTimestamp}, #{groupedId}, #{replyToMessageId}, #{viewCount}, #{forwardCount}, #{replyCount}, #{fmtEntitiesJson})")
+    " #{editTimestamp}, #{groupedId}, #{replyToMessageId}, #{viewCount}, #{forwardCount}, #{replyCount}, #{fmtEntitiesJson}, #{stickerInfoJson}, #{mediaInfoJson})")
   insert(@sql.Param("chatId") chatId: number, @sql.Param("messageId") messageId: number,
     @sql.Param("outgoing") outgoing: boolean,
     @sql.Param("pinned") pinned: boolean, @sql.Param("senderId") senderId: number,
@@ -54,22 +56,24 @@ class MessageDao {
     @sql.Param("viewCount") viewCount: number,
     @sql.Param("forwardCount") forwardCount: number,
     @sql.Param("replyCount") replyCount: number,
-    @sql.Param("fmtEntitiesJson") fmtEntitiesJson: string): Promise<void> {
+    @sql.Param("fmtEntitiesJson") fmtEntitiesJson: string,
+    @sql.Param("stickerInfoJson") stickerInfoJson: string,
+    @sql.Param("mediaInfoJson") mediaInfoJson: string): Promise<void> {
     return sql.PromiseNull();
   }
 
   @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
-    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) " +
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson, stickerInfoJson, mediaInfoJson) " +
     "VALUES (#{message.chatId}, #{message.messageId}, #{message.outgoing}, #{message.pinned}, #{message.senderId}," +
     "#{message.senderName}, #{message.timestamp}, #{message.text}, #{message.mediaType}, " +
     "#{message.editTimestamp}, #{message.groupedId}, #{message.replyToMessageId}, " +
-    "#{message.viewCount}, #{message.forwardCount}, #{message.replyCount}, #{message.fmtEntitiesJson})")
+    "#{message.viewCount}, #{message.forwardCount}, #{message.replyCount}, #{message.fmtEntitiesJson}, #{message.stickerInfoJson}, #{message.mediaInfoJson})")
   insertMessage(@sql.Param("message") message: Message): Promise<void> {
     return sql.PromiseNull();
   }
 
   @sql.SqlInsert("REPLACE INTO messages (chatId, messageId, outgoing, pinned, senderId, senderName, timestamp, text, " +
-    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson) VALUES #{messagesSql}")
+    "mediaType, editTimestamp, groupedId, replyToMessageId, viewCount, forwardCount, replyCount, fmtEntitiesJson, stickerInfoJson, mediaInfoJson) VALUES #{messagesSql}")
   _insertMessages(@sql.Param("messagesSql", true) messagesSql: string): Promise<void> {
     return sql.PromiseNull();
   }
@@ -77,10 +81,12 @@ class MessageDao {
   async insertMessages(messages: Array<Message>): Promise<void> {
     let messagesSql = messages.map((message) => {
       const fmtJson = message.fmtEntitiesJson ? `"${escapeString(message.fmtEntitiesJson)}"` : 'NULL';
+      const stickerJson = message.stickerInfoJson ? `"${escapeString(message.stickerInfoJson)}"` : 'NULL';
+      const mediaJson = message.mediaInfoJson ? `"${escapeString(message.mediaInfoJson)}"` : 'NULL';
       return `(${message.chatId}, ${message.messageId}, ${message.outgoing}, ${message.pinned}, ${message.senderId},
       "${escapeString(message.senderName)}", ${message.timestamp}, "${escapeString(message.text)}", ${message.mediaType},
       ${message.editTimestamp || 0}, ${message.groupedId || 0}, ${message.replyToMessageId || 0},
-      ${message.viewCount || 0}, ${message.forwardCount || 0}, ${message.replyCount || 0}, ${fmtJson})`;
+      ${message.viewCount || 0}, ${message.forwardCount || 0}, ${message.replyCount || 0}, ${fmtJson}, ${stickerJson}, ${mediaJson})`;
     }).join(", ");
     return this._insertMessages(messagesSql);
   }
