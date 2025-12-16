@@ -131,6 +131,74 @@
     {
       "name": "role_admin",
       "value": "管理员"
+    },
+    {
+      "name": "profile_loading_chat",
+      "value": "正在加载 chat_id: "
+    },
+    {
+      "name": "profile_username",
+      "value": "用户名"
+    },
+    {
+      "name": "profile_phone",
+      "value": "电话"
+    },
+    {
+      "name": "profile_first_name",
+      "value": "名"
+    },
+    {
+      "name": "profile_last_name",
+      "value": "姓"
+    },
+    {
+      "name": "profile_birthday",
+      "value": "生日"
+    },
+    {
+      "name": "profile_contact",
+      "value": "联系人"
+    },
+    {
+      "name": "profile_yes",
+      "value": "是"
+    },
+    {
+      "name": "profile_no",
+      "value": "否"
+    },
+    {
+      "name": "profile_mutual_contact",
+      "value": "互相联系人"
+    },
+    {
+      "name": "profile_forum",
+      "value": "论坛"
+    },
+    {
+      "name": "profile_type",
+      "value": "类型"
+    },
+    {
+      "name": "profile_device",
+      "value": "设备"
+    },
+    {
+      "name": "profile_chat_type_user",
+      "value": "用户"
+    },
+    {
+      "name": "profile_chat_type_group",
+      "value": "群组"
+    },
+    {
+      "name": "profile_chat_type_channel",
+      "value": "频道"
+    },
+    {
+      "name": "profile_chat_type_unknown",
+      "value": "未知"
     }
   ]
 }

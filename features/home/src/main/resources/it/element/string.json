@@ -135,6 +135,74 @@
     {
       "name": "role_admin",
       "value": "Amministratore"
+    },
+    {
+      "name": "profile_loading_chat",
+      "value": "Caricamento chat_id: "
+    },
+    {
+      "name": "profile_username",
+      "value": "Nome utente"
+    },
+    {
+      "name": "profile_phone",
+      "value": "Telefono"
+    },
+    {
+      "name": "profile_first_name",
+      "value": "Nome"
+    },
+    {
+      "name": "profile_last_name",
+      "value": "Cognome"
+    },
+    {
+      "name": "profile_birthday",
+      "value": "Compleanno"
+    },
+    {
+      "name": "profile_contact",
+      "value": "Contatto"
+    },
+    {
+      "name": "profile_yes",
+      "value": "Sì"
+    },
+    {
+      "name": "profile_no",
+      "value": "No"
+    },
+    {
+      "name": "profile_mutual_contact",
+      "value": "Contatto reciproco"
+    },
+    {
+      "name": "profile_forum",
+      "value": "Forum"
+    },
+    {
+      "name": "profile_type",
+      "value": "Tipo"
+    },
+    {
+      "name": "profile_device",
+      "value": "Dispositivo"
+    },
+    {
+      "name": "profile_chat_type_user",
+      "value": "Utente"
+    },
+    {
+      "name": "profile_chat_type_group",
+      "value": "Gruppo"
+    },
+    {
+      "name": "profile_chat_type_channel",
+      "value": "Canale"
+    },
+    {
+      "name": "profile_chat_type_unknown",
+      "value": "Sconosciuto"
     }
   ]
 }

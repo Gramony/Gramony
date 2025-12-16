@@ -6,7 +6,7 @@
   "name": "Homogram",
   "description": "Native Telegram Client for HarmonyOS NEXT",
   "main": "",
-  "version": "1.5.3",
+  "version": "1.5.5",
   "dynamicDependencies": {},
   "dependencies": {
     "@liushengyi/smartdb": "^4.0.1",

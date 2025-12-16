@@ -135,6 +135,74 @@
     {
       "name": "role_admin",
       "value": "管理者"
+    },
+    {
+      "name": "profile_loading_chat",
+      "value": "chat_idを読み込み中: "
+    },
+    {
+      "name": "profile_username",
+      "value": "ユーザー名"
+    },
+    {
+      "name": "profile_phone",
+      "value": "電話番号"
+    },
+    {
+      "name": "profile_first_name",
+      "value": "名"
+    },
+    {
+      "name": "profile_last_name",
+      "value": "姓"
+    },
+    {
+      "name": "profile_birthday",
+      "value": "誕生日"
+    },
+    {
+      "name": "profile_contact",
+      "value": "連絡先"
+    },
+    {
+      "name": "profile_yes",
+      "value": "はい"
+    },
+    {
+      "name": "profile_no",
+      "value": "いいえ"
+    },
+    {
+      "name": "profile_mutual_contact",
+      "value": "相互連絡先"
+    },
+    {
+      "name": "profile_forum",
+      "value": "フォーラム"
+    },
+    {
+      "name": "profile_type",
+      "value": "タイプ"
+    },
+    {
+      "name": "profile_device",
+      "value": "デバイス"
+    },
+    {
+      "name": "profile_chat_type_user",
+      "value": "ユーザー"
+    },
+    {
+      "name": "profile_chat_type_group",
+      "value": "グループ"
+    },
+    {
+      "name": "profile_chat_type_channel",
+      "value": "チャンネル"
+    },
+    {
+      "name": "profile_chat_type_unknown",
+      "value": "不明"
     }
   ]
 }

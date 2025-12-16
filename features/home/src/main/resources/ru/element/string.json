@@ -135,6 +135,74 @@
     {
       "name": "role_admin",
       "value": "Администратор"
+    },
+    {
+      "name": "profile_loading_chat",
+      "value": "Загрузка chat_id: "
+    },
+    {
+      "name": "profile_username",
+      "value": "Имя пользователя"
+    },
+    {
+      "name": "profile_phone",
+      "value": "Телефон"
+    },
+    {
+      "name": "profile_first_name",
+      "value": "Имя"
+    },
+    {
+      "name": "profile_last_name",
+      "value": "Фамилия"
+    },
+    {
+      "name": "profile_birthday",
+      "value": "День рождения"
+    },
+    {
+      "name": "profile_contact",
+      "value": "Контакт"
+    },
+    {
+      "name": "profile_yes",
+      "value": "Да"
+    },
+    {
+      "name": "profile_no",
+      "value": "Нет"
+    },
+    {
+      "name": "profile_mutual_contact",
+      "value": "Взаимный контакт"
+    },
+    {
+      "name": "profile_forum",
+      "value": "Форум"
+    },
+    {
+      "name": "profile_type",
+      "value": "Тип"
+    },
+    {
+      "name": "profile_device",
+      "value": "Устройство"
+    },
+    {
+      "name": "profile_chat_type_user",
+      "value": "Пользователь"
+    },
+    {
+      "name": "profile_chat_type_group",
+      "value": "Группа"
+    },
+    {
+      "name": "profile_chat_type_channel",
+      "value": "Канал"
+    },
+    {
+      "name": "profile_chat_type_unknown",
+      "value": "Неизвестно"
     }
   ]
 }

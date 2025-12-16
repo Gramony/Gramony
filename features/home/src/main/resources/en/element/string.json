@@ -139,6 +139,74 @@
     {
       "name": "role_admin",
       "value": "Admin"
+    },
+    {
+      "name": "profile_loading_chat",
+      "value": "Loading chat_id: "
+    },
+    {
+      "name": "profile_username",
+      "value": "Username"
+    },
+    {
+      "name": "profile_phone",
+      "value": "Phone"
+    },
+    {
+      "name": "profile_first_name",
+      "value": "First Name"
+    },
+    {
+      "name": "profile_last_name",
+      "value": "Last Name"
+    },
+    {
+      "name": "profile_birthday",
+      "value": "Birthday"
+    },
+    {
+      "name": "profile_contact",
+      "value": "Contact"
+    },
+    {
+      "name": "profile_yes",
+      "value": "Yes"
+    },
+    {
+      "name": "profile_no",
+      "value": "No"
+    },
+    {
+      "name": "profile_mutual_contact",
+      "value": "Mutual Contact"
+    },
+    {
+      "name": "profile_forum",
+      "value": "Forum"
+    },
+    {
+      "name": "profile_type",
+      "value": "Type"
+    },
+    {
+      "name": "profile_device",
+      "value": "Device"
+    },
+    {
+      "name": "profile_chat_type_user",
+      "value": "User"
+    },
+    {
+      "name": "profile_chat_type_group",
+      "value": "Group"
+    },
+    {
+      "name": "profile_chat_type_channel",
+      "value": "Channel"
+    },
+    {
+      "name": "profile_chat_type_unknown",
+      "value": "Unknown"
     }
   ]
 }
