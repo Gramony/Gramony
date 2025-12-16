@@ -82,13 +82,13 @@ export struct MessageBubble {
     bottomStart: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
     bottomEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
   };
-  private messageListScroller?: ListScroller;
-  private chatType: ChatType = ChatType.User;
+  messageListScroller?: ListScroller;
+  chatType: ChatType = ChatType.User;
   private content: string = "";
   private isAppletMsg?: boolean = false;
   private isDocumentMsg?: boolean = false;
-  private textController: TextController = new TextController();
-  private message?= new Message(
+  textController: TextController = new TextController();
+  message?= new Message(
     1,
     1,
     false,
@@ -250,7 +250,7 @@ export struct MessageBubble {
                             height: 800
                           };
                           let fileInfo: filePreview.PreviewInfo = {
-                            uri: "file://" + getContext().applicationInfo.name + this.mediaPath,
+                            uri: "file://" + uiContext.applicationInfo.name + this.mediaPath,
                             mimeType: 'image/jpeg'
                           };
                           filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
@@ -486,21 +486,25 @@ export struct MessageBubble {
       BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString() + ".jpg";
     Logger.debug("Media onAppear: " + this.mediaPath);
     // download the image if not exists
-    if (!fs.accessSync(this.mediaPath)) {
-      Logger.debug("Media onAppear: media " + this.mediaPath + " not exists, downloading media");
-      downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
-        .then((path) => {
-          Logger.debug("Media onAppear: media downloaded: " + path);
-          this.mediaPath = path;
-          this.mediaLoaded = true;
-        })
-        .catch((error: Error) => {
-          Logger.debug("Media onAppear Failed to download media: " + error.message);
-          this.mediaLoadFailed = true;
-        });
-    } else {
-      Logger.debug("Media onAppear: media exists");
-      this.mediaLoaded = true;
+    try {
+      if (!fs.accessSync(this.mediaPath)) {
+        Logger.debug("Media onAppear: media " + this.mediaPath + " not exists, downloading media");
+        downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
+          .then((path) => {
+            Logger.debug("Media onAppear: media downloaded: " + path);
+            this.mediaPath = path;
+            this.mediaLoaded = true;
+          })
+          .catch((error: Error) => {
+            Logger.debug("Media onAppear Failed to download media: " + error.message);
+            this.mediaLoadFailed = true;
+          });
+      } else {
+        Logger.debug("Media onAppear: media exists");
+        this.mediaLoaded = true;
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 

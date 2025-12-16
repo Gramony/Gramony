@@ -62,7 +62,11 @@ export async function loadCachedChats(chatDataSource: ChatDataSource,
   // Logger.debug('loadCachedChats: retrieved ' + unpinnedChats.length + ' unpinned chats');
   let seen_chats = await seenChatDao.getAllSeenChats();
   for (let i = 0; i < seen_chats.length; i++) {
-    seenChatsMap.set(seen_chats[i].chatId.toString(), seen_chats[i]);
+    try {
+      seenChatsMap.set(seen_chats[i].chatId.toString(), seen_chats[i]);
+    } catch (error) {
+      Logger.error('loadCachedChats: failed to add seen chat to map: ' + error);
+    }
   }
   Logger.debug('loadCachedChats: retrieved ' + seen_chats.length + ' seen chats');
 
@@ -78,12 +82,18 @@ export async function loadCachedChats(chatDataSource: ChatDataSource,
 
   start = Date.now();
 
-
+  console.warn(`[FMTENTITIES] ChatViewModel.loadCachedChats: loading messages for ${chats.length} chats`);
   for (let i = 0; i < chats.length; i++) {
+    console.warn(`[FMTENTITIES] ChatViewModel.loadCachedChats: loading messages for chatId=${chats[i].chatId}`);
     let messages = await messageDao.getMessagesByChatId(chats[i].chatId);
-    let messageDataSources = messagesOfChats.get(chats[i].chatId.toString()) || new MessageDataSource();
-    messageDataSources.setMessages(messages);
-    messagesOfChats.set(chats[i].chatId.toString(), messageDataSources);
+    console.warn(`[FMTENTITIES] ChatViewModel.loadCachedChats: loaded ${messages.length} messages for chatId=${chats[i].chatId}`);
+    try {
+      let messageDataSources = messagesOfChats.get(chats[i].chatId.toString()) || new MessageDataSource();
+      messageDataSources.setMessages(messages);
+      messagesOfChats.set(chats[i].chatId.toString(), messageDataSources);
+    } catch (e) {
+      Logger.error(`loadCachedChats: failed to set messages for chatId=${chats[i].chatId}: ${e}`);
+    }
     // packed_chats.push((await packedChatDao.getPackedChatById(chats[i].chatId))); // TODO: using batch query
     // if (packed_chats[packed_chats.length - 1] === null) {
     //   Logger.error('loadCachedChats: packed chat not found for chat ' + chats[i].chatId);

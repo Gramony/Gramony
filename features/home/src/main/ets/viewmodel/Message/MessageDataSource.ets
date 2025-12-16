@@ -14,7 +14,10 @@ export class MessageDataSource implements IDataSourcePrefetching {
   private listeners: DataChangeListener[] = [];
 
   public setMessages(messages: Message[]): void {
+    console.warn(`[FMTENTITIES] MessageDataSource.setMessages: setting ${messages.length} messages`);
     for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      console.warn(`[FMTENTITIES] MessageDataSource.setMessages: message ${i} - messageId=${msg.messageId}, fmtEntities count=${msg.fmtEntities?.length ?? 0}, fmtEntitiesJson=${msg.fmtEntitiesJson?.substring(0, 100)}`);
       this.sortedMessages.set(messages[i].messageId, messages[i]);
     }
     this.notifyDataReload();

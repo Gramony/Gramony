@@ -52,7 +52,11 @@ export struct VerifyCode {
               return;
             }
             this.isLoading = true;
-            promptAction.showToast({ message: $r('app.string.loading'), duration: 2000 });
+              try {
+                promptAction.showToast({ message: $r('app.string.loading'), duration: 2000 });
+              } catch (error) {
+                console.warn(error);
+              }
             Logger.debug('Login/VerifyCode submit code: ' + this.code);
             let result = await verifyCode(this.code);
             if (result == LoginState.LoggedIn) {
@@ -63,7 +67,11 @@ export struct VerifyCode {
                 Logger.error(this.errorMessage);
                 this.isError = true;
                 this.isLoading = false;
-                promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
+                try {
+                  promptAction.showToast({ message: $r('app.string.login_failed_retry'), duration: 2000 });
+                } catch (error) {
+                  console.warn(error);
+                }
                 this.isSignOut = await signOut();
                 this.errorMessage = 'Sign out: ' + this.isSignOut.toString();
                 return

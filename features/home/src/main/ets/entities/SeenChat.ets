@@ -87,7 +87,7 @@ export class SeenChat {
       forum: this.forum
     };
     if (this.photoThumb !== "") {
-      native.photoThumb = Array.from(Base64.decode(this.photoThumb));
+      native.photoThumb = Array.from(Base64.decode(this.photoThumb ?? ""));
     } else {
       native.photoThumb = undefined;
     }

@@ -20,11 +20,11 @@ import { MessageBubble } from '../Message/MessageBubble';
 
 @Component
 export default struct ChatDetailItem {
-  private messageListScroller?: ListScroller;
-  private chatType?: ChatType;
-  private message?: Message;
-  private isAppletMsg?: boolean;
-  private isDocumentMsg?: boolean;
+  messageListScroller?: ListScroller;
+  chatType?: ChatType;
+  message?: Message;
+  isAppletMsg?: boolean;
+  isDocumentMsg?: boolean;
 
   build() {
     Flex({ justifyContent: FlexAlign.End, alignItems: ItemAlign.End }) {

@@ -58,7 +58,7 @@
     },
     {
       "name": "login_failed_retry",
-      "value": "Failed, please try again"
+      "value": "Failed. Please try again."
     },
     {
       "name": "message",

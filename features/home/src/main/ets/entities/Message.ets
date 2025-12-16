@@ -112,12 +112,9 @@ export class Message implements NativeMessage, IComparable<Message> {
     // 转换格式化实体
     let fmtEntities: MessageEntity[] | undefined;
     if (nativeMessage.fmtEntities && nativeMessage.fmtEntities.length > 0) {
-      console.warn(`[FMTENTITIES] fromNative: converting ${nativeMessage.fmtEntities.length} entities from NAPI`);
-      console.warn(`[FMTENTITIES] fromNative: first entity raw: ${JSON.stringify(nativeMessage.fmtEntities[0])}`);
+      console.warn(`[FMTENTITIES] fromNative: converting ${nativeMessage.fmtEntities.length} entities from NAPI, first entity raw: ${JSON.stringify(nativeMessage.fmtEntities[0])}`);
       fmtEntities = nativeMessage.fmtEntities.map(e => MessageEntity.fromNative(e));
-      console.warn(`[FMTENTITIES] fromNative: first entity converted: ${JSON.stringify(fmtEntities[0])}`);
-    } else {
-      console.warn(`[FMTENTITIES] fromNative: no fmtEntities in nativeMessage`);
+      console.warn(`[FMTENTITIES] fromNative: first entity converted: ${JSON.stringify(fmtEntities ? fmtEntities[0] : null)}`);
     }
 
     const msg = new Message(
