@@ -514,10 +514,13 @@ export struct MessageBubble {
       Text(senderName)
         .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
         .fontWeight(FontWeight.Bold)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
         .textAlign(TextAlign.Start)
       Blank()
     }
-    .alignSelf(ItemAlign.Start)
+    .padding({ bottom: 2 })
+      .alignSelf(ItemAlign.Start)
   }
 }
 

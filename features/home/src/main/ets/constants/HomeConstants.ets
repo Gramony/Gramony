@@ -123,7 +123,7 @@ export class HomeConstants {
   static readonly NAV_SIGNAL_BAR_HEIGHT = 36;
   static readonly NAV_TITLE_FONT_SIZE = 18;
   static readonly NAV_TITLE_FONT_SIZE_LARGE = 26;
-  static readonly NAV_TITLE_TOP_MARGIN = 36;
+  static readonly NAV_TITLE_TOP_MARGIN = 28;
   static readonly NAV_TITLE_LEFT_MARGIN = 24;
   static readonly NAV_TITLE_TOP_MARGIN_MINI = 56;
   static readonly NAV_MENU_TOP_MARGIN = HomeConstants.NAV_TITLE_TOP_MARGIN;

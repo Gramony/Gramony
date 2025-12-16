@@ -334,7 +334,6 @@ export struct Index {
             })
               .expandSafeArea([SafeAreaType.SYSTEM])
               .width(BaseConstants.FULL_WIDTH)
-            // .height(BaseConstants.FULL_HEIGHT)
           }
           .tabBar(new BottomTabBarStyle({
             normal: new SymbolGlyphModifier($r('sys.symbol.message_on_message')),
@@ -486,9 +485,6 @@ export struct Index {
       })
       .animation({ curve: curves.springMotion(0.6, 0.8) })
       .transition(TransitionEffect.move(TransitionEdge.TOP).animation({ curve: curves.springMotion(0.6, 0.8) }))
-      // .padding({
-      //   top: this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM ? HomeConstants.NAV_TITLE_TOP_MARGIN : 0
-      // })
       .onNavBarStateChange((isVisible: boolean) => {
         Logger.debug('Home page onNavBarStateChange isVisible is ' + isVisible);
         this.isOnTop = isVisible;

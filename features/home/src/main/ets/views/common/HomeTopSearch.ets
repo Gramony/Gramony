@@ -15,7 +15,6 @@
 
 import { BaseConstants, BreakpointConstants, CircleButton, StandardIcon } from '@ohos/base';
 import { HomeConstants } from '../../constants/HomeConstants';
-import { deviceInfo } from '@kit.BasicServicesKit';
 
 @Preview
 @Component
@@ -96,6 +95,5 @@ export struct HomeTopSearch {
     }
     .justifyContent(FlexAlign.Center)
       .width(BaseConstants.FULL_WIDTH)
-    // .height(BaseConstants.FULL_HEIGHT)
   }
 }

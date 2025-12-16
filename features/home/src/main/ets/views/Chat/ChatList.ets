@@ -68,7 +68,7 @@ export struct ChatList {
         .zIndex(1)
         .onAreaChange((oldValue, newValue) => {
           this.homeTopSearchHeight = newValue.height
-          console.log("homeTopSearchHeight", oldValue.height.toString(), "to", newValue.height)
+          console.debug("homeTopSearchHeight", oldValue.height.toString(), "to", newValue.height)
         })
 
       List({
@@ -122,6 +122,7 @@ export struct ChatList {
         ListItem() { // Placeholder to prevent HomeTopSearch from overlapping ChatItems
           Row()
             .height(this.homeTopSearchHeight)
+            .margin({ bottom: -20 })
             .width(BaseConstants.FULL_WIDTH)
         }
 
@@ -196,10 +197,6 @@ export struct ChatList {
         }
       }
       .height(BaseConstants.FULL_PERCENT)
-      // .nestedScroll({
-      //   scrollForward: NestedScrollMode.PARENT_FIRST,
-      //   scrollBackward: NestedScrollMode.SELF_FIRST
-      // })
       .cachedCount(BaseConstants.LAZY_FOR_EACH_CACHED_COUNT)
       .padding({
         bottom: deviceInfo.deviceType !== BaseConstants.DEVICE_2IN1 &&

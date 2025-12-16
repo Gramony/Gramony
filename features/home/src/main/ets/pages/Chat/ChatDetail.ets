@@ -25,7 +25,7 @@ import { HashMap } from '@kit.ArkTS';
 import { ChatDataSource } from '../../viewmodel/Chat/ChatDataSource';
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
 import { ChatType, loadHistoryMessages, NativeMessage } from 'libhomogrape.so';
-import { AlertDialog, curves, promptAction } from '@kit.ArkUI';
+import { AlertDialog, curves, LengthMetrics, LengthUnit, promptAction } from '@kit.ArkUI';
 
 @AnimatableExtend(NavDestination)
   function animatableBlur(blurRadius: number) {
@@ -70,6 +70,9 @@ export struct ChatDetail {
         .fontColor($r('sys.color.font_primary'))
         .fontSize(HomeConstants.NAV_TITLE_FONT_SIZE)
         .fontWeight(FontWeight.Medium)
+        .padding({
+          start: new LengthMetrics(8, LengthUnit.VP),
+        })
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
