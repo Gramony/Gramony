@@ -21,6 +21,7 @@ import { HomeConstants } from '../../constants/HomeConstants';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { Message } from '../../entities/Message';
 import { Chat } from '../../entities/Chat';
+import { SeenChat } from '../../entities/SeenChat';
 import { HashMap } from '@kit.ArkTS';
 import { ChatDataSource } from '../../viewmodel/Chat/ChatDataSource';
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
@@ -39,6 +40,7 @@ export struct ChatDetail {
   // @Consume chatsMap: Map<string, Chat>;
   @Consume chatDataSource: ChatDataSource;
   @Consume messagesOfChatMap: HashMap<string, MessageDataSource>;
+  @Consume seenChatsMap: HashMap<string, SeenChat>;
   @Consume currentChatId: string;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @State currentChatUserName: string = '';
@@ -293,7 +295,13 @@ export struct ChatDetail {
     let chat = this.chatDataSource.get(this.currentChatId);
     this.chatType = chat?.chatType || ChatType.User;
     this.isGroupOrChannel = this.chatType === ChatType.Group || this.chatType === ChatType.Channel;
-    this.currentChatUserName = chat?.name || '';
+    // 如果 chatDataSource 中没有，尝试从 seenChatsMap 中获取用户名
+    if (chat?.name) {
+      this.currentChatUserName = chat.name;
+    } else {
+      const seenChat = this.seenChatsMap.get(this.currentChatId);
+      this.currentChatUserName = seenChat?.fullName || seenChat?.firstName || '';
+    }
     this.length = this.messagesOfChatMap.get(this.currentChatId)?.totalCount() || 0;
     // this.messages = (this.currentChatPinned ? this.pinnedChatsMap :
     // this.chatsMap).get(this.currentChatId)?.sortedMessages || [];

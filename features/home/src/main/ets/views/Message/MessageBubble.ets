@@ -166,6 +166,21 @@ export struct MessageBubble {
                       if (!this.messagesOfChatMap.hasKey(id.toString())) {
                         this.messagesOfChatMap.set(id.toString(), new MessageDataSource());
                       }
+                      // 确保 seenChatsMap 中有用户信息（用于显示标题）
+                      if (!this.seenChatsMap.hasKey(id.toString())) {
+                        // 创建一个临时的 SeenChat 对象
+                        const tempSeenChat = new SeenChat(
+                          id,
+                          ChatType.User,
+                          "",  // packedChat
+                          false,  // isContact
+                          false,  // isMutualContact
+                          this.message?.senderName || "User",  // fullName
+                          this.message?.senderName || "User",  // firstName
+                          false  // forum
+                        );
+                        this.seenChatsMap.set(id.toString(), tempSeenChat);
+                      }
                       this.pageInfo.pushPath({ name: 'ChatDetail' });
                     }
                   },
