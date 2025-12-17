@@ -41,7 +41,7 @@ import {
 import { ChatDetail } from './Chat/ChatDetail';
 import { ChatList } from '../views/Chat/ChatList';
 import { HomeConstants } from '../constants/HomeConstants';
-import { deviceInfo, emitter } from '@kit.BasicServicesKit';
+import { emitter } from '@kit.BasicServicesKit';
 import { PhoneNumber, VerifyCode, Password } from './Login/Index'
 import {
   isLoggedIn,
@@ -305,7 +305,7 @@ export struct Index {
       }
       .alignItems(VerticalAlign.Center)
       .visibility(this.isLoadingNewMessages && this.currentPageIndex === 0 && this.isOnTop ? Visibility.Visible :
-      Visibility.Hidden)
+        Visibility.Hidden)
       .zIndex(1)
       .transition(TransitionEffect.move(TransitionEdge.TOP).animation({ curve: curves.springMotion(0.6, 0.8) }))
 
@@ -324,7 +324,7 @@ export struct Index {
         // })
         Tabs({
           barPosition: this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ?
-          BarPosition.Start : BarPosition.End
+            BarPosition.Start : BarPosition.End
         }) {
           TabContent() {
             ChatList({
@@ -374,7 +374,7 @@ export struct Index {
         .scrollable(false)
         .vertical(this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM)
         .barWidth(this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM ?
-        $r('app.float.bar_width') : BaseConstants.FULL_PERCENT)
+          $r('app.float.bar_width') : BaseConstants.FULL_PERCENT)
         // .barHeight(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ? BaseConstants.FULL_PERCENT :
         //   (deviceInfo.deviceType === BaseConstants.DEVICE_TYPES[0] ? $r('app.float.tab_size_lg') :
         //   $r('app.float.tab_size')))
@@ -412,13 +412,13 @@ export struct Index {
       .hideToolBar(true)
       .hideBackButton(true)
       .navBarWidth(this.currentBreakpoint === BreakpointConstants.BREAKPOINT_XL ?
-      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_XL :
-      (this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
-      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_LG :
-      HomeConstants.NAVIGATION_NAV_BAR_WIDTH_MD))
+        HomeConstants.NAVIGATION_NAV_BAR_WIDTH_XL :
+        (this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
+          HomeConstants.NAVIGATION_NAV_BAR_WIDTH_LG :
+          HomeConstants.NAVIGATION_NAV_BAR_WIDTH_MD))
       .navDestination(this.PageMap)
       .mode((this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM || !this.isLoggedIn) ? NavigationMode.Stack :
-      NavigationMode.Split)
+        NavigationMode.Split)
       .width(BaseConstants.FULL_WIDTH)
       .onAppear(async () => {
         Logger.debug('Home page onAppear');
@@ -457,14 +457,14 @@ export struct Index {
                   .catch((e: Error) => {
                     Logger.error('Home page onAppear getMe error ' + e);
                   });
-                // this.loadNewMessages()
-                //   .then(() => {
-                //     this.isLoadingNewMessages = false;
-                //     Logger.debug('Home page onAppear loadNewMessages finished');
-                //   })
-                //   .catch((e: Error) => {
-                //     Logger.error('Home page onAppear loadNewMessages error ' + e);
-                //   });
+                this.loadNewMessages()
+                  .then(() => {
+                    this.isLoadingNewMessages = false;
+                    Logger.debug('Home page onAppear loadNewMessages finished');
+                  })
+                  .catch((e: Error) => {
+                    Logger.error('Home page onAppear loadNewMessages error ' + e);
+                  });
                 Logger.debug('Home page onAppear isLoggedIn');
                 this.isLoadingNewMessages = false;
                 run()
