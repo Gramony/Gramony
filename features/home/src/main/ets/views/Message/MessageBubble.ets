@@ -158,15 +158,19 @@ export struct MessageBubble {
                 alignment: DialogAlignment.Bottom,
                 sheets: [
                   {
-                    title: '发送消息',
+                    title: $r('app.string.send_message'),
                     action: () => {
                       // 跳转到与该用户的聊天页面
                       this.currentChatId = id.toString();
+                      // 确保该聊天的消息数据源存在
+                      if (!this.messagesOfChatMap.hasKey(id.toString())) {
+                        this.messagesOfChatMap.set(id.toString(), new MessageDataSource());
+                      }
                       this.pageInfo.pushPath({ name: 'ChatDetail' });
                     }
                   },
                   {
-                    title: '查看资料',
+                    title: $r('app.string.view_profile'),
                     action: () => {
                       this.pageInfo.pushPath({ name: "ProfilePage", param: id });
                     }

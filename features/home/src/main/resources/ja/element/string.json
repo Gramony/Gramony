@@ -65,6 +65,14 @@
       "value": "返信"
     },
     {
+      "name": "send_message",
+      "value": "メッセージを送信"
+    },
+    {
+      "name": "view_profile",
+      "value": "プロフィールを見る"
+    },
+    {
       "name": "reply_selected",
       "value": "メッセージを返信として選択しました"
     },

@@ -68,6 +68,14 @@
       "name": "reply_selected",
       "value": "Выбран ответ на сообщение"
     },
+        {
+      "name": "send_message",
+      "value": "Отправить сообщение"
+    },
+    {
+      "name": "view_profile",
+      "value": "Просмотреть профиль"
+    },
     {
       "name": "unsupported_functionality",
       "value": "Эта функция пока не реализована"

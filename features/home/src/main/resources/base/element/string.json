@@ -65,6 +65,14 @@
       "value": "回复"
     },
     {
+      "name": "send_message",
+      "value": "发送消息"
+    },
+    {
+      "name": "view_profile",
+      "value": "查看资料"
+    },
+    {
       "name": "reply_selected",
       "value": "已选择回复消息"
     },

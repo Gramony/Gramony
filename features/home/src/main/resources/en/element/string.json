@@ -69,6 +69,15 @@
       "value": "Message"
     },
     {
+      "name": "send_message",
+      "value": "Send messages"
+    },
+
+    {
+      "name": "view_profile",
+      "value": "View profile"
+    },
+    {
       "name": "reply",
       "value": "Reply"
     },
