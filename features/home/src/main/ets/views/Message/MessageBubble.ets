@@ -7,6 +7,8 @@ import {
   // downloadProfilePhoto,
   ChatType,
 } from 'libhomogrape.so';
+import { webview } from '@kit.ArkWeb';
+import { util } from '@kit.ArkTS';
 import { HomeConstants } from '../../constants/HomeConstants';
 import { Message, MessageEntity } from '../../entities/Message';
 import { fileIo as fs } from '@kit.CoreFileKit';
@@ -59,7 +61,7 @@ export struct MessageBubble {
   @Consume messagesOfChatMap: HashMap<string, MessageDataSource>;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @State mediaPath: string = "";
-  @State decompressedMediaPath: string = "";  // 解压后的文件路径（TGS -> JSON）
+  @State decompressedMediaPath: string = ""; // 解压后的文件路径（TGS -> JSON）
   @State mediaLoaded: boolean = false;
   @State mediaLoadFailed: boolean = false;
   @State profilePhotoPath: string | undefined = undefined;
@@ -73,8 +75,10 @@ export struct MessageBubble {
   @Consume isScrollingDueToReplyToMessage: boolean;
   @Consume scrollToRepliedMessageIndex: number;
   @State lottieJson: string = "{}";
+  @State videoBase64: string = ""; // Base64 编码的视频数据
   @Prop showUserName: boolean = true;
   private lottieController: LottieController = new LottieController();
+  private stickerWebviewController: webview.WebviewController = new webview.WebviewController();
   private incomingBorderRadius: LocalizedBorderRadiuses = {
     topStart: new LengthMetrics(0, LengthUnit.VP),
     topEnd: new LengthMetrics(HomeConstants.PATH_BORDER_RADIUS, LengthUnit.VP),
@@ -93,7 +97,7 @@ export struct MessageBubble {
   private isAppletMsg?: boolean = false;
   private isDocumentMsg?: boolean = false;
   textController: TextController = new TextController();
-  message?= new Message(
+  message? = new Message(
     1,
     1,
     false,
@@ -150,7 +154,9 @@ export struct MessageBubble {
             })
             .onClick(() => {
               const id = this.message?.senderId;
-              if (!id) return;
+              if (!id) {
+                return;
+              }
 
               this.getUIContext().showActionSheet({
                 title: this.message?.senderName ?? '用户',
@@ -173,12 +179,12 @@ export struct MessageBubble {
                         const tempSeenChat = new SeenChat(
                           id,
                           ChatType.User,
-                          "",  // packedChat
-                          false,  // isContact
-                          false,  // isMutualContact
-                          this.message?.senderName || "User",  // fullName
-                          this.message?.senderName || "User",  // firstName
-                          false  // forum
+                          "", // packedChat
+                          false, // isContact
+                          false, // isMutualContact
+                          this.message?.senderName || "User", // fullName
+                          this.message?.senderName || "User", // firstName
+                          false// forum
                         );
                         this.seenChatsMap.set(id.toString(), tempSeenChat);
                       }
@@ -198,7 +204,8 @@ export struct MessageBubble {
         Column() {
           Stack({ alignContent: !this.message?.outgoing ? Alignment.TopStart : Alignment.TopEnd }) {
             Column() {
-              if (this.showUserName && (!this.message?.outgoing) && (this.chatType != ChatType.User) && (this.message?.mediaType !== MediaType.Sticker)) {
+              if (this.showUserName && (!this.message?.outgoing) && (this.chatType != ChatType.User) &&
+                (this.message?.mediaType !== MediaType.Sticker)) {
                 this.SenderName(this.message?.senderName ?? "")
               }
 
@@ -214,7 +221,7 @@ export struct MessageBubble {
                     })
                     .onClick(() => {
                       Logger.debug("ReplyToPreview onClick: " + this.message?.replyToMessageId + " currentChatId: " +
-                        this.currentChatId);
+                      this.currentChatId);
                       let target_index =
                         this.messagesOfChatMap.get(this.currentChatId)?.indexOf(this.message?.replyToMessageId || -1);
                       Logger.debug("ReplyToPreview onClick: target_index: " + target_index);
@@ -231,14 +238,14 @@ export struct MessageBubble {
                         this.isScrollingDueToReplyToMessage = true;
                         this.scrollToRepliedMessageIndex = target_index;
                         this.messageListScroller?.scrollToIndex(current_index -
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
+                        BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                        BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
                           true,
                           ScrollAlign.CENTER);
                         Logger.debug("ReplyToPreview onClick: scrollToIndex first step: " +
                           (current_index -
-                            BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                            BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
                       } else {
                         Logger.debug("ReplyToPreview onClick: scroll to target in one step");
                         this.messageListScroller?.scrollToIndex(target_index, true, ScrollAlign.CENTER);
@@ -254,42 +261,42 @@ export struct MessageBubble {
                       }
                       //TODO: 设置id，不然不会显示一镜到底效果
                       .id(this.mediaPreviewOptions.idBuilder(item, index))
-                        //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
-                        .id(`media_${index}`)
-                        // .aspectRatio(1)
-                        .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
-                        //TODO: 仿微信那种资源在预览时原始资源隐藏显示
-                        .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
-                        .onClick(() => {
-                          Logger.debug("MessageBubble Media onClick: " + index);
-                          // this.mediaPreviewOptions
-                          //   .setInitIndex(index)
-                          //   .setMedias(this.mediaResources);
-                          // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
-                          let uiContext = getContext(this);
-                          let displayInfo: filePreview.DisplayInfo = {
-                            x: 100,
-                            y: 100,
-                            width: 800,
-                            height: 800
-                          };
-                          let fileInfo: filePreview.PreviewInfo = {
-                            uri: "file://" + uiContext.applicationInfo.name + this.mediaPath,
-                            mimeType: 'image/jpeg'
-                          };
-                          filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
-                            console.info('Succeeded in opening preview');
-                          }).catch((err: BusinessError) => {
-                            console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
-                          });
-                        })
+                      //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
+                      .id(`media_${index}`)
+                      // .aspectRatio(1)
+                      .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
+                      //TODO: 仿微信那种资源在预览时原始资源隐藏显示
+                      .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
+                      .onClick(() => {
+                        Logger.debug("MessageBubble Media onClick: " + index);
+                        // this.mediaPreviewOptions
+                        //   .setInitIndex(index)
+                        //   .setMedias(this.mediaResources);
+                        // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
+                        let uiContext = getContext(this);
+                        let displayInfo: filePreview.DisplayInfo = {
+                          x: 100,
+                          y: 100,
+                          width: 800,
+                          height: 800
+                        };
+                        let fileInfo: filePreview.PreviewInfo = {
+                          uri: "file://" + uiContext.applicationInfo.name + this.mediaPath,
+                          mimeType: 'image/jpeg'
+                        };
+                        filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
+                          console.info('Succeeded in opening preview');
+                        }).catch((err: BusinessError) => {
+                          console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
+                        });
+                      })
                     }, (item: DefaultMediaModel, index: number) => JSON.stringify(item) + index)
                   }
                 }
 
                 // Video 显示（Document 类型且 MIME 类型为 video/*）
-                if (this.message?.mediaType === MediaType.Document && 
-                    this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+                if (this.message?.mediaType === MediaType.Document &&
+                this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
                   this.VideoView()
                 }
 
@@ -331,16 +338,16 @@ export struct MessageBubble {
               top: 8,
               bottom: 8
             })
-              .backgroundColor(this.shouldHideBubble() ? Color.Transparent :
-                (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
-                  HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
-              .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
+            .backgroundColor(this.shouldHideBubble() ? Color.Transparent :
+              (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
+                HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
+            .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
           }
           .padding({
             top: 5,
             bottom: 5
           })
-            .width(BaseConstants.NINETY_WIDTH_PERCENT)
+          .width(BaseConstants.NINETY_WIDTH_PERCENT)
         }
         .width(BaseConstants.NINETY_WIDTH_PERCENT)
 
@@ -386,7 +393,8 @@ export struct MessageBubble {
       ];
     }
     // 构建 StyledString 用于富文本渲染
-    console.warn(`[FMTENTITIES] MessageBubble messageId=${this.message?.messageId} || count: ${this.message?.fmtEntities?.length ?? 0} || text: "${this.message?.text?.substring(0, 50)}"`);
+    console.warn(`[FMTENTITIES] MessageBubble messageId=${this.message?.messageId} || count: ${this.message?.fmtEntities?.length ??
+      0} || text: "${this.message?.text?.substring(0, 50)}"`);
     if (this.message?.fmtEntities && this.message.fmtEntities.length > 0) {
       console.warn(`[FMTENTITIES] MessageBubble fmtEntities: ${JSON.stringify(this.message.fmtEntities)}`);
     }
@@ -442,7 +450,12 @@ export struct MessageBubble {
     }) {
       this.StickerView()
     }
-    .margin({ left: 5, right: 5, top: 2, bottom: 2 })
+    .margin({
+      left: 5,
+      right: 5,
+      top: 2,
+      bottom: 2
+    })
   }
 
   @Builder
@@ -483,10 +496,10 @@ export struct MessageBubble {
       }
     }
     .width(300)
-      .height(200)
-      .onAppear(() => {
-        this.loadMedia();
-      })
+    .height(200)
+    .onAppear(() => {
+      this.loadMedia();
+    })
   }
 
   @Builder
@@ -504,17 +517,39 @@ export struct MessageBubble {
           .width(160)
           .height(160)
       } else if (this.message?.stickerInfo?.isVideo) {
-        // 视频 Sticker (WEBM)
-        Video({
-          src: "file://" + this.mediaPath
-        })
-          .width(150)
-          .height(150)
-          .autoPlay(true)
-          .loop(true)
-          .muted(true)
-          .controls(false)
-          .objectFit(ImageFit.Contain)
+        // 视频 Sticker (WEBM) - 使用 Web 组件显示
+        if (this.videoBase64) {
+          Web({
+            src: 'about:blank',
+            controller: this.stickerWebviewController,
+            renderMode: RenderMode.SYNC_RENDER
+          })
+            .width(160)
+            .height(160)
+            .backgroundColor(Color.Transparent)
+            .domStorageAccess(false)
+            .mixedMode(MixedMode.All)
+            .cacheMode(CacheMode.None)
+            .mediaPlayGestureAccess(true)
+            .onAppear(() => {
+              try {
+
+                this.stickerWebviewController.loadData(
+                  "<html><body><style>body{font-size:5em}</style>Unsupported message</body></html>", 'text/html',
+                  'UTF-8'
+                );
+                // 加载包含 Base64 视频的 HTML
+                if (this.videoBase64) {
+                  // const html = this.generateStickerVideoHtml();
+                  this.stickerWebviewController.loadData(
+                    this.videoBase64, 'audio/webm', 'base64'
+                  );
+                }
+              } catch (e) {
+                Logger.error(`[ARKWEB] Failed to load sticker video HTML: ${e}`);
+              }
+            })
+        }
       } else {
         // 静态 Sticker (WEBP)
         Image("file://" + this.mediaPath)
@@ -544,10 +579,10 @@ export struct MessageBubble {
       }
     }
     .width(150)
-      .height(150)
-      .onAppear(() => {
-        this.loadMedia();
-      })
+    .height(150)
+    .onAppear(() => {
+      this.loadMedia();
+    })
   }
 
   @Builder
@@ -626,9 +661,9 @@ export struct MessageBubble {
       }
     }
     .alignSelf(ItemAlign.Start)
-      .onAppear(() => {
-        this.loadMedia();
-      })
+    .onAppear(() => {
+      this.loadMedia();
+    })
   }
 
   loadMedia() {
@@ -638,8 +673,8 @@ export struct MessageBubble {
     Logger.warn(`[MEDIA] loadMedia called for messageId=${this.message?.messageId}, mediaType=${this.message?.mediaType}`);
 
     // 根据 mediaInfo 或 stickerInfo 确定文件扩展名
-    let extension = ".jpg";  // 默认扩展名
-    
+    let extension = ".jpg"; // 默认扩展名
+
     // Sticker 类型优先使用 stickerInfo 判断
     if (this.message?.mediaType === MediaType.Sticker) {
       if (this.message?.stickerInfo?.isVideo) {
@@ -684,6 +719,19 @@ export struct MessageBubble {
             // 如果是 TGS 文件，需要解压为 JSON
             if (extension === ".tgs") {
               this.decompressTgsFile(path);
+            } else if (extension === ".webm" && this.message?.mediaType === MediaType.Sticker) {
+              // WebM sticker - 转换为 Base64
+              Logger.warn(`[MEDIA] Converting downloaded WebM to Base64: ${path}`);
+              this.loadVideoAsBase64(path)
+                .then((base64) => {
+                  this.videoBase64 = base64;
+                  this.mediaLoaded = true;
+                  Logger.warn(`[MEDIA] Downloaded WebM Base64 conversion successful, length: ${base64.length}`);
+                })
+                .catch((error: Error) => {
+                  Logger.error(`[MEDIA] Failed to convert downloaded WebM to Base64: ${error.message}`);
+                  this.mediaLoadFailed = true;
+                });
             } else {
               this.mediaLoaded = true;
             }
@@ -702,7 +750,7 @@ export struct MessageBubble {
           if (fs.accessSync(jsonPath)) {
             Logger.debug("TGS already decompressed: " + jsonPath);
             this.decompressedMediaPath = jsonPath;
-            
+
             // 读取 JSON 文件内容
             try {
               const file = fs.openSync(jsonPath, fs.OpenMode.READ_ONLY);
@@ -710,14 +758,14 @@ export struct MessageBubble {
               const buffer = new ArrayBuffer(stat.size);
               fs.readSync(file.fd, buffer);
               fs.closeSync(file);
-              
+
               // 转换为字符串
               const bytes = new Uint8Array(buffer);
               let jsonContent = '';
               for (let i = 0; i < bytes.length; i++) {
                 jsonContent += String.fromCharCode(bytes[i]);
               }
-              
+
               Logger.warn(`[TGSJSON] Loaded existing JSON (${jsonContent.length} bytes)`);
               this.lottieJson = jsonContent;
               this.mediaLoaded = true;
@@ -729,6 +777,19 @@ export struct MessageBubble {
           } else {
             this.decompressTgsFile(this.mediaPath);
           }
+        } else if (extension === ".webm" && this.message?.mediaType === MediaType.Sticker) {
+          // WebM sticker - 转换为 Base64
+          Logger.warn(`[MEDIA] Converting WebM to Base64: ${this.mediaPath}`);
+          this.loadVideoAsBase64(this.mediaPath)
+            .then((base64) => {
+              this.videoBase64 = base64;
+              this.mediaLoaded = true;
+              Logger.warn(`[MEDIA] WebM Base64 conversion successful, length: ${base64.length}`);
+            })
+            .catch((error: Error) => {
+              Logger.error(`[MEDIA] Failed to convert WebM to Base64: ${error.message}`);
+              this.mediaLoadFailed = true;
+            });
         } else {
           this.mediaLoaded = true;
         }
@@ -744,9 +805,9 @@ export struct MessageBubble {
    */
   private async decompressTgsFile(tgsPath: string): Promise<void> {
     const jsonPath = tgsPath.replace(".tgs", ".json");
-    
+
     Logger.warn(`[TGSJSON] Decompressing TGS (gzip): ${tgsPath} -> ${jsonPath}`);
-    
+
     try {
       // 创建 Checksum 实例用于 gzip 操作
       const checksum = await zlib.createGZip();
@@ -766,7 +827,7 @@ export struct MessageBubble {
       // 关闭 gzip 文件
       await checksum.gzcloser();
       Logger.warn(`[TGSJSON] Gzip file closed`);
-      
+
       if (bytesRead > 0) {
         // 将解压后的数据转换为字符串
         const bytes = new Uint8Array(buffer, 0, bytesRead);
@@ -774,7 +835,7 @@ export struct MessageBubble {
         for (let i = 0; i < bytes.length; i++) {
           jsonContent += String.fromCharCode(bytes[i]);
         }
-        
+
         const contentPreview = jsonContent.length > 200 ? jsonContent.substring(0, 200) + '...' : jsonContent;
         Logger.warn(`[TGSJSON] JSON content (${jsonContent.length} bytes): ${contentPreview}`);
 
@@ -809,14 +870,14 @@ export struct MessageBubble {
     if (this.message?.mediaType === MediaType.Sticker) {
       return true;
     }
-    
+
     // 视频：如果没有文本，则不显示气泡
-    if (this.message?.mediaType === MediaType.Document && 
-        this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+    if (this.message?.mediaType === MediaType.Document &&
+    this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
       const hasText = this.message?.text && this.message.text.trim().length > 0;
       return !hasText;
     }
-    
+
     return false;
   }
 
@@ -844,18 +905,24 @@ export struct MessageBubble {
       'application/zip': '.zip',
       'application/x-rar-compressed': '.rar',
     };
-    
+
     // 直接匹配
     if (mimeMap[mimeType]) {
       return mimeMap[mimeType];
     }
-    
+
     // 按前缀匹配
-    if (mimeType.startsWith('video/')) return '.mp4';
-    if (mimeType.startsWith('audio/')) return '.mp3';
-    if (mimeType.startsWith('image/')) return '.jpg';
-    
-    return '.bin';  // 未知类型
+    if (mimeType.startsWith('video/')) {
+      return '.mp4';
+    }
+    if (mimeType.startsWith('audio/')) {
+      return '.mp3';
+    }
+    if (mimeType.startsWith('image/')) {
+      return '.jpg';
+    }
+
+    return '.bin'; // 未知类型
   }
 
   /**
@@ -873,6 +940,90 @@ export struct MessageBubble {
     return '.bin';
   }
 
+  /**
+   * 生成用于显示视频 sticker 的 HTML 内容
+   * 针对 512x512 的 WebM sticker 优化
+   * 使用 Base64 编码的 data URI
+   */
+  private generateStickerVideoHtml(): string {
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            zoom: 0.8;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: red;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+test
+test
+test
+test
+test
+test
+
+</body>
+</html>
+`;
+    return html;
+  }
+
+  /**
+   * 读取视频文件并转换为 Base64 编码
+   */
+  private async loadVideoAsBase64(filePath: string): Promise<string> {
+    try {
+      Logger.warn(`[BASE64] Reading video file: ${filePath}`);
+
+      // 打开文件
+      const file = await fs.open(filePath, fs.OpenMode.READ_ONLY);
+      const stat = await fs.stat(filePath);
+      const fileSize = stat.size;
+
+      Logger.warn(`[BASE64] File size: ${fileSize} bytes`);
+
+      // 读取文件内容到 ArrayBuffer
+      const buffer = new ArrayBuffer(fileSize);
+      const readLen = await fs.read(file.fd, buffer);
+      await fs.close(file);
+
+      Logger.warn(`[BASE64] Read ${readLen} bytes from file`);
+
+      // 转换为 Uint8Array
+      const uint8Array = new Uint8Array(buffer);
+
+      // 使用 Base64Helper 编码
+      const base64Helper = new util.Base64Helper();
+      const base64String = base64Helper.encodeToStringSync(uint8Array, util.Type.BASIC);
+
+      Logger.warn(`[BASE64] Base64 encoded length: ${base64String.length} characters`);
+
+      return base64String;
+    } catch (error) {
+      Logger.error(`[BASE64] Failed to encode video: ${error}`);
+      return "";
+    }
+  }
+
   @Builder
   SenderName(senderName: string) {
     Row() {
@@ -885,12 +1036,12 @@ export struct MessageBubble {
       Blank()
     }
     .padding({ bottom: 2 })
-      .alignSelf(ItemAlign.Start)
+    .alignSelf(ItemAlign.Start)
   }
 }
 
 @Builder
-  function Loading() {
+function Loading() {
   LoadingProgress()
     .color(Color.Blue)
     .layoutWeight(1)
