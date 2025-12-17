@@ -45,9 +45,12 @@ export struct ChatItem {
 
   build() {
     Flex({ alignItems: ItemAlign.Center }) {
-
-      NodeContainer(this.chatPhotoNodeController)
-        .margin({ left: $r('app.float.icon_margin_one'), right: $r('app.float.icon_margin_one') })
+      Stack() {
+        NodeContainer(this.chatPhotoNodeController)
+      }
+      .width(48)
+      .height(48)
+      .margin({ left: $r('app.float.icon_margin_one'), right: $r('app.float.icon_margin_one') })
 
       if (!this.isInTopicPage) {
         Flex({ direction: FlexDirection.Column, justifyContent: FlexAlign.Start, alignItems: ItemAlign.Start }) {
