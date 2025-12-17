@@ -518,38 +518,38 @@ export struct MessageBubble {
           .height(160)
       } else if (this.message?.stickerInfo?.isVideo) {
         // 视频 Sticker (WEBM) - 使用 Web 组件显示
-        if (this.videoBase64) {
-          Web({
-            src: 'about:blank',
-            controller: this.stickerWebviewController,
-            renderMode: RenderMode.SYNC_RENDER
-          })
-            .width(160)
-            .height(160)
-            .backgroundColor(Color.Transparent)
-            .domStorageAccess(false)
-            .mixedMode(MixedMode.All)
-            .cacheMode(CacheMode.None)
-            .mediaPlayGestureAccess(true)
-            .onAppear(() => {
-              try {
-
+        Web({
+          src: 'about:blank',
+          controller: this.stickerWebviewController,
+          renderMode: RenderMode.SYNC_RENDER
+        })
+          .width(160)
+          .height(160)
+          .backgroundColor(Color.Transparent)
+          .domStorageAccess(false)
+          .mixedMode(MixedMode.All)
+          .cacheMode(CacheMode.None)
+          .mediaPlayGestureAccess(true)
+          .fileAccess(true)
+          .onAppear(() => {
+            try {
+              // 加载包含 video 标签的 HTML，使用 file:// 协议
+              if (this.mediaPath && this.mediaLoaded) {
+                Logger.warn(`[ARKWEB] Loading video from: ${this.mediaPath}`);
+                const html = this.generateStickerVideoHtml();
+                // 使用 loadData 加载 HTML，启用文件访问
                 this.stickerWebviewController.loadData(
-                  "<html><body><style>body{font-size:5em}</style>Unsupported message</body></html>", 'text/html',
-                  'UTF-8'
+                  html,
+                  'text/html',
+                  'UTF-8',
+                  ' ', // baseUrl 设置为空格以支持本地文件
+                  ' '   // historyUrl 设置为空格
                 );
-                // 加载包含 Base64 视频的 HTML
-                if (this.videoBase64) {
-                  // const html = this.generateStickerVideoHtml();
-                  this.stickerWebviewController.loadData(
-                    this.videoBase64, 'audio/webm', 'base64'
-                  );
-                }
-              } catch (e) {
-                Logger.error(`[ARKWEB] Failed to load sticker video HTML: ${e}`);
               }
-            })
-        }
+            } catch (e) {
+              Logger.error(`[ARKWEB] Failed to load sticker video HTML: ${e}`);
+            }
+          })
       } else {
         // 静态 Sticker (WEBP)
         Image("file://" + this.mediaPath)
@@ -719,21 +719,10 @@ export struct MessageBubble {
             // 如果是 TGS 文件，需要解压为 JSON
             if (extension === ".tgs") {
               this.decompressTgsFile(path);
-            } else if (extension === ".webm" && this.message?.mediaType === MediaType.Sticker) {
-              // WebM sticker - 转换为 Base64
-              Logger.warn(`[MEDIA] Converting downloaded WebM to Base64: ${path}`);
-              this.loadVideoAsBase64(path)
-                .then((base64) => {
-                  this.videoBase64 = base64;
-                  this.mediaLoaded = true;
-                  Logger.warn(`[MEDIA] Downloaded WebM Base64 conversion successful, length: ${base64.length}`);
-                })
-                .catch((error: Error) => {
-                  Logger.error(`[MEDIA] Failed to convert downloaded WebM to Base64: ${error.message}`);
-                  this.mediaLoadFailed = true;
-                });
             } else {
+              // 其他媒体类型（包括 WebM sticker）
               this.mediaLoaded = true;
+              Logger.warn(`[MEDIA] Downloaded media file ready: ${path}`);
             }
           })
           .catch((error: Error) => {
@@ -777,21 +766,10 @@ export struct MessageBubble {
           } else {
             this.decompressTgsFile(this.mediaPath);
           }
-        } else if (extension === ".webm" && this.message?.mediaType === MediaType.Sticker) {
-          // WebM sticker - 转换为 Base64
-          Logger.warn(`[MEDIA] Converting WebM to Base64: ${this.mediaPath}`);
-          this.loadVideoAsBase64(this.mediaPath)
-            .then((base64) => {
-              this.videoBase64 = base64;
-              this.mediaLoaded = true;
-              Logger.warn(`[MEDIA] WebM Base64 conversion successful, length: ${base64.length}`);
-            })
-            .catch((error: Error) => {
-              Logger.error(`[MEDIA] Failed to convert WebM to Base64: ${error.message}`);
-              this.mediaLoadFailed = true;
-            });
         } else {
+          // 其他媒体类型（包括 WebM sticker）
           this.mediaLoaded = true;
+          Logger.warn(`[MEDIA] Media file ready: ${this.mediaPath}`);
         }
       }
     } catch (error) {
@@ -943,9 +921,10 @@ export struct MessageBubble {
   /**
    * 生成用于显示视频 sticker 的 HTML 内容
    * 针对 512x512 的 WebM sticker 优化
-   * 使用 Base64 编码的 data URI
+   * 使用 file:// 协议加载本地视频
    */
   private generateStickerVideoHtml(): string {
+    const videoPath = this.mediaPath;
     const html = `
 <!DOCTYPE html>
 <html>
@@ -959,11 +938,10 @@ export struct MessageBubble {
             box-sizing: border-box;
         }
         html, body {
-            zoom: 0.8;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: red;
+            background: transparent;
         }
         video {
             width: 100%;
@@ -974,13 +952,10 @@ export struct MessageBubble {
     </style>
 </head>
 <body>
-test
-test
-test
-test
-test
-test
-
+    <video autoplay loop muted playsinline>
+        <source src="file://${videoPath}" type="video/webm">
+        Your browser does not support WebM video.
+    </video>
 </body>
 </html>
 `;
