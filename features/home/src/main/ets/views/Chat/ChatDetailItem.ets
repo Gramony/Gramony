@@ -25,6 +25,7 @@ export default struct ChatDetailItem {
   message?: Message;
   isAppletMsg?: boolean;
   isDocumentMsg?: boolean;
+  showUserName?: boolean;
 
   build() {
     Flex({ justifyContent: FlexAlign.End, alignItems: ItemAlign.End }) {
@@ -35,6 +36,7 @@ export default struct ChatDetailItem {
         isDocumentMsg: this.isDocumentMsg,
         message: this.message,
         messageListScroller: this.messageListScroller,
+        showUserName: this.showUserName,
       })
     }
   }

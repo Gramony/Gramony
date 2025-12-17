@@ -15,7 +15,7 @@ import { SeenChat } from '../../entities/SeenChat';
 import { getOrDownloadProfilePhoto, getThumbProfilePhotoPixelMap } from '../../utils';
 import { ReplyToPreview } from './ReplyToPreview'
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
-import { MediaModel, MediaPreview, MediaPreviewOptions, MediaPreviewComponent } from '@lyb/media-preview';
+import { MediaModel, MediaPreviewOptions } from '@lyb/media-preview';
 import { BusinessError, zlib } from '@kit.BasicServicesKit';
 import { filePreview } from '@kit.PreviewKit';
 import { applyEntityStyle } from './FmtEntities';
@@ -73,6 +73,7 @@ export struct MessageBubble {
   @Consume isScrollingDueToReplyToMessage: boolean;
   @Consume scrollToRepliedMessageIndex: number;
   @State lottieJson: string = "{}";
+  @Prop showUserName: boolean = true;
   private lottieController: LottieController = new LottieController();
   private incomingBorderRadius: LocalizedBorderRadiuses = {
     topStart: new LengthMetrics(0, LengthUnit.VP),
@@ -197,7 +198,7 @@ export struct MessageBubble {
         Column() {
           Stack({ alignContent: !this.message?.outgoing ? Alignment.TopStart : Alignment.TopEnd }) {
             Column() {
-              if ((!this.message?.outgoing) && (this.chatType != ChatType.User) && (this.message?.mediaType !== MediaType.Sticker)) {
+              if (this.showUserName && (!this.message?.outgoing) && (this.chatType != ChatType.User) && (this.message?.mediaType !== MediaType.Sticker)) {
                 this.SenderName(this.message?.senderName ?? "")
               }
 

@@ -59,11 +59,12 @@ export struct ChatDetail {
   private shouldTransferToOnScrollIndex = false;
   private beforeFinalScrollIndex: number = -1;
   private messageListScroller: ListScroller = new ListScroller();
-  private data: MessageDataSource = new MessageDataSource();
   private isAtEnd: boolean = false;
   private length: number = 0;
   private chatType: ChatType = ChatType.User;
   private isGroupOrChannel: boolean = false;
+
+  @State messageDataSource: MessageDataSource = this.messagesOfChatMap.get(this.currentChatId);
 
   @Builder
   TitleBuilder() {
@@ -79,14 +80,14 @@ export struct ChatDetail {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .alignItems(HorizontalAlign.Start)
-    .justifyContent(FlexAlign.Center)
-    .height('100%')
-    .onClick(() => {
-      if (this.isGroupOrChannel) {
-        Logger.debug('ChatDetail title clicked, navigating to ParticipantList');
-        this.pageInfo.pushPath({ name: 'ParticipantList' });
-      }
-    })
+      .justifyContent(FlexAlign.Center)
+      .height('100%')
+      .onClick(() => {
+        if (this.isGroupOrChannel) {
+          Logger.debug('ChatDetail title clicked, navigating to ParticipantList');
+          this.pageInfo.pushPath({ name: 'ParticipantList' });
+        }
+      })
   }
 
   @Styles
@@ -184,7 +185,7 @@ export struct ChatDetail {
           initialIndex: this.length - 1,
           scroller: this.messageListScroller
         }) {
-          LazyForEach(this.messagesOfChatMap.get(this.currentChatId), (item: Message, index: number) => {
+          LazyForEach(this.messageDataSource, (item: Message, index: number) => {
             ListItem() {
               ChatDetailItem({
                 chatType: this.chatType,
@@ -192,6 +193,7 @@ export struct ChatDetail {
                 isDocumentMsg: false,
                 message: item,
                 messageListScroller: this.messageListScroller,
+                showUserName: this.shouldShowUserName(item, index),
               })
             }.swipeAction({
               end: this.replyEnd.bind(this, item.messageId),
@@ -302,12 +304,38 @@ export struct ChatDetail {
       const seenChat = this.seenChatsMap.get(this.currentChatId);
       this.currentChatUserName = seenChat?.fullName || seenChat?.firstName || '';
     }
-    this.length = this.messagesOfChatMap.get(this.currentChatId)?.totalCount() || 0;
+    this.length = this.messageDataSource?.totalCount() || 0;
     // this.messages = (this.currentChatPinned ? this.pinnedChatsMap :
     // this.chatsMap).get(this.currentChatId)?.sortedMessages || [];
   }
 
   aboutToDisappear(): void {
+  }
+
+  /**
+   * 判断是否应该显示用户名
+   * 如果相邻消息的发送者是同一人且时间间隔不超过10分钟，则不显示用户名
+   */
+  private shouldShowUserName(currentMessage: Message, currentIndex: number): boolean {
+    // 对于私聊或者发出的消息，不显示用户名
+    if (this.chatType === ChatType.User || currentMessage.outgoing) {
+      return false;
+    }
+
+    // 第一条消息总是显示用户名
+    if (currentIndex === 0) return true;
+
+    const previousMessage = this.messageDataSource?.get(currentIndex - 1);
+    // does not exist || different senders
+    if (!previousMessage || previousMessage.senderId !== currentMessage.senderId)
+      return true;
+
+    // 10 min gap
+    const timeDiff = currentMessage.timestamp - previousMessage.timestamp;
+    if (timeDiff > 600000) return true;
+
+    // TODO: Should sticker's logic be handled here as well?
+    return false;
   }
 
   private async loadHistoryMessagesIfNeeded(): Promise<void> {
@@ -316,14 +344,13 @@ export struct ChatDetail {
       return;
     }
 
-    const messageDataSource = this.messagesOfChatMap.get(this.currentChatId);
-    if (!messageDataSource || messageDataSource.totalCount() === 0) {
+    if (!this.messageDataSource || this.messageDataSource.totalCount() === 0) {
       Logger.debug('ChatDetail loadHistoryMessages: no messages in current chat');
       return;
     }
 
     // 获取当前最早的消息 ID
-    const oldestMessage = messageDataSource.get(0);
+    const oldestMessage = this.messageDataSource.get(0);
     const oldestMessageId = oldestMessage?.messageId;
 
     if (!oldestMessageId) {
@@ -343,10 +370,10 @@ export struct ChatDetail {
 
         // 将 NativeMessage 转换为 Message 并添加到数据源
         const messages = historyMessages.map((nativeMsg: NativeMessage) => Message.fromNative(nativeMsg));
-        messageDataSource.append(messages);
+        this.messageDataSource.append(messages);
 
         // 更新长度
-        this.length = messageDataSource.totalCount();
+        this.length = this.messageDataSource.totalCount();
       } else {
         Logger.debug('ChatDetail loadHistoryMessages: no more history messages');
       }
