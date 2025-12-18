@@ -536,19 +536,19 @@ export struct MessageBubble {
             try {
               // 加载包含 video 标签的 HTML，使用 file:// 协议
               if (this.mediaPath && this.mediaLoaded) {
-                Logger.warn(`[ARKWEB] Loading video from: ${this.mediaPath}`);
+                Logger.debug(`[ARKWEB] Loading video from: ${this.mediaPath}`);
                 const html = this.generateStickerVideoHtml();
                 // 使用 loadData 加载 HTML，启用文件访问
                 this.stickerWebviewController.loadData(
                   html,
                   'text/html',
                   'UTF-8',
-                  ' ', // baseUrl 设置为空格以支持本地文件
-                  ' '   // historyUrl 设置为空格
+                  ' ',
+                  ' '
                 );
               }
             } catch (e) {
-              Logger.error(`[ARKWEB] Failed to load sticker video HTML: ${e}`);
+              Logger.error(`[ARKWEB] Failed to load sticker video: ${e}`);
             }
           })
       } else {
@@ -581,6 +581,7 @@ export struct MessageBubble {
     }
     .width(150)
     .height(150)
+    .margin({ bottom: 8 })
     .onAppear(() => {
       this.loadMedia();
     })
@@ -671,76 +672,55 @@ export struct MessageBubble {
     this.mediaLoaded = false;
     this.mediaLoadFailed = false;
 
-    Logger.warn(`[MEDIA] loadMedia called for messageId=${this.message?.messageId}, mediaType=${this.message?.mediaType}`);
-    Logger.warn(`[MEDIA] stickerInfo: ${JSON.stringify(this.message?.stickerInfo)}`);
-    Logger.warn(`[MEDIA] mediaInfo: ${JSON.stringify(this.message?.mediaInfo)}`);
-
     // 根据 mediaInfo 或 stickerInfo 确定文件扩展名
     let extension = ".jpg"; // 默认扩展名
 
     // Sticker 类型优先使用 stickerInfo 判断
     if (this.message?.mediaType === MediaType.Sticker) {
-      // 添加额外的检查和备用方案
       if (this.message?.stickerInfo) {
         if (this.message.stickerInfo.isVideo) {
           extension = ".webm";
-          Logger.warn(`[MEDIA] Sticker is video, using .webm`);
         } else if (this.message.stickerInfo.isAnimated) {
           extension = ".tgs";
-          Logger.warn(`[MEDIA] Sticker is animated (TGS), using .tgs`);
         } else {
           extension = ".webp";
-          Logger.warn(`[MEDIA] Sticker is static, using .webp`);
         }
       } else if (this.message?.mediaInfo?.mimeType) {
         // 备用方案：从 mediaInfo 的 mimeType 判断
         const mime = this.message.mediaInfo.mimeType;
         if (mime === 'video/webm' || mime.startsWith('video/')) {
           extension = ".webm";
-          Logger.warn(`[MEDIA] Fallback: detected video sticker from mimeType: ${mime}`);
         } else if (mime === 'application/x-tgsticker') {
           extension = ".tgs";
-          Logger.warn(`[MEDIA] Fallback: detected animated sticker from mimeType: ${mime}`);
-        } else if (mime === 'image/webp') {
-          extension = ".webp";
-          Logger.warn(`[MEDIA] Fallback: detected static sticker from mimeType: ${mime}`);
         } else {
           extension = ".webp";
-          Logger.warn(`[MEDIA] Fallback: unknown sticker mimeType ${mime}, defaulting to .webp`);
         }
       } else {
-        // 最后的备用方案：检查文件是否存在
         extension = ".webp";
-        Logger.error(`[MEDIA] ERROR: No stickerInfo or mediaInfo for sticker message! Defaulting to .webp`);
       }
     } else if (this.message?.mediaInfo?.mimeType) {
       // 使用 mediaInfo 中的 MIME 类型
       extension = this.getExtensionFromMimeType(this.message.mediaInfo.mimeType);
-      Logger.warn(`[MEDIA] Using extension from mimeType: ${this.message.mediaInfo.mimeType} -> ${extension}`);
     } else if (this.message?.mediaInfo?.fileName) {
       // 使用文件名中的扩展名
       extension = this.getExtensionFromFileName(this.message.mediaInfo.fileName);
-      Logger.warn(`[MEDIA] Using extension from fileName: ${this.message.mediaInfo.fileName} -> ${extension}`);
     }
 
     this.mediaPath =
       BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString() + extension;
-    Logger.warn(`[MEDIA] Computed mediaPath: ${this.mediaPath}`);
 
     // download the media if not exists
     try {
       // 对于 Sticker 类型，如果文件不存在，尝试其他扩展名
       if (!fs.accessSync(this.mediaPath) && this.message?.mediaType === MediaType.Sticker) {
-        Logger.warn(`[MEDIA] Sticker file not found: ${this.mediaPath}, trying alternative extensions...`);
         const basePath = BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString();
         const alternatives = ['.webm', '.tgs', '.webp'];
         let found = false;
         
         for (const alt of alternatives) {
-          if (alt !== extension) { // 跳过已经尝试过的扩展名
+          if (alt !== extension) {
             const altPath = basePath + alt;
             if (fs.accessSync(altPath)) {
-              Logger.warn(`[MEDIA] Found alternative file: ${altPath}`);
               this.mediaPath = altPath;
               extension = alt;
               found = true;
@@ -769,7 +749,7 @@ export struct MessageBubble {
 
                 this.lottieJson = jsonContent;
                 this.mediaLoaded = true;
-                Logger.warn(`[MEDIA] Loaded existing TGS JSON from alternative path`);
+                Logger.info(`[MEDIA] Loaded existing TGS JSON from alternative path`);
                 return;
               } catch (e) {
                 Logger.error(`[MEDIA] Failed to load TGS JSON: ${e}`);
@@ -783,10 +763,8 @@ export struct MessageBubble {
       }
       
       if (!fs.accessSync(this.mediaPath)) {
-        Logger.warn(`[MEDIA] File not exists, downloading: ${this.mediaPath}`);
         downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
           .then((path) => {
-            Logger.warn(`[MEDIA] Download succeeded: ${path}`);
             this.mediaPath = path;
             // 验证文件是否存在
             if (fs.accessSync(path)) {
@@ -799,9 +777,7 @@ export struct MessageBubble {
             if (extension === ".tgs") {
               this.decompressTgsFile(path);
             } else {
-              // 其他媒体类型（包括 WebM sticker）
               this.mediaLoaded = true;
-              Logger.warn(`[MEDIA] Downloaded media file ready: ${path}`);
             }
           })
           .catch((error: Error) => {
@@ -810,13 +786,10 @@ export struct MessageBubble {
             this.mediaLoaded = true; // TODO: 临时忽略下载成功仍然返回失败的问题
           });
       } else {
-        const stat = fs.statSync(this.mediaPath);
-        Logger.warn(`[MEDIA] File already exists: ${this.mediaPath}, size: ${stat.size} bytes`);
         // 如果是 TGS 文件，检查是否已解压
         if (extension === ".tgs") {
           const jsonPath = this.mediaPath.replace(".tgs", ".json");
           if (fs.accessSync(jsonPath)) {
-            Logger.debug("TGS already decompressed: " + jsonPath);
             this.decompressedMediaPath = jsonPath;
 
             // 读取 JSON 文件内容
@@ -834,21 +807,17 @@ export struct MessageBubble {
                 jsonContent += String.fromCharCode(bytes[i]);
               }
 
-              Logger.warn(`[TGSJSON] Loaded existing JSON (${jsonContent.length} bytes)`);
               this.lottieJson = jsonContent;
               this.mediaLoaded = true;
             } catch (readErr) {
-              Logger.error(`[TGSJSON] Failed to read existing JSON: ${readErr}`);
-              // 读取失败，尝试重新解压
+              Logger.error(`[TGSJSON] Failed to read TGS JSON: ${readErr}`);
               this.decompressTgsFile(this.mediaPath);
             }
           } else {
             this.decompressTgsFile(this.mediaPath);
           }
         } else {
-          // 其他媒体类型（包括 WebM sticker）
           this.mediaLoaded = true;
-          Logger.warn(`[MEDIA] Media file ready: ${this.mediaPath}`);
         }
       }
     } catch (error) {
@@ -863,52 +832,33 @@ export struct MessageBubble {
   private async decompressTgsFile(tgsPath: string): Promise<void> {
     const jsonPath = tgsPath.replace(".tgs", ".json");
 
-    Logger.warn(`[TGSJSON] Decompressing TGS (gzip): ${tgsPath} -> ${jsonPath}`);
-
     try {
-      // 创建 Checksum 实例用于 gzip 操作
       const checksum = await zlib.createGZip();
-
-      // 打开 gzip 文件进行读取 (mode: "rb" = read binary)
       await checksum.gzopen(tgsPath, "rb");
-      Logger.warn(`[TGSJSON] Gzip file opened successfully`);
 
       // 预分配一个足够大的缓冲区（TGS 文件通常小于 1MB）
       const bufferSize = 1024 * 1024; // 1MB
       const buffer = new ArrayBuffer(bufferSize);
-
-      // 读取并解压数据
       const bytesRead = await checksum.gzread(buffer);
-      Logger.warn(`[TGSJSON] Gzip read ${bytesRead} bytes`);
-
-      // 关闭 gzip 文件
       await checksum.gzcloser();
-      Logger.warn(`[TGSJSON] Gzip file closed`);
 
       if (bytesRead > 0) {
-        // 将解压后的数据转换为字符串
         const bytes = new Uint8Array(buffer, 0, bytesRead);
         let jsonContent = '';
         for (let i = 0; i < bytes.length; i++) {
           jsonContent += String.fromCharCode(bytes[i]);
         }
 
-        const contentPreview = jsonContent.length > 200 ? jsonContent.substring(0, 200) + '...' : jsonContent;
-        Logger.warn(`[TGSJSON] JSON content (${jsonContent.length} bytes): ${contentPreview}`);
-
-        // 将 JSON 内容写入文件
         const file = await fs.open(jsonPath, fs.OpenMode.CREATE | fs.OpenMode.TRUNC | fs.OpenMode.WRITE_ONLY);
         await fs.write(file.fd, jsonContent);
         await fs.close(file);
 
-        Logger.warn(`[TGSJSON] JSON written to file: ${jsonPath}`);
-        Logger.warn(`[TGSJSON] TGS decompression completed!! ${jsonContent.slice(0, 150)}`);
+        Logger.debug(`[TGSJSON] JSON written to file: ${jsonPath}`);
 
         this.lottieJson = jsonContent;
         this.decompressedMediaPath = jsonPath;
         this.mediaLoaded = true;
       } else {
-        Logger.error(`[TGSJSON] No data read from gzip file`);
         this.mediaLoadFailed = true;
       }
     } catch (err) {
@@ -1039,43 +989,6 @@ export struct MessageBubble {
 </html>
 `;
     return html;
-  }
-
-  /**
-   * 读取视频文件并转换为 Base64 编码
-   */
-  private async loadVideoAsBase64(filePath: string): Promise<string> {
-    try {
-      Logger.warn(`[BASE64] Reading video file: ${filePath}`);
-
-      // 打开文件
-      const file = await fs.open(filePath, fs.OpenMode.READ_ONLY);
-      const stat = await fs.stat(filePath);
-      const fileSize = stat.size;
-
-      Logger.warn(`[BASE64] File size: ${fileSize} bytes`);
-
-      // 读取文件内容到 ArrayBuffer
-      const buffer = new ArrayBuffer(fileSize);
-      const readLen = await fs.read(file.fd, buffer);
-      await fs.close(file);
-
-      Logger.warn(`[BASE64] Read ${readLen} bytes from file`);
-
-      // 转换为 Uint8Array
-      const uint8Array = new Uint8Array(buffer);
-
-      // 使用 Base64Helper 编码
-      const base64Helper = new util.Base64Helper();
-      const base64String = base64Helper.encodeToStringSync(uint8Array, util.Type.BASIC);
-
-      Logger.warn(`[BASE64] Base64 encoded length: ${base64String.length} characters`);
-
-      return base64String;
-    } catch (error) {
-      Logger.error(`[BASE64] Failed to encode video: ${error}`);
-      return "";
-    }
   }
 
   @Builder

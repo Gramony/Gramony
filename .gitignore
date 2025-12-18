@@ -15,6 +15,7 @@
 **/.test
 /.appanalyzer
 .DS_store
+.claude
 /signing
 
 docs

@@ -202,64 +202,37 @@ export class Message implements NativeMessage, IComparable<Message> {
       mediaInfo.duration = nativeMessage.mediaInfo.duration;
       msg.mediaInfo = mediaInfo;
       msg.mediaInfoJson = JSON.stringify(mediaInfo);
-      console.warn(`[MEDIA] fromNative: serialized mediaInfo for messageId=${msg.messageId}: ${msg.mediaInfoJson}`);
-    } else {
-      console.warn(`[MEDIA] fromNative: no mediaInfo for messageId=${msg.messageId}`);
     }
 
     return msg;
   }
 
   /**
-   * 从数据库加载后，反序列化 fmtEntities 和 stickerInfo
+   * 从数据库加载后，反序列化 fmtEntities、stickerInfo 和 mediaInfo
    */
   public deserializeFmtEntities(): void {
-    console.warn(`[FMTENTITIES] deserializeFmtEntities: messageId=${this.messageId}, fmtEntitiesJson=${this.fmtEntitiesJson}`);
-
     if (this.fmtEntitiesJson && this.fmtEntitiesJson.length > 0) {
       try {
-        // JSON 中的字段名已经是 camelCase（因为序列化时就是 MessageEntity 对象）
-        // 直接解析为 MessageEntity 数组，不需要 fromNative 转换
         this.fmtEntities = JSON.parse(this.fmtEntitiesJson) as MessageEntity[];
-        console.warn(`[FMTENTITIES] deserializeFmtEntities: successfully parsed ${this.fmtEntities.length} entities`);
-        if (this.fmtEntities.length > 0) {
-          console.warn(`[FMTENTITIES] deserializeFmtEntities: first entity: ${JSON.stringify(this.fmtEntities[0])}`);
-        }
       } catch (e) {
-        // 解析失败，忽略
-        console.warn(`[FMTENTITIES] deserializeFmtEntities: failed to parse JSON: ${e}`);
         this.fmtEntities = undefined;
       }
-    } else {
-      console.warn(`[FMTENTITIES] deserializeFmtEntities: no fmtEntitiesJson to deserialize`);
     }
 
-    // 反序列化 stickerInfo
-    console.warn(`[STICKER] deserializeFmtEntities: messageId=${this.messageId}, stickerInfoJson=${this.stickerInfoJson}`);
     if (this.stickerInfoJson && this.stickerInfoJson.length > 0) {
       try {
         this.stickerInfo = JSON.parse(this.stickerInfoJson) as StickerInfo;
-        console.warn(`[STICKER] deserializeFmtEntities: successfully parsed stickerInfo: ${JSON.stringify(this.stickerInfo)}`);
       } catch (e) {
-        console.warn(`[STICKER] deserializeFmtEntities: failed to parse stickerInfo JSON: ${e}`);
         this.stickerInfo = undefined;
       }
-    } else {
-      console.warn(`[STICKER] deserializeFmtEntities: no stickerInfoJson to deserialize`);
     }
 
-    // 反序列化 mediaInfo
-    console.warn(`[MEDIA] deserializeFmtEntities: messageId=${this.messageId}, mediaInfoJson=${this.mediaInfoJson}`);
     if (this.mediaInfoJson && this.mediaInfoJson.length > 0) {
       try {
         this.mediaInfo = JSON.parse(this.mediaInfoJson) as MediaInfo;
-        console.warn(`[MEDIA] deserializeFmtEntities: successfully parsed mediaInfo: ${JSON.stringify(this.mediaInfo)}`);
       } catch (e) {
-        console.warn(`[MEDIA] deserializeFmtEntities: failed to parse mediaInfo JSON: ${e}`);
         this.mediaInfo = undefined;
       }
-    } else {
-      console.warn(`[MEDIA] deserializeFmtEntities: no mediaInfoJson to deserialize`);
     }
   }
 
