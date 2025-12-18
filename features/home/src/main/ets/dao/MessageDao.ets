@@ -83,6 +83,14 @@ class MessageDao {
       const fmtJson = message.fmtEntitiesJson ? `"${escapeString(message.fmtEntitiesJson)}"` : 'NULL';
       const stickerJson = message.stickerInfoJson ? `"${escapeString(message.stickerInfoJson)}"` : 'NULL';
       const mediaJson = message.mediaInfoJson ? `"${escapeString(message.mediaInfoJson)}"` : 'NULL';
+
+      // 添加插入日志
+      if (message.mediaType === 3 || message.stickerInfoJson || message.mediaInfoJson) {
+        console.warn(`[DB_INSERT] MessageDao: inserting messageId=${message.messageId}, mediaType=${message.mediaType}`);
+        console.warn(`[DB_INSERT] MessageDao: stickerInfoJson=${message.stickerInfoJson}`);
+        console.warn(`[DB_INSERT] MessageDao: mediaInfoJson=${message.mediaInfoJson}`);
+      }
+      
       return `(${message.chatId}, ${message.messageId}, ${message.outgoing}, ${message.pinned}, ${message.senderId},
       "${escapeString(message.senderName)}", ${message.timestamp}, "${escapeString(message.text)}", ${message.mediaType},
       ${message.editTimestamp || 0}, ${message.groupedId || 0}, ${message.replyToMessageId || 0},
@@ -107,12 +115,15 @@ class MessageDao {
   @sql.ReturnType([Message])
   async getMessagesByChatId(@sql.Param("chatId") chatId: number): Promise<Array<Message>> {
     const messages: Array<Message> = await sql.PromiseNull();
-    console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: loaded ${messages.length} messages for chatId=${chatId}`);
+    console.warn(`[DB_QUERY] MessageDao.getMessagesByChatId: loaded ${messages.length} messages for chatId=${chatId}`);
     // 反序列化格式化实体
     for (const msg of messages) {
-      console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: processing messageId=${msg.messageId}, fmtEntitiesJson=${msg.fmtEntitiesJson}`);
+      console.warn(`[DB_QUERY] MessageDao: messageId=${msg.messageId}, mediaType=${msg.mediaType}`);
+      console.warn(`[DB_QUERY] MessageDao: fmtEntitiesJson=${msg.fmtEntitiesJson}`);
+      console.warn(`[DB_QUERY] MessageDao: stickerInfoJson=${msg.stickerInfoJson}`);
+      console.warn(`[DB_QUERY] MessageDao: mediaInfoJson=${msg.mediaInfoJson}`);
       msg.deserializeFmtEntities();
-      console.warn(`[FMTENTITIES] MessageDao.getMessagesByChatId: after deserialize, fmtEntities count=${msg.fmtEntities?.length ?? 0}`);
+      console.warn(`[DB_QUERY] MessageDao: after deserialize - fmtEntities count=${msg.fmtEntities?.length ?? 0}, stickerInfo=${JSON.stringify(msg.stickerInfo)}, mediaInfo=${JSON.stringify(msg.mediaInfo)}`);
     }
     return messages;
   }

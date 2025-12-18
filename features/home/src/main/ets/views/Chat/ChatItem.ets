@@ -17,10 +17,7 @@ import { BaseConstants, BreakpointConstants, Logger } from '@ohos/base';
 import { HomeConstants } from '../../constants/HomeConstants';
 import { DateHelper } from '@ohos/base';
 import { Chat } from '../../entities/Chat';
-import { image } from '@kit.ImageKit';
-import { ListFileOptions } from '@kit.CoreFileKit';
-import { fileIo as fs, ReadOptions } from '@kit.CoreFileKit';
-import { getProfilePhotoPathAndCount, downloadProfilePhoto, ChatType } from 'libhomogrape.so'
+import { ChatType } from 'libhomogrape.so'
 import { HashMap } from '@kit.ArkTS';
 import { SeenChat } from '../../entities/SeenChat';
 import { getOrDownloadProfilePhoto, getThumbProfilePhotoPixelMap } from '../../utils';

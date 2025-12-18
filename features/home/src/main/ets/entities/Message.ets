@@ -186,6 +186,9 @@ export class Message implements NativeMessage, IComparable<Message> {
     }
     if (nativeMessage.stickerInfo) {
       msg.stickerInfoJson = JSON.stringify(nativeMessage.stickerInfo);
+      console.warn(`[STICKER] fromNative: serialized stickerInfo for messageId=${msg.messageId}: ${msg.stickerInfoJson}`);
+    } else {
+      console.warn(`[STICKER] fromNative: no stickerInfo for messageId=${msg.messageId}`);
     }
     // 序列化媒体信息
     if (nativeMessage.mediaInfo) {
@@ -199,6 +202,9 @@ export class Message implements NativeMessage, IComparable<Message> {
       mediaInfo.duration = nativeMessage.mediaInfo.duration;
       msg.mediaInfo = mediaInfo;
       msg.mediaInfoJson = JSON.stringify(mediaInfo);
+      console.warn(`[MEDIA] fromNative: serialized mediaInfo for messageId=${msg.messageId}: ${msg.mediaInfoJson}`);
+    } else {
+      console.warn(`[MEDIA] fromNative: no mediaInfo for messageId=${msg.messageId}`);
     }
 
     return msg;
@@ -229,23 +235,31 @@ export class Message implements NativeMessage, IComparable<Message> {
     }
 
     // 反序列化 stickerInfo
+    console.warn(`[STICKER] deserializeFmtEntities: messageId=${this.messageId}, stickerInfoJson=${this.stickerInfoJson}`);
     if (this.stickerInfoJson && this.stickerInfoJson.length > 0) {
       try {
         this.stickerInfo = JSON.parse(this.stickerInfoJson) as StickerInfo;
+        console.warn(`[STICKER] deserializeFmtEntities: successfully parsed stickerInfo: ${JSON.stringify(this.stickerInfo)}`);
       } catch (e) {
         console.warn(`[STICKER] deserializeFmtEntities: failed to parse stickerInfo JSON: ${e}`);
         this.stickerInfo = undefined;
       }
+    } else {
+      console.warn(`[STICKER] deserializeFmtEntities: no stickerInfoJson to deserialize`);
     }
 
     // 反序列化 mediaInfo
+    console.warn(`[MEDIA] deserializeFmtEntities: messageId=${this.messageId}, mediaInfoJson=${this.mediaInfoJson}`);
     if (this.mediaInfoJson && this.mediaInfoJson.length > 0) {
       try {
         this.mediaInfo = JSON.parse(this.mediaInfoJson) as MediaInfo;
+        console.warn(`[MEDIA] deserializeFmtEntities: successfully parsed mediaInfo: ${JSON.stringify(this.mediaInfo)}`);
       } catch (e) {
         console.warn(`[MEDIA] deserializeFmtEntities: failed to parse mediaInfo JSON: ${e}`);
         this.mediaInfo = undefined;
       }
+    } else {
+      console.warn(`[MEDIA] deserializeFmtEntities: no mediaInfoJson to deserialize`);
     }
   }
 

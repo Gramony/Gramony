@@ -505,7 +505,8 @@ export struct MessageBubble {
   @Builder
   StickerView() {
     Stack() {
-      if (this.message?.stickerInfo?.isAnimated && this.lottieJson.length > 7) {
+      // 智能判断：优先使用 stickerInfo，如果没有则从文件路径推断
+      if ((this.message?.stickerInfo?.isAnimated || this.mediaPath.endsWith('.tgs')) && this.lottieJson.length > 7) {
         // 动画 Sticker (TGS 格式 - Lottie)
         // TGS 文件已解压为 JSON
         Lottie({
@@ -516,7 +517,7 @@ export struct MessageBubble {
         })
           .width(160)
           .height(160)
-      } else if (this.message?.stickerInfo?.isVideo) {
+      } else if (this.message?.stickerInfo?.isVideo || this.mediaPath.endsWith('.webm')) {
         // 视频 Sticker (WEBM) - 使用 Web 组件显示
         Web({
           src: 'about:blank',
@@ -671,21 +672,46 @@ export struct MessageBubble {
     this.mediaLoadFailed = false;
 
     Logger.warn(`[MEDIA] loadMedia called for messageId=${this.message?.messageId}, mediaType=${this.message?.mediaType}`);
+    Logger.warn(`[MEDIA] stickerInfo: ${JSON.stringify(this.message?.stickerInfo)}`);
+    Logger.warn(`[MEDIA] mediaInfo: ${JSON.stringify(this.message?.mediaInfo)}`);
 
     // 根据 mediaInfo 或 stickerInfo 确定文件扩展名
     let extension = ".jpg"; // 默认扩展名
 
     // Sticker 类型优先使用 stickerInfo 判断
     if (this.message?.mediaType === MediaType.Sticker) {
-      if (this.message?.stickerInfo?.isVideo) {
-        extension = ".webm";
-        Logger.warn(`[MEDIA] Sticker is video, using .webm`);
-      } else if (this.message?.stickerInfo?.isAnimated) {
-        extension = ".tgs";
-        Logger.warn(`[MEDIA] Sticker is animated (TGS), using .tgs`);
+      // 添加额外的检查和备用方案
+      if (this.message?.stickerInfo) {
+        if (this.message.stickerInfo.isVideo) {
+          extension = ".webm";
+          Logger.warn(`[MEDIA] Sticker is video, using .webm`);
+        } else if (this.message.stickerInfo.isAnimated) {
+          extension = ".tgs";
+          Logger.warn(`[MEDIA] Sticker is animated (TGS), using .tgs`);
+        } else {
+          extension = ".webp";
+          Logger.warn(`[MEDIA] Sticker is static, using .webp`);
+        }
+      } else if (this.message?.mediaInfo?.mimeType) {
+        // 备用方案：从 mediaInfo 的 mimeType 判断
+        const mime = this.message.mediaInfo.mimeType;
+        if (mime === 'video/webm' || mime.startsWith('video/')) {
+          extension = ".webm";
+          Logger.warn(`[MEDIA] Fallback: detected video sticker from mimeType: ${mime}`);
+        } else if (mime === 'application/x-tgsticker') {
+          extension = ".tgs";
+          Logger.warn(`[MEDIA] Fallback: detected animated sticker from mimeType: ${mime}`);
+        } else if (mime === 'image/webp') {
+          extension = ".webp";
+          Logger.warn(`[MEDIA] Fallback: detected static sticker from mimeType: ${mime}`);
+        } else {
+          extension = ".webp";
+          Logger.warn(`[MEDIA] Fallback: unknown sticker mimeType ${mime}, defaulting to .webp`);
+        }
       } else {
+        // 最后的备用方案：检查文件是否存在
         extension = ".webp";
-        Logger.warn(`[MEDIA] Sticker is static, using .webp`);
+        Logger.error(`[MEDIA] ERROR: No stickerInfo or mediaInfo for sticker message! Defaulting to .webp`);
       }
     } else if (this.message?.mediaInfo?.mimeType) {
       // 使用 mediaInfo 中的 MIME 类型
@@ -703,6 +729,59 @@ export struct MessageBubble {
 
     // download the media if not exists
     try {
+      // 对于 Sticker 类型，如果文件不存在，尝试其他扩展名
+      if (!fs.accessSync(this.mediaPath) && this.message?.mediaType === MediaType.Sticker) {
+        Logger.warn(`[MEDIA] Sticker file not found: ${this.mediaPath}, trying alternative extensions...`);
+        const basePath = BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString();
+        const alternatives = ['.webm', '.tgs', '.webp'];
+        let found = false;
+        
+        for (const alt of alternatives) {
+          if (alt !== extension) { // 跳过已经尝试过的扩展名
+            const altPath = basePath + alt;
+            if (fs.accessSync(altPath)) {
+              Logger.warn(`[MEDIA] Found alternative file: ${altPath}`);
+              this.mediaPath = altPath;
+              extension = alt;
+              found = true;
+              break;
+            }
+          }
+        }
+        
+        if (found) {
+          // 更新 lottieJson 如果找到了 .tgs 文件
+          if (extension === '.tgs') {
+            const jsonPath = this.mediaPath.replace(".tgs", ".json");
+            if (fs.accessSync(jsonPath)) {
+              try {
+                const file = fs.openSync(jsonPath, fs.OpenMode.READ_ONLY);
+                const stat = fs.statSync(jsonPath);
+                const buffer = new ArrayBuffer(stat.size);
+                fs.readSync(file.fd, buffer);
+                fs.closeSync(file);
+
+                const bytes = new Uint8Array(buffer);
+                let jsonContent = '';
+                for (let i = 0; i < bytes.length; i++) {
+                  jsonContent += String.fromCharCode(bytes[i]);
+                }
+
+                this.lottieJson = jsonContent;
+                this.mediaLoaded = true;
+                Logger.warn(`[MEDIA] Loaded existing TGS JSON from alternative path`);
+                return;
+              } catch (e) {
+                Logger.error(`[MEDIA] Failed to load TGS JSON: ${e}`);
+              }
+            }
+          }
+          // 对于其他类型，直接标记为已加载
+          this.mediaLoaded = true;
+          return;
+        }
+      }
+      
       if (!fs.accessSync(this.mediaPath)) {
         Logger.warn(`[MEDIA] File not exists, downloading: ${this.mediaPath}`);
         downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
