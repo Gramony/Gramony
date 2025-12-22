@@ -137,15 +137,8 @@ export class Message implements NativeMessage, IComparable<Message> {
     this.viewCount = 0;
     this.fmtEntities = fmtEntities;
     this.stickerInfo = stickerInfo;
-    // 序列化为 JSON 存储
-    if (fmtEntities && fmtEntities.length > 0) {
-      this.fmtEntitiesJson = JSON.stringify(fmtEntities);
-      console.warn(`[FMTENTITIES] Message constructor: serialized ${fmtEntities.length} entities to JSON: ${this.fmtEntitiesJson}`);
-    }
-    if (stickerInfo) {
-      this.stickerInfoJson = JSON.stringify(stickerInfo);
-    }
-    // Note: mediaInfo 会在 fromNative 时设置
+    // Note: JSON 序列化由 fromNative 统一处理，直接序列化 NAPI 原始对象
+    // 构造函数不再序列化，避免类实例序列化问题
   }
 
   public static fromNative(nativeMessage: NativeMessage): Message {
@@ -178,30 +171,21 @@ export class Message implements NativeMessage, IComparable<Message> {
     msg.forwardCount = nativeMessage.forwardCount ?? 0;
     msg.replyCount = nativeMessage.replyCount ?? 0;
 
-    // 确保 fmtEntitiesJson 被正确设置,以便 ORM 能保存它
-    // 注意:构造函数已经设置了 fmtEntitiesJson,但为了确保,这里再次显式赋值
-    if (fmtEntities && fmtEntities.length > 0) {
-      msg.fmtEntitiesJson = JSON.stringify(fmtEntities);
-      console.warn(`[FMTENTITIES] fromNative: explicitly set fmtEntitiesJson for ORM: ${msg.fmtEntitiesJson}`);
+    // 直接序列化原始 NAPI 对象，避免类实例序列化问题
+    // 这样可以确保数据在数据库往返过程中不丢失
+    if (nativeMessage.fmtEntities && nativeMessage.fmtEntities.length > 0) {
+      msg.fmtEntitiesJson = JSON.stringify(nativeMessage.fmtEntities);
+      console.warn(`[FMTENTITIES] fromNative: serialized ${nativeMessage.fmtEntities.length} entities from NAPI`);
     }
     if (nativeMessage.stickerInfo) {
       msg.stickerInfoJson = JSON.stringify(nativeMessage.stickerInfo);
-      console.warn(`[STICKER] fromNative: serialized stickerInfo for messageId=${msg.messageId}: ${msg.stickerInfoJson}`);
+      console.warn(`[STICKER] fromNative: serialized stickerInfo for messageId=${msg.messageId}`);
     } else {
       console.warn(`[STICKER] fromNative: no stickerInfo for messageId=${msg.messageId}`);
     }
-    // 序列化媒体信息
     if (nativeMessage.mediaInfo) {
-      // 创建 MediaInfo 实例而不是直接赋值，避免结构化类型问题
-      const mediaInfo = new MediaInfo();
-      mediaInfo.mimeType = nativeMessage.mediaInfo.mimeType;
-      mediaInfo.fileName = nativeMessage.mediaInfo.fileName;
-      mediaInfo.fileSize = nativeMessage.mediaInfo.fileSize;
-      mediaInfo.width = nativeMessage.mediaInfo.width;
-      mediaInfo.height = nativeMessage.mediaInfo.height;
-      mediaInfo.duration = nativeMessage.mediaInfo.duration;
-      msg.mediaInfo = mediaInfo;
-      msg.mediaInfoJson = JSON.stringify(mediaInfo);
+      msg.mediaInfoJson = JSON.stringify(nativeMessage.mediaInfo);
+      console.warn(`[MEDIA] fromNative: serialized mediaInfo for messageId=${msg.messageId}`);
     }
 
     return msg;
@@ -211,18 +195,35 @@ export class Message implements NativeMessage, IComparable<Message> {
    * 从数据库加载后，反序列化 fmtEntities、stickerInfo 和 mediaInfo
    */
   public deserializeFmtEntities(): void {
+    console.error(`============ [DESERIALIZE START] messageId=${this.messageId} ============`);
+    console.error(`[DESERIALIZE] fmtEntitiesJson: type=${typeof this.fmtEntitiesJson}, length=${this.fmtEntitiesJson?.length ?? 'undefined'}`);
+    if (this.fmtEntitiesJson) {
+      console.error(`[DESERIALIZE] fmtEntitiesJson value: ${this.fmtEntitiesJson.substring(0, 150)}`);
+    }
+    console.error(`[DESERIALIZE] stickerInfoJson: type=${typeof this.stickerInfoJson}, length=${this.stickerInfoJson?.length ?? 'undefined'}`);
+    console.error(`[DESERIALIZE] mediaInfoJson: type=${typeof this.mediaInfoJson}, length=${this.mediaInfoJson?.length ?? 'undefined'}`);
+    if (this.mediaInfoJson) {
+      console.error(`[DESERIALIZE] mediaInfoJson value: ${this.mediaInfoJson.substring(0, 150)}`);
+    }
+
     if (this.fmtEntitiesJson && this.fmtEntitiesJson.length > 0) {
       try {
         this.fmtEntities = JSON.parse(this.fmtEntitiesJson) as MessageEntity[];
+        console.error(`[DESERIALIZE] ✓ Successfully parsed ${this.fmtEntities.length} fmtEntities`);
       } catch (e) {
+        console.error(`[DESERIALIZE] ✗ Failed to parse fmtEntitiesJson: ${e}`);
         this.fmtEntities = undefined;
       }
+    } else {
+      console.error(`[DESERIALIZE] ✗ No fmtEntitiesJson to deserialize`);
     }
 
     if (this.stickerInfoJson && this.stickerInfoJson.length > 0) {
       try {
         this.stickerInfo = JSON.parse(this.stickerInfoJson) as StickerInfo;
+        console.error(`[DESERIALIZE] ✓ Successfully parsed stickerInfo`);
       } catch (e) {
+        console.error(`[DESERIALIZE] ✗ Failed to parse stickerInfoJson: ${e}`);
         this.stickerInfo = undefined;
       }
     }
@@ -230,10 +231,13 @@ export class Message implements NativeMessage, IComparable<Message> {
     if (this.mediaInfoJson && this.mediaInfoJson.length > 0) {
       try {
         this.mediaInfo = JSON.parse(this.mediaInfoJson) as MediaInfo;
+        console.error(`[DESERIALIZE] ✓ Successfully parsed mediaInfo`);
       } catch (e) {
+        console.error(`[DESERIALIZE] ✗ Failed to parse mediaInfoJson: ${e}`);
         this.mediaInfo = undefined;
       }
     }
+    console.error(`============ [DESERIALIZE END] messageId=${this.messageId} ============`);
   }
 
   /**

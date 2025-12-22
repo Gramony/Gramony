@@ -97,7 +97,7 @@ export struct MessageBubble {
   private isAppletMsg?: boolean = false;
   private isDocumentMsg?: boolean = false;
   textController: TextController = new TextController();
-  message? = new Message(
+  message?= new Message(
     1,
     1,
     false,
@@ -221,7 +221,7 @@ export struct MessageBubble {
                     })
                     .onClick(() => {
                       Logger.debug("ReplyToPreview onClick: " + this.message?.replyToMessageId + " currentChatId: " +
-                      this.currentChatId);
+                        this.currentChatId);
                       let target_index =
                         this.messagesOfChatMap.get(this.currentChatId)?.indexOf(this.message?.replyToMessageId || -1);
                       Logger.debug("ReplyToPreview onClick: target_index: " + target_index);
@@ -238,14 +238,14 @@ export struct MessageBubble {
                         this.isScrollingDueToReplyToMessage = true;
                         this.scrollToRepliedMessageIndex = target_index;
                         this.messageListScroller?.scrollToIndex(current_index -
-                        BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                        BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER,
                           true,
                           ScrollAlign.CENTER);
                         Logger.debug("ReplyToPreview onClick: scrollToIndex first step: " +
                           (current_index -
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
-                          BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
+                            BaseConstants.LAZY_FOR_EACH_SCROLL_INDEX_LIMIT +
+                            BaseConstants.LAZY_FOR_EACH_SCROLL_SMOOTH_BUFFER));
                       } else {
                         Logger.debug("ReplyToPreview onClick: scroll to target in one step");
                         this.messageListScroller?.scrollToIndex(target_index, true, ScrollAlign.CENTER);
@@ -261,48 +261,54 @@ export struct MessageBubble {
                       }
                       //TODO: 设置id，不然不会显示一镜到底效果
                       .id(this.mediaPreviewOptions.idBuilder(item, index))
-                      //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
-                      .id(`media_${index}`)
-                      // .aspectRatio(1)
-                      .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
-                      //TODO: 仿微信那种资源在预览时原始资源隐藏显示
-                      .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
-                      .onClick(() => {
-                        Logger.debug("MessageBubble Media onClick: " + index);
-                        // this.mediaPreviewOptions
-                        //   .setInitIndex(index)
-                        //   .setMedias(this.mediaResources);
-                        // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
-                        let uiContext = getContext(this);
-                        let displayInfo: filePreview.DisplayInfo = {
-                          x: 100,
-                          y: 100,
-                          width: 800,
-                          height: 800
-                        };
-                        let fileInfo: filePreview.PreviewInfo = {
-                          uri: "file://" + uiContext.applicationInfo.name + this.mediaPath,
-                          mimeType: 'image/jpeg'
-                        };
-                        filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
-                          console.info('Succeeded in opening preview');
-                        }).catch((err: BusinessError) => {
-                          console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
-                        });
-                      })
+                        //TODO: 如果列表数据模型和mediaPreview的数据模型不一致，可以自己设置，不过要和上面的`setIdBuilder`中id一致
+                        .id(`media_${index}`)
+                        // .aspectRatio(1)
+                        .clickEffect({ level: ClickEffectLevel.MIDDLE, scale: 0.8 })
+                        //TODO: 仿微信那种资源在预览时原始资源隐藏显示
+                        .visibility(index == this.mediaPreviewIndex ? Visibility.Hidden : Visibility.Visible)
+                        .onClick(() => {
+                          Logger.debug("MessageBubble Media onClick: " + index);
+                          // this.mediaPreviewOptions
+                          //   .setInitIndex(index)
+                          //   .setMedias(this.mediaResources);
+                          // MediaPreview.open(this.getUIContext(), this.mediaPreviewOptions);
+                          let uiContext = getContext(this);
+                          let displayInfo: filePreview.DisplayInfo = {
+                            x: 100,
+                            y: 100,
+                            width: 800,
+                            height: 800
+                          };
+                          let fileInfo: filePreview.PreviewInfo = {
+                            uri: "file://" + uiContext.applicationInfo.name + this.mediaPath,
+                            mimeType: 'image/jpeg'
+                          };
+                          filePreview.openPreview(uiContext, fileInfo, displayInfo).then(() => {
+                            console.info('Succeeded in opening preview');
+                          }).catch((err: BusinessError) => {
+                            console.error(`Failed to open preview, err.code = ${err.code}, err.message = ${err.message}`);
+                          });
+                        })
                     }, (item: DefaultMediaModel, index: number) => JSON.stringify(item) + index)
                   }
                 }
 
                 // Video 显示（Document 类型且 MIME 类型为 video/*）
                 if (this.message?.mediaType === MediaType.Document &&
-                this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+                  this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
                   this.VideoView()
                 }
 
                 // Sticker 显示
                 if (this.message?.mediaType === MediaType.Sticker) {
                   this.StickerView()
+                }
+
+                // 其他文档类型显示（音频、文档等）
+                if (this.message?.mediaType === MediaType.Document &&
+                  !this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+                  this.DocumentView()
                 }
 
                 this.MessageContent()
@@ -338,16 +344,16 @@ export struct MessageBubble {
               top: 8,
               bottom: 8
             })
-            .backgroundColor(this.shouldHideBubble() ? Color.Transparent :
-              (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
-                HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
-            .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
+              .backgroundColor(this.shouldHideBubble() ? Color.Transparent :
+                (!this.message?.outgoing ? HomeConstants.MESSAGE_BACKGROUND_COLOR :
+                  HomeConstants.MESSAGE_BACKGROUND_COLOR_OUTGOING))
+              .borderRadius(this.message?.outgoing ? this.outgoingBorderRadius : this.incomingBorderRadius)
           }
           .padding({
             top: 5,
             bottom: 5
           })
-          .width(BaseConstants.NINETY_WIDTH_PERCENT)
+            .width(BaseConstants.NINETY_WIDTH_PERCENT)
         }
         .width(BaseConstants.NINETY_WIDTH_PERCENT)
 
@@ -496,10 +502,10 @@ export struct MessageBubble {
       }
     }
     .width(300)
-    .height(200)
-    .onAppear(() => {
-      this.loadMedia();
-    })
+      .height(200)
+      .onAppear(() => {
+        this.loadMedia();
+      })
   }
 
   @Builder
@@ -580,11 +586,63 @@ export struct MessageBubble {
       }
     }
     .width(150)
-    .height(150)
-    .margin({ bottom: 8 })
-    .onAppear(() => {
-      this.loadMedia();
-    })
+      .height(150)
+      .margin({ bottom: 8 })
+      .onAppear(() => {
+        this.loadMedia();
+      })
+  }
+
+  @Builder
+  DocumentView() {
+    Column() {
+      Row() {
+        // 文件图标
+        Text() {
+          if (this.message?.mediaInfo?.mimeType?.startsWith('audio/')) {
+            SymbolSpan($r('sys.symbol.music_fill'))
+          } else if (this.message?.mediaInfo?.mimeType?.includes('pdf')) {
+            SymbolSpan($r('sys.symbol.doc_text_fill'))
+          } else if (this.message?.mediaInfo?.mimeType?.includes('word') ||
+            this.message?.mediaInfo?.mimeType?.includes('document')) {
+            SymbolSpan($r('sys.symbol.doc_text_fill'))
+          } else if (this.message?.mediaInfo?.mimeType?.includes('excel') ||
+            this.message?.mediaInfo?.mimeType?.includes('spreadsheet')) {
+            SymbolSpan($r('sys.symbol.square_grid_2x2'))
+          } else if (this.message?.mediaInfo?.mimeType?.includes('zip') ||
+            this.message?.mediaInfo?.mimeType?.includes('rar') ||
+            this.message?.mediaInfo?.mimeType?.includes('compressed')) {
+            SymbolSpan($r('sys.symbol.folder_fill'))
+          } else {
+            SymbolSpan($r('sys.symbol.doc_text'))
+          }
+        }
+        .fontSize(40)
+          .margin({ right: 12 })
+
+        // 文件信息
+        Column() {
+          Text(this.message?.mediaInfo?.fileName ?? '未知文件')
+            .fontSize(14)
+            .fontColor(Color.Black)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+          Text(this.formatFileSize(this.message?.mediaInfo?.fileSize ?? 0))
+            .fontSize(12)
+            .fontColor(Color.Gray)
+            .margin({ top: 4 })
+        }
+        .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+      }
+      .width('100%')
+        .padding(12)
+        .backgroundColor(Color.White)
+        .borderRadius(8)
+    }
+    .width(280)
+      .margin({ bottom: 8 })
   }
 
   @Builder
@@ -663,12 +721,12 @@ export struct MessageBubble {
       }
     }
     .alignSelf(ItemAlign.Start)
-    .onAppear(() => {
-      this.loadMedia();
-    })
+      .onAppear(() => {
+        this.loadMedia();
+      })
   }
 
-  loadMedia() {
+  async loadMedia(): Promise<void> {
     this.mediaLoaded = false;
     this.mediaLoadFailed = false;
 
@@ -716,7 +774,7 @@ export struct MessageBubble {
         const basePath = BaseConstants.BASE_DIR + this.message?.chatId.toString() + "/" + this.message?.messageId.toString();
         const alternatives = ['.webm', '.tgs', '.webp'];
         let found = false;
-        
+
         for (const alt of alternatives) {
           if (alt !== extension) {
             const altPath = basePath + alt;
@@ -728,7 +786,7 @@ export struct MessageBubble {
             }
           }
         }
-        
+
         if (found) {
           // 更新 lottieJson 如果找到了 .tgs 文件
           if (extension === '.tgs') {
@@ -761,30 +819,30 @@ export struct MessageBubble {
           return;
         }
       }
-      
+
       if (!fs.accessSync(this.mediaPath)) {
-        downloadMediaFromMessage(this.message?.chatId, this.message?.messageId)
-          .then((path) => {
-            this.mediaPath = path;
-            // 验证文件是否存在
-            if (fs.accessSync(path)) {
-              const stat = fs.statSync(path);
-              Logger.warn(`[MEDIA] File exists, size: ${stat.size} bytes`);
-            } else {
-              Logger.error(`[MEDIA] Downloaded file not found: ${path}`);
-            }
-            // 如果是 TGS 文件，需要解压为 JSON
-            if (extension === ".tgs") {
-              this.decompressTgsFile(path);
-            } else {
-              this.mediaLoaded = true;
-            }
-          })
-          .catch((error: Error) => {
-            Logger.error(`[MEDIA] Download failed: ${error.message}`);
-            // this.mediaLoadFailed = true;
-            this.mediaLoaded = true; // TODO: 临时忽略下载成功仍然返回失败的问题
-          });
+        try {
+          Logger.info(`[MEDIA] Downloading media: chatId=${this.message?.chatId}, messageId=${this.message?.messageId}`);
+          const path = await downloadMediaFromMessage(this.message?.chatId, this.message?.messageId);
+          this.mediaPath = path;
+          // 验证文件是否存在
+          if (fs.accessSync(path)) {
+            const stat = fs.statSync(path);
+            Logger.warn(`[MEDIA] File downloaded successfully, size: ${stat.size} bytes`);
+          } else {
+            Logger.error(`[MEDIA] Downloaded file not found: ${path}`);
+          }
+          // 如果是 TGS 文件，需要解压为 JSON
+          if (extension === ".tgs") {
+            await this.decompressTgsFile(path);
+          } else {
+            this.mediaLoaded = true;
+          }
+        } catch (error) {
+          Logger.error(`[MEDIA] Download failed: ${error}`);
+          this.mediaLoadFailed = true;
+          throw new Error(`Download failed: ${error}`); // 抛出 Error 对象
+        }
       } else {
         // 如果是 TGS 文件，检查是否已解压
         if (extension === ".tgs") {
@@ -880,7 +938,7 @@ export struct MessageBubble {
 
     // 视频：如果没有文本，则不显示气泡
     if (this.message?.mediaType === MediaType.Document &&
-    this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
+      this.message?.mediaInfo?.mimeType?.startsWith('video/')) {
       const hasText = this.message?.text && this.message.text.trim().length > 0;
       return !hasText;
     }
@@ -948,6 +1006,19 @@ export struct MessageBubble {
   }
 
   /**
+   * 格式化文件大小
+   */
+  private formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+
+
+  /**
    * 生成用于显示视频 sticker 的 HTML 内容
    * 针对 512x512 的 WebM sticker 优化
    * 使用 file:// 协议加载本地视频
@@ -1003,12 +1074,12 @@ export struct MessageBubble {
       Blank()
     }
     .padding({ bottom: 2 })
-    .alignSelf(ItemAlign.Start)
+      .alignSelf(ItemAlign.Start)
   }
 }
 
 @Builder
-function Loading() {
+  function Loading() {
   LoadingProgress()
     .color(Color.Blue)
     .layoutWeight(1)

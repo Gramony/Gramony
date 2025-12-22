@@ -4,7 +4,7 @@ import relationalStore from "@ohos.data.relationalStore";
 import { Logger } from '@ohos/base';
 
 class AppDB {
-  static DB_VERSION = 14;
+  static DB_VERSION = 15;
   private static STORE_CONFIG: relationalStore.StoreConfig = {
     name: 'homo.db',
     securityLevel: relationalStore.SecurityLevel.S1,

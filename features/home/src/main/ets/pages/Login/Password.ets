@@ -32,6 +32,8 @@ export struct Password {
           Text($r('app.string.login_password_hint')).margin({ top: 20 })
           TextInput({ placeholder: $r('app.string.login_password_placeholder'), text: this.password })
             .type(InputType.Password)
+            .fontFamily("HarmonyOS Sans Condensed")
+            .fontSize(20)
             .margin({ top: 20 })
             .onChange((value) => {
               this.password = value;
