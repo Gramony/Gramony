@@ -116,7 +116,7 @@ export async function testPush(nickname: string): Promise<string> {
         nick: nickname,
         title: 'Telegram 测试',
         msg: '这是一条测试推送消息',
-        url: 'settings://wifi/',
+        url: 'tg://launchohos',
       })
     });
 

@@ -45,7 +45,7 @@ export struct PushSettings {
   showAppStoreDialog() {
     promptAction.showDialog({
       title: `前去应用市场`,
-      message: 'MeoW为一款专注于鸿蒙推送服务的应用，与本应用无关。请您注意相应的隐私政策与风险。',
+      message: 'MeoW 为一款专注于鸿蒙推送服务的应用，仅提供中文界面，与本应用无关。请您注意相应的隐私政策与风险。',
       buttons: [{
         text: '确定',
         color: '#096ad2',
@@ -176,16 +176,12 @@ export struct PushSettings {
       Column({ space: 20 }) {
         // 引导信息
         Column({ space: 12 }) {
-          Text('推送通知设置')
-            .fontSize(28)
-            .fontWeight(FontWeight.Bold)
-
-          Text('要接收推送通知，您需要先安装配套的推送应用')
+          Text('需先安装配套的推送应用')
             .fontSize(14)
             .fontColor('#8a8a8a')
             .textAlign(TextAlign.Center)
 
-          Button('下载推送应用')
+          Button('下载第三方应用 MeoW')
             .width('100%')
             .backgroundColor('#007AFF')
             .onClick(() => {
@@ -206,7 +202,7 @@ export struct PushSettings {
             .fontWeight(FontWeight.Medium)
             .alignSelf(ItemAlign.Start)
 
-          Text('在 MeoW → 我的中第三个选项里复制一串字母和数字')
+          Text('在 MeoW → 「我的」中第三个选项里复制一串字母和数字')
             .fontSize(12)
             .fontColor('#8a8a8a')
             .alignSelf(ItemAlign.Start)
@@ -218,7 +214,7 @@ export struct PushSettings {
             })
             .maxLength(50)
 
-          Text('此 Nickname 将用于接收推送通知')
+          Text('此昵称将用于接收推送通知')
             .fontSize(12)
             .fontColor('#8a8a8a')
             .alignSelf(ItemAlign.Start)
@@ -276,12 +272,12 @@ export struct PushSettings {
             .fontColor('#666')
             .alignSelf(ItemAlign.Start)
 
-          Text('2. 在推送应用中注册您的 Nickname')
+          Text('2. 在推送应用中注册您的昵称（一串字母和数字）')
             .fontSize(13)
             .fontColor('#666')
             .alignSelf(ItemAlign.Start)
 
-          Text('3. 在此输入相同的 Nickname 并注册')
+          Text('3. 在此输入昵称并注册')
             .fontSize(13)
             .fontColor('#666')
             .alignSelf(ItemAlign.Start)

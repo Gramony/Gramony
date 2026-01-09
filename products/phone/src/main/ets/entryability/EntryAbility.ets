@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { ConfigurationConstant, UIAbility } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { display, KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { AsyncCallback, BusinessError, commonEventManager } from '@kit.BasicServicesKit';
@@ -44,7 +44,12 @@ export default class EntryAbility extends UIAbility {
     ]
   };
 
-  onCreate() {
+  onCreate(want?: Want, launchParam?: AbilityConstant.LaunchParam): void {
+    // 处理应用首次启动时的 Deep Linking
+    if (want?.uri) {
+      Logger.info(`Deep Linking onCreate - URI: ${want.uri}`);
+    }
+
     // this.KV = new KV(this.context, PREF_STORE_NAME);
     // AppStorage.setOrCreate('KV', this.KV);
     // Database.deleteRdb(this.context);
@@ -80,6 +85,16 @@ export default class EntryAbility extends UIAbility {
     }
 
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
+  }
+
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // 处理应用运行时通过 Deep Linking 拉起
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onNewWant');
+    if (want?.uri) {
+      Logger.info(`Deep Linking onNewWant - URI: ${want.uri}`);
+      // 目前只需要拉起主界面，不做额外处理
+      // 后续可以在这里解析 URI 并进行相应的页面跳转
+    }
   }
 
   onDestroy(): void {
