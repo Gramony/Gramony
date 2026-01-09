@@ -220,6 +220,14 @@
     {
       "name": "profile_chat_type_unknown",
       "value": "Unknown"
+    },
+    {
+      "name": "push_settings",
+      "value": "Push Settings"
+    },
+    {
+      "name": "push_settings_desc",
+      "value": "Configure push notifications"
     }
   ]
 }

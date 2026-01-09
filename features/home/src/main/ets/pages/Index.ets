@@ -43,6 +43,8 @@ import { ChatList } from '../views/Chat/ChatList';
 import { HomeConstants } from '../constants/HomeConstants';
 import { emitter } from '@kit.BasicServicesKit';
 import { PhoneNumber, VerifyCode, Password } from './Login/Index'
+import { PushSettings } from './PushSettings';
+import { autoRegisterPushIfNeeded } from '../utils';
 import {
   isLoggedIn,
   run,
@@ -71,6 +73,7 @@ import { ParticipantList } from './Chat/Group/ParticipantList';
 import { EventConstants } from '../constants/EventConstants';
 import { Contacts } from './Contacts';
 import { Me } from './Me';
+import { common } from '@kit.AbilityKit';
 
 
 @Entry
@@ -280,6 +283,8 @@ export struct Index {
       ChatDetailNone();
     } else if (name === 'Profile' || name === 'ProfilePage') {
       ProfilePage();
+    } else if (name === 'PushSettings') {
+      PushSettings();
     } else if (name === 'Login/PhoneNumber') {
       PhoneNumber();
     } else if (name === 'Login/VerifyCode') {
@@ -467,6 +472,14 @@ export struct Index {
                   });
                 Logger.debug('Home page onAppear isLoggedIn');
                 this.isLoadingNewMessages = false;
+                
+                // Auto register push if needed (every 24 hours)
+                const context = getContext(this) as common.UIAbilityContext;
+                autoRegisterPushIfNeeded(context)
+                  .catch((e: Error) => {
+                    Logger.error('Home page onAppear autoRegisterPushIfNeeded error ' + e);
+                  });
+                
                 run()
                   .catch((e: Error) => {
                     Logger.error('Home page onAppear run error ' + e);
@@ -537,6 +550,14 @@ export struct Index {
         Logger.debug('Home page onForegroundEvent reconnect not authorized');
         return;
       }
+      
+      // Auto register push if needed (every 24 hours)
+      const context = getContext(this) as common.UIAbilityContext;
+      autoRegisterPushIfNeeded(context)
+        .catch((e: Error) => {
+          Logger.error('Home page onForegroundEvent autoRegisterPushIfNeeded error ' + e);
+        });
+      
       // this.loadNewMessages();
       run()
         .catch((err: Error) => {
@@ -556,6 +577,14 @@ export struct Index {
           Logger.error('Home page onLoginEvent loadNewMessages error ' + e);
         });
       this.isLoadingNewMessages = false;
+      
+      // Auto register push if needed (every 24 hours)
+      const context = getContext(this) as common.UIAbilityContext;
+      autoRegisterPushIfNeeded(context)
+        .catch((e: Error) => {
+          Logger.error('Home page onLoginEvent autoRegisterPushIfNeeded error ' + e);
+        });
+      
       run().catch((e: Error) => {
         Logger.error('Home page onLoginEvent run error ' + e);
       });

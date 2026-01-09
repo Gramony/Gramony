@@ -211,6 +211,14 @@
     {
       "name": "profile_chat_type_unknown",
       "value": "不明"
+    },
+    {
+      "name": "push_settings",
+      "value": "プッシュ設定"
+    },
+    {
+      "name": "push_settings_desc",
+      "value": "プッシュ通知を設定"
     }
   ]
 }

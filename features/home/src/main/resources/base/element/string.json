@@ -211,6 +211,14 @@
     {
       "name": "profile_chat_type_unknown",
       "value": "未知"
+    },
+    {
+      "name": "push_settings",
+      "value": "推送设置"
+    },
+    {
+      "name": "push_settings_desc",
+      "value": "配置推送通知"
     }
   ]
 }

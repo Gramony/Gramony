@@ -211,6 +211,14 @@
     {
       "name": "profile_chat_type_unknown",
       "value": "Неизвестно"
+    },
+    {
+      "name": "push_settings",
+      "value": "Настройки push"
+    },
+    {
+      "name": "push_settings_desc",
+      "value": "Настроить push-уведомления"
     }
   ]
 }

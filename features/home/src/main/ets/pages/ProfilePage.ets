@@ -1,6 +1,7 @@
 import { NativeSeenChat } from "libhomogrape.so";
 import { Profile } from "../views/Profile"
 import { ComposeListItem, IconType } from "@kit.ArkUI";
+import { PushSettings } from './PushSettings';
 
 @ComponentV2
 export struct ProfilePage {
@@ -9,6 +10,7 @@ export struct ProfilePage {
   @Param chatId: string = '';
   @Param title: Resource | string = 'Profile';
   @Param device: string | false = false;
+  @Local showPushSettings: boolean = false;
   pathStack: NavPathStack | undefined = undefined;
   pageParam: string = '';
 
@@ -45,6 +47,14 @@ export struct ProfilePage {
       .width('100%')
       .padding(16)
     }
+    .bindSheet($$this.showPushSettings, this.pushSettingsSheet(), {
+      height: '90%',
+      showClose: true,
+      title: { title: $r('app.string.push_settings') },
+      onDisappear: () => {
+        this.showPushSettings = false;
+      }
+    })
     .title(this.user?.fullName ?? this.title, { barStyle: BarStyle.STACK })
     .onAppear(() => {
       if (!this.user) {
@@ -201,10 +211,51 @@ export struct ProfilePage {
             }
           })
         }
+
+        // 推送设置入口
+        ListItem() {
+          Button({ type: ButtonType.Normal }) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.bell'))
+                .fontSize(24)
+                .fontColor([Color.Blue])
+              Column({ space: 4 }) {
+                Text($r('app.string.push_settings'))
+                  .fontSize(16)
+                  .fontWeight(FontWeight.Medium)
+                  .alignSelf(ItemAlign.Start)
+                Text($r('app.string.push_settings_desc'))
+                  .fontSize(14)
+                  .fontColor('#8a8a8a')
+                  .alignSelf(ItemAlign.Start)
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+              .margin({ left: 12 })
+            }
+            .width('100%')
+            .padding(12)
+          }
+          .width('100%')
+          .backgroundColor(Color.Transparent)
+          .onClick(() => {
+            console.log('Push Settings button clicked');
+            this.showPushSettings = true;
+          })
+        }
       }
     }
     .width('100%')
     .padding({ top: 4 })
+  }
+
+  @Builder
+  pushSettingsSheet() {
+    Column() {
+      PushSettings()
+    }
+    .width('100%')
+    .height('100%')
   }
 
   private getAvatarFromBytes(bytes: ArrayBuffer | number[]): string {
