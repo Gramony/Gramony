@@ -219,6 +219,130 @@
     {
       "name": "push_settings_desc",
       "value": "配置推送通知"
+    },
+    {
+      "name": "push_download_app",
+      "value": "前去应用市场"
+    },
+    {
+      "name": "push_meow_disclaimer",
+      "value": "MeoW 为一款专注于鸿蒙推送服务的应用,仅提供中文界面,与本应用无关。请您注意相应的隐私政策与风险。"
+    },
+    {
+      "name": "push_confirm",
+      "value": "确定"
+    },
+    {
+      "name": "push_enter_nickname",
+      "value": "请输入昵称"
+    },
+    {
+      "name": "push_registering",
+      "value": "正在注册推送…"
+    },
+    {
+      "name": "push_register_success",
+      "value": "推送注册成功！"
+    },
+    {
+      "name": "push_register_failed",
+      "value": "推送注册失败: "
+    },
+    {
+      "name": "push_register_first",
+      "value": "请先注册推送"
+    },
+    {
+      "name": "push_testing",
+      "value": "正在测试推送..."
+    },
+    {
+      "name": "push_test_sent",
+      "value": "测试推送已发送！"
+    },
+    {
+      "name": "push_test_failed",
+      "value": "测试推送失败: "
+    },
+    {
+      "name": "push_unregistering",
+      "value": "正在取消注册..."
+    },
+    {
+      "name": "push_unregister_success",
+      "value": "取消注册成功！"
+    },
+    {
+      "name": "push_unregister_failed",
+      "value": "取消注册失败: "
+    },
+    {
+      "name": "push_install_app_first",
+      "value": "需先安装配套的推送应用"
+    },
+    {
+      "name": "push_download_meow",
+      "value": "下载第三方应用 MeoW"
+    },
+    {
+      "name": "push_nickname",
+      "value": "昵称"
+    },
+    {
+      "name": "push_nickname_instruction",
+      "value": "在 MeoW → 「我的」中第三个选项里复制一串字母和数字"
+    },
+    {
+      "name": "push_nickname_note",
+      "value": "此昵称将用于接收推送通知"
+    },
+    {
+      "name": "push_registering_loading",
+      "value": "注册中..."
+    },
+    {
+      "name": "push_register_button",
+      "value": "注册推送"
+    },
+    {
+      "name": "push_testing_loading",
+      "value": "测试中..."
+    },
+    {
+      "name": "push_test_button",
+      "value": "测试推送"
+    },
+    {
+      "name": "push_unregistering_loading",
+      "value": "取消中..."
+    },
+    {
+      "name": "push_unregister_button",
+      "value": "取消推送"
+    },
+    {
+      "name": "push_instructions_title",
+      "value": "使用说明"
+    },
+    {
+      "name": "push_instruction_1",
+      "value": "1. 先下载并安装推送应用"
+    },
+    {
+      "name": "push_instruction_2",
+      "value": "2. 在推送应用中注册您的昵称（一串字母和数字）"
+    },
+    {
+      "name": "push_instruction_3",
+      "value": "3. 在此输入昵称并注册"
+    },
+    {
+      "name": "push_instruction_4",
+      "value": "4. 点击测试按钮验证推送是否正常"
+    },
+    {
+      "name": "push_return_value",
+      "value": "返回值: "
     }
   ]
 }

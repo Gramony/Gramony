@@ -219,6 +219,130 @@
     {
       "name": "push_settings_desc",
       "value": "プッシュ通知を設定"
+    },
+    {
+      "name": "push_download_app",
+      "value": "AppGalleryへ"
+    },
+    {
+      "name": "push_meow_disclaimer",
+      "value": "MeoWはHarmonyOSプッシュサービスに特化したアプリで、中国語のみ対応しており、本アプリとは関係ありません。関連するプライバシーポリシーとリスクにご注意ください。"
+    },
+    {
+      "name": "push_confirm",
+      "value": "確認"
+    },
+    {
+      "name": "push_enter_nickname",
+      "value": "ニックネームを入力してください"
+    },
+    {
+      "name": "push_registering",
+      "value": "プッシュを登録中..."
+    },
+    {
+      "name": "push_register_success",
+      "value": "プッシュの登録に成功しました!"
+    },
+    {
+      "name": "push_register_failed",
+      "value": "プッシュの登録に失敗しました: "
+    },
+    {
+      "name": "push_register_first",
+      "value": "先にプッシュを登録してください"
+    },
+    {
+      "name": "push_testing",
+      "value": "プッシュをテスト中..."
+    },
+    {
+      "name": "push_test_sent",
+      "value": "テストプッシュを送信しました!"
+    },
+    {
+      "name": "push_test_failed",
+      "value": "テストプッシュが失敗しました: "
+    },
+    {
+      "name": "push_unregistering",
+      "value": "登録を解除中..."
+    },
+    {
+      "name": "push_unregister_success",
+      "value": "登録解除に成功しました!"
+    },
+    {
+      "name": "push_unregister_failed",
+      "value": "登録解除に失敗しました: "
+    },
+    {
+      "name": "push_install_app_first",
+      "value": "最初にプッシュアプリをインストールしてください"
+    },
+    {
+      "name": "push_download_meow",
+      "value": "MeoWアプリをダウンロード"
+    },
+    {
+      "name": "push_nickname",
+      "value": "ニックネーム"
+    },
+    {
+      "name": "push_nickname_instruction",
+      "value": "MeoW → マイページ → 3番目のオプションから英数字の文字列をコピー"
+    },
+    {
+      "name": "push_nickname_note",
+      "value": "このニックネームはプッシュ通知の受信に使用されます"
+    },
+    {
+      "name": "push_registering_loading",
+      "value": "登録中..."
+    },
+    {
+      "name": "push_register_button",
+      "value": "プッシュを登録"
+    },
+    {
+      "name": "push_testing_loading",
+      "value": "テスト中..."
+    },
+    {
+      "name": "push_test_button",
+      "value": "プッシュをテスト"
+    },
+    {
+      "name": "push_unregistering_loading",
+      "value": "解除中..."
+    },
+    {
+      "name": "push_unregister_button",
+      "value": "プッシュを解除"
+    },
+    {
+      "name": "push_instructions_title",
+      "value": "使用方法"
+    },
+    {
+      "name": "push_instruction_1",
+      "value": "1. プッシュアプリをダウンロードしてインストール"
+    },
+    {
+      "name": "push_instruction_2",
+      "value": "2. プッシュアプリでニックネーム（英数字）を登録"
+    },
+    {
+      "name": "push_instruction_3",
+      "value": "3. ここにニックネームを入力して登録"
+    },
+    {
+      "name": "push_instruction_4",
+      "value": "4. テストボタンをクリックしてプッシュが動作するか確認"
+    },
+    {
+      "name": "push_return_value",
+      "value": "戻り値: "
     }
   ]
 }

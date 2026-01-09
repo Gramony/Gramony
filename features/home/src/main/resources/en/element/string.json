@@ -228,6 +228,130 @@
     {
       "name": "push_settings_desc",
       "value": "Configure push notifications"
+    },
+    {
+      "name": "push_download_app",
+      "value": "Go to AppGallery"
+    },
+    {
+      "name": "push_meow_disclaimer",
+      "value": "MeoW is an application focused on HarmonyOS push services, available only in Chinese, and is not related to this application. Please note the relevant privacy policy and risks."
+    },
+    {
+      "name": "push_confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "push_enter_nickname",
+      "value": "Please enter nickname"
+    },
+    {
+      "name": "push_registering",
+      "value": "Registering push..."
+    },
+    {
+      "name": "push_register_success",
+      "value": "Push registered successfully!"
+    },
+    {
+      "name": "push_register_failed",
+      "value": "Push registration failed: "
+    },
+    {
+      "name": "push_register_first",
+      "value": "Please register push first"
+    },
+    {
+      "name": "push_testing",
+      "value": "Testing push..."
+    },
+    {
+      "name": "push_test_sent",
+      "value": "Test push sent!"
+    },
+    {
+      "name": "push_test_failed",
+      "value": "Test push failed: "
+    },
+    {
+      "name": "push_unregistering",
+      "value": "Unregistering..."
+    },
+    {
+      "name": "push_unregister_success",
+      "value": "Unregistered successfully!"
+    },
+    {
+      "name": "push_unregister_failed",
+      "value": "Unregistration failed: "
+    },
+    {
+      "name": "push_install_app_first",
+      "value": "Please install the companion push app first"
+    },
+    {
+      "name": "push_download_meow",
+      "value": "Download MeoW App"
+    },
+    {
+      "name": "push_nickname",
+      "value": "Nickname"
+    },
+    {
+      "name": "push_nickname_instruction",
+      "value": "Copy the alphanumeric string from MeoW → Me → third option"
+    },
+    {
+      "name": "push_nickname_note",
+      "value": "This nickname will be used to receive push notifications"
+    },
+    {
+      "name": "push_registering_loading",
+      "value": "Registering..."
+    },
+    {
+      "name": "push_register_button",
+      "value": "Register Push"
+    },
+    {
+      "name": "push_testing_loading",
+      "value": "Testing..."
+    },
+    {
+      "name": "push_test_button",
+      "value": "Test Push"
+    },
+    {
+      "name": "push_unregistering_loading",
+      "value": "Unregistering..."
+    },
+    {
+      "name": "push_unregister_button",
+      "value": "Unregister Push"
+    },
+    {
+      "name": "push_instructions_title",
+      "value": "Instructions"
+    },
+    {
+      "name": "push_instruction_1",
+      "value": "1. Download and install the push app"
+    },
+    {
+      "name": "push_instruction_2",
+      "value": "2. Register your nickname (alphanumeric string) in the push app"
+    },
+    {
+      "name": "push_instruction_3",
+      "value": "3. Enter the nickname here and register"
+    },
+    {
+      "name": "push_instruction_4",
+      "value": "4. Click the test button to verify the push is working"
+    },
+    {
+      "name": "push_return_value",
+      "value": "Return value: "
     }
   ]
 }

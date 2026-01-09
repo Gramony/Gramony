@@ -219,6 +219,130 @@
     {
       "name": "push_settings_desc",
       "value": "Настроить push-уведомления"
+    },
+    {
+      "name": "push_download_app",
+      "value": "Перейти в AppGallery"
+    },
+    {
+      "name": "push_meow_disclaimer",
+      "value": "MeoW — это приложение, ориентированное на службы push-уведомлений HarmonyOS, доступное только на китайском языке и не связанное с этим приложением. Обратите внимание на соответствующую политику конфиденциальности и риски."
+    },
+    {
+      "name": "push_confirm",
+      "value": "Подтвердить"
+    },
+    {
+      "name": "push_enter_nickname",
+      "value": "Введите никнейм"
+    },
+    {
+      "name": "push_registering",
+      "value": "Регистрация push..."
+    },
+    {
+      "name": "push_register_success",
+      "value": "Push зарегистрирован успешно!"
+    },
+    {
+      "name": "push_register_failed",
+      "value": "Ошибка регистрации push: "
+    },
+    {
+      "name": "push_register_first",
+      "value": "Сначала зарегистрируйте push"
+    },
+    {
+      "name": "push_testing",
+      "value": "Тестирование push..."
+    },
+    {
+      "name": "push_test_sent",
+      "value": "Тестовый push отправлен!"
+    },
+    {
+      "name": "push_test_failed",
+      "value": "Тест push не удался: "
+    },
+    {
+      "name": "push_unregistering",
+      "value": "Отмена регистрации..."
+    },
+    {
+      "name": "push_unregister_success",
+      "value": "Регистрация отменена успешно!"
+    },
+    {
+      "name": "push_unregister_failed",
+      "value": "Не удалось отменить регистрацию: "
+    },
+    {
+      "name": "push_install_app_first",
+      "value": "Сначала установите сопутствующее приложение push"
+    },
+    {
+      "name": "push_download_meow",
+      "value": "Скачать приложение MeoW"
+    },
+    {
+      "name": "push_nickname",
+      "value": "Никнейм"
+    },
+    {
+      "name": "push_nickname_instruction",
+      "value": "Скопируйте буквенно-цифровую строку из MeoW → Мой → третий вариант"
+    },
+    {
+      "name": "push_nickname_note",
+      "value": "Этот никнейм будет использоваться для получения push-уведомлений"
+    },
+    {
+      "name": "push_registering_loading",
+      "value": "Регистрация..."
+    },
+    {
+      "name": "push_register_button",
+      "value": "Зарегистрировать Push"
+    },
+    {
+      "name": "push_testing_loading",
+      "value": "Тестирование..."
+    },
+    {
+      "name": "push_test_button",
+      "value": "Тест Push"
+    },
+    {
+      "name": "push_unregistering_loading",
+      "value": "Отмена..."
+    },
+    {
+      "name": "push_unregister_button",
+      "value": "Отменить Push"
+    },
+    {
+      "name": "push_instructions_title",
+      "value": "Инструкции"
+    },
+    {
+      "name": "push_instruction_1",
+      "value": "1. Скачайте и установите приложение push"
+    },
+    {
+      "name": "push_instruction_2",
+      "value": "2. Зарегистрируйте свой никнейм (буквенно-цифровая строка) в приложении push"
+    },
+    {
+      "name": "push_instruction_3",
+      "value": "3. Введите никнейм здесь и зарегистрируйтесь"
+    },
+    {
+      "name": "push_instruction_4",
+      "value": "4. Нажмите кнопку теста, чтобы проверить работу push"
+    },
+    {
+      "name": "push_return_value",
+      "value": "Возвращаемое значение: "
     }
   ]
 }

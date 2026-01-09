@@ -14,7 +14,8 @@ export struct PushSettings {
   @State isSaving: boolean = false;
   @State isTesting: boolean = false;
   @State isUnregistering: boolean = false;
-  @State statusMessage: string = '';
+  @State statusType: string = ''; // 'enter_nickname', 'registering', 'register_success', 'register_failed', 'register_first', 'testing', 'test_sent', 'test_failed', 'unregistering', 'unregister_success', 'unregister_failed'
+  @State statusDetail: string = ''; // 用于存储额外信息如返回值或错误信息
   @Consume('pageInfo') pageInfo: NavPathStack;
 
   aboutToAppear(): void {
@@ -44,10 +45,10 @@ export struct PushSettings {
 
   showAppStoreDialog() {
     promptAction.showDialog({
-      title: `前去应用市场`,
-      message: 'MeoW 为一款专注于鸿蒙推送服务的应用，仅提供中文界面，与本应用无关。请您注意相应的隐私政策与风险。',
+      title: $r('app.string.push_download_app'),
+      message: $r('app.string.push_meow_disclaimer'),
       buttons: [{
-        text: '确定',
+        text: $r('app.string.push_confirm'),
         color: '#096ad2',
       }]
     },
@@ -72,13 +73,15 @@ export struct PushSettings {
 
   async handleRegisterPush() {
     if (!this.nickname || this.nickname.trim() === '') {
-      this.statusMessage = '请输入昵称';
+      this.statusType = 'enter_nickname';
+      this.statusDetail = '';
       Vibrator.kata();
       return;
     }
 
     this.isSaving = true;
-    this.statusMessage = '正在注册推送…';
+    this.statusType = 'registering';
+    this.statusDetail = '';
 
     try {
       const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
@@ -87,12 +90,14 @@ export struct PushSettings {
       await this.saveNickname();
       await this.saveLastRegisterTime();
 
-      this.statusMessage = `推送注册成功！\n返回值: ${result}`;
+      this.statusType = 'register_success';
+      this.statusDetail = result;
       Vibrator.kata();
 
       Logger.debug(`PushSettings registered push with URL: ${pushUrl}, result: ${result}`);
     } catch (e) {
-      this.statusMessage = '推送注册失败: ' + JSON.stringify(e);
+      this.statusType = 'register_failed';
+      this.statusDetail = JSON.stringify(e);
       Logger.error('PushSettings handleRegisterPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
@@ -113,21 +118,25 @@ export struct PushSettings {
 
   async handleTestPush() {
     if (!this.nickname || this.nickname.trim() === '') {
-      this.statusMessage = '请先注册推送';
+      this.statusType = 'register_first';
+      this.statusDetail = '';
       Vibrator.kata();
       return;
     }
 
     this.isTesting = true;
-    this.statusMessage = '正在测试推送...';
+    this.statusType = 'testing';
+    this.statusDetail = '';
 
     try {
       const response = await testPush(this.nickname.trim());
-      this.statusMessage = `测试推送已发送！\n${response}`;
+      this.statusType = 'test_sent';
+      this.statusDetail = response;
       Vibrator.kata();
       Logger.debug(`handleTestPush response: ${response}`);
     } catch (e) {
-      this.statusMessage = '测试推送失败: ' + JSON.stringify(e);
+      this.statusType = 'test_failed';
+      this.statusDetail = JSON.stringify(e);
       Logger.error('PushSettings handleTestPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
@@ -137,33 +146,37 @@ export struct PushSettings {
 
   async handleUnregisterPush() {
     if (!this.nickname || this.nickname.trim() === '') {
-      this.statusMessage = '请输入昵称';
+      this.statusType = 'enter_nickname';
+      this.statusDetail = '';
       Vibrator.kata();
       return;
     }
 
     this.isUnregistering = true;
-    this.statusMessage = '正在取消注册...';
+    this.statusType = 'unregistering';
+    this.statusDetail = '';
 
     try {
       const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
 
       const result = await unregisterPush(pushUrl);
-      
+
       // 清除保存的数据
       const context = getContext(this) as common.UIAbilityContext;
       const dataPreferences = await preferences.getPreferences(context, 'push_settings');
       await dataPreferences.delete(PUSH_NICKNAME_KEY);
       await dataPreferences.delete('push_last_register_time');
       await dataPreferences.flush();
-      
+
       this.nickname = '';
-      this.statusMessage = `取消注册成功！\n返回值: ${result}`;
+      this.statusType = 'unregister_success';
+      this.statusDetail = result;
       Vibrator.kata();
 
       Logger.debug(`PushSettings unregistered push with URL: ${pushUrl}, result: ${result}`);
     } catch (e) {
-      this.statusMessage = '取消注册失败: ' + JSON.stringify(e);
+      this.statusType = 'unregister_failed';
+      this.statusDetail = JSON.stringify(e);
       Logger.error('PushSettings handleUnregisterPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
@@ -173,132 +186,276 @@ export struct PushSettings {
 
   build() {
     NavDestination() {
-      Column({ space: 20 }) {
-        // 引导信息
-        Column({ space: 12 }) {
-          Text('需先安装配套的推送应用')
-            .fontSize(14)
-            .fontColor('#8a8a8a')
-            .textAlign(TextAlign.Center)
+      Scroll() {
+        Column({ space: 20 }) {
+          // 引导信息
+          Column({ space: 12 }) {
+            Text($r('app.string.push_install_app_first'))
+              .fontSize(14)
+              .fontColor('#8a8a8a')
+              .textAlign(TextAlign.Center)
 
-          Button('下载第三方应用 MeoW')
-            .width('100%')
-            .backgroundColor('#007AFF')
-            .onClick(() => {
-              this.showAppStoreDialog();
+            Button($r('app.string.push_download_meow'))
+              .width('100%')
+              .backgroundColor('#007AFF')
+              .onClick(() => {
+                this.showAppStoreDialog();
+              })
+          }
+          .width('100%')
+            .padding(20)
+            .backgroundColor('#f5f5f5')
+            .borderRadius(12)
+
+          Divider()
+
+          // Nickname 输入
+          Column({ space: 8 }) {
+            Text($r('app.string.push_nickname'))
+              .fontSize(16)
+              .fontWeight(FontWeight.Medium)
+              .alignSelf(ItemAlign.Start)
+
+            Text($r('app.string.push_nickname_instruction'))
+              .fontSize(12)
+              .fontColor('#8a8a8a')
+              .alignSelf(ItemAlign.Start)
+
+            TextInput({
+              placeholder: 'a23bc4de',
+              text: this.nickname
             })
+              .width('100%')
+              .onChange((value: string) => {
+                this.nickname = value;
+              })
+              .maxLength(50)
+
+            Text($r('app.string.push_nickname_note'))
+              .fontSize(12)
+              .fontColor('#8a8a8a')
+              .alignSelf(ItemAlign.Start)
+          }
+          .width('100%')
+
+          // 操作按钮
+          Column({ space: 12 }) {
+            Button(this.isSaving ? $r('app.string.push_registering_loading') : $r('app.string.push_register_button'))
+              .width('100%')
+              .backgroundColor('#34C759')
+              .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering)
+              .onClick(() => {
+                this.handleRegisterPush();
+              })
+
+            Button(this.isTesting ? $r('app.string.push_testing_loading') : $r('app.string.push_test_button'))
+              .width('100%')
+              .backgroundColor('#FF9500')
+              .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering && this.nickname !== '')
+              .onClick(() => {
+                this.handleTestPush();
+              })
+
+            Button(this.isUnregistering ? $r('app.string.push_unregistering_loading') : $r('app.string.push_unregister_button'))
+              .width('100%')
+              .backgroundColor('#FF3B30')
+              .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering && this.nickname !== '')
+              .onClick(() => {
+                this.handleUnregisterPush();
+              })
+          }
+          .width('100%')
+
+          // 状态消息
+          if (this.statusType === 'enter_nickname') {
+            Text($r('app.string.push_enter_nickname'))
+              .fontSize(14)
+              .fontColor('#FF3B30')
+              .textAlign(TextAlign.Center)
+              .width('100%')
+          }
+          
+          if (this.statusType === 'registering') {
+            Text($r('app.string.push_registering'))
+              .fontSize(14)
+              .fontColor('#007AFF')
+              .textAlign(TextAlign.Center)
+              .width('100%')
+          }
+          
+          if (this.statusType === 'register_success') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_register_success'))
+                .fontSize(14)
+                .fontColor('#34C759')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Row({ space: 4 }) {
+                  Text($r('app.string.push_return_value'))
+                    .fontSize(12)
+                    .fontColor('#34C759')
+                  Text(this.statusDetail)
+                    .fontSize(12)
+                    .fontColor('#34C759')
+                }
+                .justifyContent(FlexAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+          
+          if (this.statusType === 'register_failed') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_register_failed'))
+                .fontSize(14)
+                .fontColor('#FF3B30')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Text(this.statusDetail)
+                  .fontSize(12)
+                  .fontColor('#FF3B30')
+                  .textAlign(TextAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+          
+          if (this.statusType === 'register_first') {
+            Text($r('app.string.push_register_first'))
+              .fontSize(14)
+              .fontColor('#FF3B30')
+              .textAlign(TextAlign.Center)
+              .width('100%')
+          }
+          
+          if (this.statusType === 'testing') {
+            Text($r('app.string.push_testing'))
+              .fontSize(14)
+              .fontColor('#007AFF')
+              .textAlign(TextAlign.Center)
+              .width('100%')
+          }
+          
+          if (this.statusType === 'test_sent') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_test_sent'))
+                .fontSize(14)
+                .fontColor('#34C759')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Text(this.statusDetail)
+                  .fontSize(12)
+                  .fontColor('#34C759')
+                  .textAlign(TextAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+          
+          if (this.statusType === 'test_failed') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_test_failed'))
+                .fontSize(14)
+                .fontColor('#FF3B30')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Text(this.statusDetail)
+                  .fontSize(12)
+                  .fontColor('#FF3B30')
+                  .textAlign(TextAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+          
+          if (this.statusType === 'unregistering') {
+            Text($r('app.string.push_unregistering'))
+              .fontSize(14)
+              .fontColor('#007AFF')
+              .textAlign(TextAlign.Center)
+              .width('100%')
+          }
+          
+          if (this.statusType === 'unregister_success') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_unregister_success'))
+                .fontSize(14)
+                .fontColor('#34C759')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Row({ space: 4 }) {
+                  Text($r('app.string.push_return_value'))
+                    .fontSize(12)
+                    .fontColor('#34C759')
+                  Text(this.statusDetail)
+                    .fontSize(12)
+                    .fontColor('#34C759')
+                }
+                .justifyContent(FlexAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+          
+          if (this.statusType === 'unregister_failed') {
+            Column({ space: 4 }) {
+              Text($r('app.string.push_unregister_failed'))
+                .fontSize(14)
+                .fontColor('#FF3B30')
+                .textAlign(TextAlign.Center)
+              if (this.statusDetail) {
+                Text(this.statusDetail)
+                  .fontSize(12)
+                  .fontColor('#FF3B30')
+                  .textAlign(TextAlign.Center)
+              }
+            }
+            .width('100%')
+          }
+
+          Blank()
+
+          // 说明信息
+          Column({ space: 8 }) {
+            Text($r('app.string.push_instructions_title'))
+              .fontSize(16)
+              .fontWeight(FontWeight.Medium)
+              .alignSelf(ItemAlign.Start)
+
+            Text($r('app.string.push_instruction_1'))
+              .fontSize(13)
+              .fontColor('#666')
+              .alignSelf(ItemAlign.Start)
+
+            Text($r('app.string.push_instruction_2'))
+              .fontSize(13)
+              .fontColor('#666')
+              .alignSelf(ItemAlign.Start)
+
+            Text($r('app.string.push_instruction_3'))
+              .fontSize(13)
+              .fontColor('#666')
+              .alignSelf(ItemAlign.Start)
+
+            Text($r('app.string.push_instruction_4'))
+              .fontSize(13)
+              .fontColor('#666')
+              .alignSelf(ItemAlign.Start)
+          }
+          .width('100%')
+            .padding(16)
+            .backgroundColor('#f9f9f9')
+            .borderRadius(8)
         }
         .width('100%')
           .padding(20)
-          .backgroundColor('#f5f5f5')
-          .borderRadius(12)
-
-        Divider()
-
-        // Nickname 输入
-        Column({ space: 8 }) {
-          Text('昵称')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .alignSelf(ItemAlign.Start)
-
-          Text('在 MeoW → 「我的」中第三个选项里复制一串字母和数字')
-            .fontSize(12)
-            .fontColor('#8a8a8a')
-            .alignSelf(ItemAlign.Start)
-
-          TextInput({ placeholder: 'a23bc4de', text: this.nickname })
-            .width('100%')
-            .onChange((value: string) => {
-              this.nickname = value;
-            })
-            .maxLength(50)
-
-          Text('此昵称将用于接收推送通知')
-            .fontSize(12)
-            .fontColor('#8a8a8a')
-            .alignSelf(ItemAlign.Start)
-        }
-        .width('100%')
-
-        // 操作按钮
-        Column({ space: 12 }) {
-          Button(this.isSaving ? '注册中...' : '注册推送')
-            .width('100%')
-            .backgroundColor('#34C759')
-            .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering)
-            .onClick(() => {
-              this.handleRegisterPush();
-            })
-
-          Button(this.isTesting ? '测试中...' : '测试推送')
-            .width('100%')
-            .backgroundColor('#FF9500')
-            .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering && this.nickname !== '')
-            .onClick(() => {
-              this.handleTestPush();
-            })
-          
-          Button(this.isUnregistering ? '取消中...' : '取消推送')
-            .width('100%')
-            .backgroundColor('#FF3B30')
-            .enabled(!this.isSaving && !this.isTesting && !this.isUnregistering && this.nickname !== '')
-            .onClick(() => {
-              this.handleUnregisterPush();
-            })
-        }
-        .width('100%')
-
-        // 状态消息
-        if (this.statusMessage) {
-          Text(this.statusMessage)
-            .fontSize(14)
-            .fontColor(this.statusMessage.includes('成功') ? '#34C759' : '#FF3B30')
-            .textAlign(TextAlign.Center)
-            .width('100%')
-        }
-
-        Blank()
-
-        // 说明信息
-        Column({ space: 8 }) {
-          Text('使用说明')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .alignSelf(ItemAlign.Start)
-
-          Text('1. 先下载并安装推送应用')
-            .fontSize(13)
-            .fontColor('#666')
-            .alignSelf(ItemAlign.Start)
-
-          Text('2. 在推送应用中注册您的昵称（一串字母和数字）')
-            .fontSize(13)
-            .fontColor('#666')
-            .alignSelf(ItemAlign.Start)
-
-          Text('3. 在此输入昵称并注册')
-            .fontSize(13)
-            .fontColor('#666')
-            .alignSelf(ItemAlign.Start)
-
-          Text('4. 点击测试按钮验证推送是否正常')
-            .fontSize(13)
-            .fontColor('#666')
-            .alignSelf(ItemAlign.Start)
-        }
-        .width('100%')
-          .padding(16)
-          .backgroundColor('#f9f9f9')
-          .borderRadius(8)
       }
       .width('100%')
         .height('100%')
-        .padding(20)
+        .scrollBar(BarState.Auto)
     }
-    .title('推送设置')
-      .onReady((context: NavDestinationContext) => {
-        this.pageInfo = context.pathStack;
-      })
+    .onReady((context: NavDestinationContext) => {
+      this.pageInfo = context.pathStack;
+    })
   }
 }

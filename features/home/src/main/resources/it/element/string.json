@@ -203,6 +203,138 @@
     {
       "name": "profile_chat_type_unknown",
       "value": "Sconosciuto"
+    },
+    {
+      "name": "push_settings",
+      "value": "Impostazioni Push"
+    },
+    {
+      "name": "push_settings_desc",
+      "value": "Configura notifiche push"
+    },
+    {
+      "name": "push_download_app",
+      "value": "Vai all'AppGallery"
+    },
+    {
+      "name": "push_meow_disclaimer",
+      "value": "MeoW è un'applicazione focalizzata sui servizi push HarmonyOS, disponibile solo in cinese e non correlata a questa applicazione. Si prega di notare la relativa politica sulla privacy e i rischi."
+    },
+    {
+      "name": "push_confirm",
+      "value": "Conferma"
+    },
+    {
+      "name": "push_enter_nickname",
+      "value": "Inserisci il nickname"
+    },
+    {
+      "name": "push_registering",
+      "value": "Registrazione push..."
+    },
+    {
+      "name": "push_register_success",
+      "value": "Push registrato con successo!"
+    },
+    {
+      "name": "push_register_failed",
+      "value": "Registrazione push fallita: "
+    },
+    {
+      "name": "push_register_first",
+      "value": "Registra prima il push"
+    },
+    {
+      "name": "push_testing",
+      "value": "Test push..."
+    },
+    {
+      "name": "push_test_sent",
+      "value": "Push di test inviato!"
+    },
+    {
+      "name": "push_test_failed",
+      "value": "Test push fallito: "
+    },
+    {
+      "name": "push_unregistering",
+      "value": "Annullamento registrazione..."
+    },
+    {
+      "name": "push_unregister_success",
+      "value": "Registrazione annullata con successo!"
+    },
+    {
+      "name": "push_unregister_failed",
+      "value": "Annullamento registrazione fallito: "
+    },
+    {
+      "name": "push_install_app_first",
+      "value": "Installa prima l'app push companion"
+    },
+    {
+      "name": "push_download_meow",
+      "value": "Scarica App MeoW"
+    },
+    {
+      "name": "push_nickname",
+      "value": "Nickname"
+    },
+    {
+      "name": "push_nickname_instruction",
+      "value": "Copia la stringa alfanumerica da MeoW → Io → terza opzione"
+    },
+    {
+      "name": "push_nickname_note",
+      "value": "Questo nickname sarà utilizzato per ricevere notifiche push"
+    },
+    {
+      "name": "push_registering_loading",
+      "value": "Registrazione..."
+    },
+    {
+      "name": "push_register_button",
+      "value": "Registra Push"
+    },
+    {
+      "name": "push_testing_loading",
+      "value": "Test in corso..."
+    },
+    {
+      "name": "push_test_button",
+      "value": "Test Push"
+    },
+    {
+      "name": "push_unregistering_loading",
+      "value": "Annullamento..."
+    },
+    {
+      "name": "push_unregister_button",
+      "value": "Annulla Push"
+    },
+    {
+      "name": "push_instructions_title",
+      "value": "Istruzioni"
+    },
+    {
+      "name": "push_instruction_1",
+      "value": "1. Scarica e installa l'app push"
+    },
+    {
+      "name": "push_instruction_2",
+      "value": "2. Registra il tuo nickname (stringa alfanumerica) nell'app push"
+    },
+    {
+      "name": "push_instruction_3",
+      "value": "3. Inserisci qui il nickname e registrati"
+    },
+    {
+      "name": "push_instruction_4",
+      "value": "4. Clicca il pulsante test per verificare che il push funzioni"
+    },
+    {
+      "name": "push_return_value",
+      "value": "Valore di ritorno: "
     }
   ]
 }
