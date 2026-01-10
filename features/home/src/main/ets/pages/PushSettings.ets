@@ -84,9 +84,15 @@ export struct PushSettings {
     this.statusDetail = '';
 
     try {
-      const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
-
-      const result = await registerPush(pushUrl);
+      // const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
+      const token = `{
+        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(this.nickname)}",
+        "keys": {
+          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
+          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
+        }
+      }`;
+      const result = await registerPush(10, token);
       await this.saveNickname();
       await this.saveLastRegisterTime();
 
@@ -94,7 +100,7 @@ export struct PushSettings {
       this.statusDetail = result;
       Vibrator.kata();
 
-      Logger.debug(`PushSettings registered push with URL: ${pushUrl}, result: ${result}`);
+      Logger.debug(`PushSettings registered push with ${token}, result: ${result}`);
     } catch (e) {
       this.statusType = 'register_failed';
       this.statusDetail = JSON.stringify(e);
@@ -157,9 +163,15 @@ export struct PushSettings {
     this.statusDetail = '';
 
     try {
-      const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
+      const token = `{
+        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(this.nickname)}",
+        "keys": {
+          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
+          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
+        }
+      }`;
 
-      const result = await unregisterPush(pushUrl);
+      const result = await unregisterPush(10, token);
 
       // 清除保存的数据
       const context = getContext(this) as common.UIAbilityContext;
@@ -173,7 +185,7 @@ export struct PushSettings {
       this.statusDetail = result;
       Vibrator.kata();
 
-      Logger.debug(`PushSettings unregistered push with URL: ${pushUrl}, result: ${result}`);
+      Logger.debug(`PushSettings unregistered with ${token}, result: ${result}`);
     } catch (e) {
       this.statusType = 'unregister_failed';
       this.statusDetail = JSON.stringify(e);
@@ -198,13 +210,13 @@ export struct PushSettings {
             Button($r('app.string.push_download_meow'))
               .width('100%')
               .backgroundColor('#007AFF')
+              .fontColor('#f5f5f5')
               .onClick(() => {
                 this.showAppStoreDialog();
               })
           }
           .width('100%')
             .padding(20)
-            .backgroundColor('#f5f5f5')
             .borderRadius(12)
 
           Divider()
@@ -233,7 +245,6 @@ export struct PushSettings {
 
             Text($r('app.string.push_nickname_note'))
               .fontSize(12)
-              .fontColor('#8a8a8a')
               .alignSelf(ItemAlign.Start)
           }
           .width('100%')
@@ -274,7 +285,7 @@ export struct PushSettings {
               .textAlign(TextAlign.Center)
               .width('100%')
           }
-          
+
           if (this.statusType === 'registering') {
             Text($r('app.string.push_registering'))
               .fontSize(14)
@@ -282,7 +293,7 @@ export struct PushSettings {
               .textAlign(TextAlign.Center)
               .width('100%')
           }
-          
+
           if (this.statusType === 'register_success') {
             Column({ space: 4 }) {
               Text($r('app.string.push_register_success'))
@@ -303,7 +314,7 @@ export struct PushSettings {
             }
             .width('100%')
           }
-          
+
           if (this.statusType === 'register_failed') {
             Column({ space: 4 }) {
               Text($r('app.string.push_register_failed'))
@@ -319,7 +330,7 @@ export struct PushSettings {
             }
             .width('100%')
           }
-          
+
           if (this.statusType === 'register_first') {
             Text($r('app.string.push_register_first'))
               .fontSize(14)
@@ -327,7 +338,7 @@ export struct PushSettings {
               .textAlign(TextAlign.Center)
               .width('100%')
           }
-          
+
           if (this.statusType === 'testing') {
             Text($r('app.string.push_testing'))
               .fontSize(14)
@@ -335,7 +346,7 @@ export struct PushSettings {
               .textAlign(TextAlign.Center)
               .width('100%')
           }
-          
+
           if (this.statusType === 'test_sent') {
             Column({ space: 4 }) {
               Text($r('app.string.push_test_sent'))
@@ -351,7 +362,7 @@ export struct PushSettings {
             }
             .width('100%')
           }
-          
+
           if (this.statusType === 'test_failed') {
             Column({ space: 4 }) {
               Text($r('app.string.push_test_failed'))
@@ -367,7 +378,7 @@ export struct PushSettings {
             }
             .width('100%')
           }
-          
+
           if (this.statusType === 'unregistering') {
             Text($r('app.string.push_unregistering'))
               .fontSize(14)
@@ -375,7 +386,7 @@ export struct PushSettings {
               .textAlign(TextAlign.Center)
               .width('100%')
           }
-          
+
           if (this.statusType === 'unregister_success') {
             Column({ space: 4 }) {
               Text($r('app.string.push_unregister_success'))
@@ -396,7 +407,7 @@ export struct PushSettings {
             }
             .width('100%')
           }
-          
+
           if (this.statusType === 'unregister_failed') {
             Column({ space: 4 }) {
               Text($r('app.string.push_unregister_failed'))

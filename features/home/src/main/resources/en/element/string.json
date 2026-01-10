@@ -72,7 +72,6 @@
       "name": "send_message",
       "value": "Send messages"
     },
-
     {
       "name": "view_profile",
       "value": "View profile"
@@ -235,7 +234,7 @@
     },
     {
       "name": "push_meow_disclaimer",
-      "value": "MeoW is an application focused on HarmonyOS push services, available only in Chinese, and is not related to this application. Please note the relevant privacy policy and risks."
+      "value": "You need to download MeoW, an application focused on push notification services for the HarmonyOS system. It provides Chinese-only interface support and is not related to this application.\nThe free version supports up to 60 push messages per hour.\nYour message content will be transmitted in plain text over the Internet, so please be aware of the relevant privacy policies and risks."
     },
     {
       "name": "push_confirm",

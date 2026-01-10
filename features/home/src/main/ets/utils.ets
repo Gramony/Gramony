@@ -121,13 +121,13 @@ export async function testPush(nickname: string): Promise<string> {
     });
 
     Logger.debug(`testPush response: ${JSON.stringify(response.result)}`);
-    
+
     const resultText = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
     const fullResponse = `状态码: ${response.responseCode}\n响应: ${resultText}`;
 
     Logger.info(`Test push result: ${fullResponse}`);
     httpRequest.destroy();
-    
+
     return fullResponse;
   } catch (e) {
     Logger.error(`testPush error: ${JSON.stringify(e)}`);
@@ -214,9 +214,16 @@ export async function autoRegisterPushIfNeeded(context: common.UIAbilityContext)
     }
 
     Logger.info(`autoRegisterPushIfNeeded: Registering push for ${nickname}`);
-    const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(nickname)}`;
+    // const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(nickname)}`;
+    const token = `{
+        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(nickname)}",
+        "keys": {
+          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
+          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
+        }
+      }`;
 
-    await registerPush(pushUrl);
+    await registerPush(10, token);
     await saveLastRegisterTime(context);
 
     Logger.info('autoRegisterPushIfNeeded: Push registered successfully');
