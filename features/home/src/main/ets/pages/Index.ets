@@ -184,7 +184,7 @@ export struct Index {
             height: HomeConstants.NAV_TITLE_FONT_SIZE_LARGE
           })
         Text($r('app.string.loading'))
-          .fontColor('#182431')
+          .fontColor($r('sys.color.font_primary'))
           .fontSize(HomeConstants.NAV_TITLE_FONT_SIZE_LARGE)
           .lineHeight(41)
           .fontWeight(700)
@@ -205,7 +205,7 @@ export struct Index {
           ))
       } else {
         Text(HomeConstants.TAB_BAR_TEXTS[this.currentPageIndex])
-          .fontColor('#182431')
+          .fontColor($r('sys.color.font_primary'))
           .fontSize(HomeConstants.NAV_TITLE_FONT_SIZE_LARGE)
           .lineHeight(41)
           .fontWeight(700)
@@ -258,10 +258,10 @@ export struct Index {
   NewMessageSheet() {
     Column() {
       Text('New Message')
-        .fontSize(30)
+        .fontSize($r('sys.float.ohos_id_text_size_headline1'))
         .fontWeight(700)
         .lineHeight(41)
-        .fontColor('#182431')
+        .fontColor($r('sys.color.font_primary'))
         .margin({ top: 24, left: 24 })
     }
   }

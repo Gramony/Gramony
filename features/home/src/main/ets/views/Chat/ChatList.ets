@@ -140,9 +140,14 @@ export struct ChatList {
                 // 判断是否为 Split 模式（非 sm 断点）
                 const isSplitMode = this.currentBreakpoint !== BreakpointConstants.BREAKPOINT_SM;
                 // 判断当前是否已有 ChatDetail 页面
-                const hasChatDetail = this.pageInfo && this.pageInfo.size() >= 1 &&
+                let hasChatDetail : undefined | boolean = undefined;
+                try {
+                  hasChatDetail = this.pageInfo && this.pageInfo?.size() >= 1 &&
                   this.pageInfo.getParamByName('ChatDetail')?.length > 0;
-                
+                } catch (e) {
+                  console.error(e);
+                }
+
                 if (chat?.chatType === ChatType.Group && chat?.forum) {
                   if (this.isInTopicPage) {
                     if (this.currentForumId !== this.currentChatId) {

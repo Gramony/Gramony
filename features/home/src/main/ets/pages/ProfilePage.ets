@@ -225,16 +225,16 @@ export struct ProfilePage {
           Button({ type: ButtonType.Normal }) {
             Row() {
               SymbolGlyph($r('sys.symbol.bell'))
-                .fontSize(24)
-                .fontColor([Color.Blue])
+                .fontSize($r('sys.float.ohos_id_text_size_headline3'))
+                .fontColor([$r('sys.color.ohos_id_color_emphasize')])
               Column({ space: 4 }) {
                 Text($r('app.string.push_settings'))
-                  .fontSize(16)
+                  .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
                   .fontWeight(FontWeight.Medium)
                   .alignSelf(ItemAlign.Start)
                 Text($r('app.string.push_settings_desc'))
-                  .fontSize(14)
-                  .fontColor('#8a8a8a')
+                  .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
+                  .fontColor($r('sys.color.font_secondary'))
                   .alignSelf(ItemAlign.Start)
               }
               .alignItems(HorizontalAlign.Start)

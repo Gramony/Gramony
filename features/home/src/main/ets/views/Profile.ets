@@ -1,4 +1,5 @@
 import { promptAction } from "@kit.ArkUI"
+import { BaseConstants } from '@ohos/base';
 
 @ComponentV2
 export struct Profile {
@@ -33,8 +34,8 @@ export struct Profile {
         Button('Chat')
           .width(100)
           .height(40)
-          .backgroundColor('#4CAF50')
-          .fontColor(Color.White)
+          .backgroundColor($r('sys.color.ohos_id_color_emphasize'))
+          .fontColor($r('sys.color.font_on_primary'))
           .onClick(() => {
             try {
               promptAction.showToast({
@@ -46,7 +47,7 @@ export struct Profile {
       }
 
       Text(this.bio)
-        .fontSize(16)
+        .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
         .margin({ top: 8, left: 20, right: 20 })
         .textAlign(TextAlign.Center)
 

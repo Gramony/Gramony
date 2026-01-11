@@ -1,4 +1,4 @@
-import { Logger, Vibrator } from '@ohos/base';
+import { Logger, Vibrator, BaseConstants } from '@ohos/base';
 import { promptAction } from '@kit.ArkUI';
 import { common, Want } from '@kit.AbilityKit';
 import { PushService, CHUCKFANG_APP_ID } from '../utils/push';
@@ -161,14 +161,14 @@ export struct PushSettings {
           // 引导信息
           Column({ space: 12 }) {
             Text($r('app.string.push_install_app_first'))
-              .fontSize(14)
-              .fontColor('#8a8a8a')
+              .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
+              .fontColor($r('sys.color.font_secondary'))
               .textAlign(TextAlign.Center)
 
             Button($r('app.string.push_download_meow'))
               .width('100%')
-              .backgroundColor('#007AFF')
-              .fontColor('#f5f5f5')
+              .backgroundColor($r('sys.color.ohos_id_color_emphasize'))
+              .fontColor($r('sys.color.font_on_primary'))
               .onClick(() => {
                 this.showAppStoreDialog();
               })
@@ -182,13 +182,13 @@ export struct PushSettings {
           // Nickname 输入
           Column({ space: 8 }) {
             Text($r('app.string.push_nickname'))
-              .fontSize(16)
+              .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
               .fontWeight(FontWeight.Medium)
               .alignSelf(ItemAlign.Start)
 
             Text($r('app.string.push_nickname_instruction'))
-              .fontSize(12)
-              .fontColor('#8a8a8a')
+              .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+              .fontColor($r('sys.color.font_secondary'))
               .alignSelf(ItemAlign.Start)
 
             TextInput({

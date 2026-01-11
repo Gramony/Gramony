@@ -39,10 +39,10 @@ export struct ParticipantList {
           Column() {
             SymbolGlyph($r('sys.symbol.exclamationmark_triangle'))
               .fontSize(48)
-              .fontColor([Color.Orange])
+              .fontColor([$r('sys.color.ohos_id_color_warning')])
             Text(this.errorMessage)
               .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
-              .fontColor(Color.Grey)
+              .fontColor($r('sys.color.font_secondary'))
               .margin({ top: 16 })
               .textAlign(TextAlign.Center)
             Button($r('app.string.retry'))

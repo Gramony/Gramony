@@ -25,7 +25,7 @@ export struct ParticipantItem {
           Text(this.getInitials())
             .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
             .fontWeight(BaseConstants.FONT_WEIGHT_FIVE)
-            .fontColor(Color.White)
+            .fontColor($r('sys.color.font_on_primary'))
         }
         .height(HomeConstants.PROFILE_PHOTO_SIZE)
         .width(HomeConstants.PROFILE_PHOTO_SIZE)
@@ -49,16 +49,16 @@ export struct ParticipantItem {
           if (this.participant?.role === NativeParticipantRole.Creator) {
             Text($r('app.string.role_creator'))
               .fontSize(BaseConstants.FONT_SIZE_TEN)
-              .fontColor(Color.White)
-              .backgroundColor('#FF6B35')
+              .fontColor($r('sys.color.font_on_primary'))
+              .backgroundColor($r('app.color.color_danger'))
               .borderRadius(4)
               .padding({ left: 4, right: 4, top: 2, bottom: 2 })
               .margin({ left: 8 })
           } else if (this.participant?.role === NativeParticipantRole.Admin) {
             Text($r('app.string.role_admin'))
               .fontSize(BaseConstants.FONT_SIZE_TEN)
-              .fontColor(Color.White)
-              .backgroundColor('#4CAF50')
+              .fontColor($r('sys.color.font_on_primary'))
+              .backgroundColor($r('app.color.color_success'))
               .borderRadius(4)
               .padding({ left: 4, right: 4, top: 2, bottom: 2 })
               .margin({ left: 8 })
@@ -73,7 +73,7 @@ export struct ParticipantItem {
             .fontWeight(BaseConstants.FONT_WEIGHT_FOUR)
             .lineHeight($r('app.float.text_line_height_one'))
             .fontFamily(BaseConstants.FONT_FAMILY_NORMAL)
-            .fontColor(Color.Grey)
+            .fontColor($r('sys.color.font_secondary'))
         }
       }
       .margin({ left: $r('app.float.icon_margin_one') })

@@ -576,11 +576,11 @@ export struct MessageBubble {
       if (this.mediaLoadFailed) {
         Column() {
           Text($r('app.string.load_failed'))
-            .fontColor(Color.Red)
+            .fontColor($r('app.color.color_danger'))
             .fontSize(BaseConstants.FONT_SIZE_TWELVE)
           Text($r('app.string.retry'))
             .fontSize(BaseConstants.FONT_SIZE_TEN)
-            .fontColor(Color.Gray)
+            .fontColor($r('sys.color.font_secondary'))
         }
         .onClick(() => this.loadMedia())
       }
@@ -623,14 +623,14 @@ export struct MessageBubble {
         // 文件信息
         Column() {
           Text(this.message?.mediaInfo?.fileName ?? '未知文件')
-            .fontSize(14)
-            .fontColor(Color.Black)
+            .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
+            .fontColor($r('sys.color.font_primary'))
             .maxLines(2)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
           Text(this.formatFileSize(this.message?.mediaInfo?.fileSize ?? 0))
-            .fontSize(12)
-            .fontColor(Color.Gray)
+            .fontSize(BaseConstants.FONT_SIZE_TWELVE)
+            .fontColor($r('sys.color.font_secondary'))
             .margin({ top: 4 })
         }
         .alignItems(HorizontalAlign.Start)
@@ -706,7 +706,7 @@ export struct MessageBubble {
       if (!this.mediaLoaded) {
         if (this.mediaLoadFailed) {
           Text("Retry")
-            .fontColor(Color.Red)
+            .fontColor($r('app.color.color_danger'))
             .fontSize(BaseConstants.FONT_SIZE_FOURTEEN)
             .fontWeight(FontWeight.Bold)
             .lineHeight(`21fp`)

@@ -131,6 +131,14 @@
     {
       "name": "message_decoration_color",
       "value": "#000000"
+    },
+    {
+      "name": "color_danger",
+      "value": "#FF3B30"
+    },
+    {
+      "name": "color_success",
+      "value": "#34C759"
     }
   ]
 }
