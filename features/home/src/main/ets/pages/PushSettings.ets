@@ -1,12 +1,7 @@
 import { Logger, Vibrator } from '@ohos/base';
 import { promptAction } from '@kit.ArkUI';
 import { common, Want } from '@kit.AbilityKit';
-import { preferences } from '@kit.ArkData';
-import { testPush } from '../utils';
-import { registerPush, unregisterPush } from 'libhomogrape.so';
-
-const PUSH_NICKNAME_KEY = 'push_nickname';
-const CHUCKFANG_APP_ID = 'com.chuckfang.meow';
+import { PushService, CHUCKFANG_APP_ID } from '../utils/push';
 
 @Component
 export struct PushSettings {
@@ -17,29 +12,20 @@ export struct PushSettings {
   @State statusType: string = ''; // 'enter_nickname', 'registering', 'register_success', 'register_failed', 'register_first', 'testing', 'test_sent', 'test_failed', 'unregistering', 'unregister_success', 'unregister_failed'
   @State statusDetail: string = ''; // 用于存储额外信息如返回值或错误信息
   @Consume('pageInfo') pageInfo: NavPathStack;
+  
+  private pushService: PushService | null = null;
 
   aboutToAppear(): void {
-    this.loadNickname();
+    this.initPushService();
   }
 
-  async loadNickname() {
+  async initPushService() {
     try {
       const context = getContext(this) as common.UIAbilityContext;
-      const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-      this.nickname = await dataPreferences.get(PUSH_NICKNAME_KEY, '') as string;
+      this.pushService = new PushService(context);
+      this.nickname = await this.pushService.loadNickname();
     } catch (e) {
-      Logger.error('PushSettings loadNickname error: ' + JSON.stringify(e));
-    }
-  }
-
-  async saveNickname() {
-    try {
-      const context = getContext(this) as common.UIAbilityContext;
-      const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-      await dataPreferences.put(PUSH_NICKNAME_KEY, this.nickname);
-      await dataPreferences.flush();
-    } catch (e) {
-      Logger.error('PushSettings saveNickname error: ' + JSON.stringify(e));
+      Logger.error('PushSettings initPushService error: ' + JSON.stringify(e));
     }
   }
 
@@ -72,6 +58,12 @@ export struct PushSettings {
   }
 
   async handleRegisterPush() {
+    if (!this.pushService) {
+      this.statusType = 'register_failed';
+      this.statusDetail = 'PushService not initialized';
+      return;
+    }
+
     if (!this.nickname || this.nickname.trim() === '') {
       this.statusType = 'enter_nickname';
       this.statusDetail = '';
@@ -84,45 +76,26 @@ export struct PushSettings {
     this.statusDetail = '';
 
     try {
-      // const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(this.nickname.trim())}`;
-      const token = `{
-        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(this.nickname)}",
-        "keys": {
-          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
-          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
-        }
-      }`;
-      const result = await registerPush(10, token);
-      await this.saveNickname();
-      await this.saveLastRegisterTime();
-
+      const result = await this.pushService.registerPush(this.nickname.trim());
       this.statusType = 'register_success';
       this.statusDetail = result;
       Vibrator.kata();
-
-      Logger.debug(`PushSettings registered push with ${token}, result: ${result}`);
     } catch (e) {
       this.statusType = 'register_failed';
       this.statusDetail = JSON.stringify(e);
-      Logger.error('PushSettings handleRegisterPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
       this.isSaving = false;
     }
   }
 
-  async saveLastRegisterTime() {
-    try {
-      const context = getContext(this) as common.UIAbilityContext;
-      const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-      await dataPreferences.put('push_last_register_time', Date.now());
-      await dataPreferences.flush();
-    } catch (e) {
-      Logger.error('PushSettings saveLastRegisterTime error: ' + JSON.stringify(e));
-    }
-  }
-
   async handleTestPush() {
+    if (!this.pushService) {
+      this.statusType = 'test_failed';
+      this.statusDetail = 'PushService not initialized';
+      return;
+    }
+
     if (!this.nickname || this.nickname.trim() === '') {
       this.statusType = 'register_first';
       this.statusDetail = '';
@@ -135,15 +108,13 @@ export struct PushSettings {
     this.statusDetail = '';
 
     try {
-      const response = await testPush(this.nickname.trim());
+      const response = await this.pushService.testPush(this.nickname.trim());
       this.statusType = 'test_sent';
-      this.statusDetail = response;
+      this.statusDetail = response ? response : "Fail";
       Vibrator.kata();
-      Logger.debug(`handleTestPush response: ${response}`);
     } catch (e) {
       this.statusType = 'test_failed';
       this.statusDetail = JSON.stringify(e);
-      Logger.error('PushSettings handleTestPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
       this.isTesting = false;
@@ -151,6 +122,12 @@ export struct PushSettings {
   }
 
   async handleUnregisterPush() {
+    if (!this.pushService) {
+      this.statusType = 'unregister_failed';
+      this.statusDetail = 'PushService not initialized';
+      return;
+    }
+
     if (!this.nickname || this.nickname.trim() === '') {
       this.statusType = 'enter_nickname';
       this.statusDetail = '';
@@ -163,33 +140,14 @@ export struct PushSettings {
     this.statusDetail = '';
 
     try {
-      const token = `{
-        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(this.nickname)}",
-        "keys": {
-          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
-          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
-        }
-      }`;
-
-      const result = await unregisterPush(10, token);
-
-      // 清除保存的数据
-      const context = getContext(this) as common.UIAbilityContext;
-      const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-      await dataPreferences.delete(PUSH_NICKNAME_KEY);
-      await dataPreferences.delete('push_last_register_time');
-      await dataPreferences.flush();
-
+      const result = await this.pushService.unregisterPush(this.nickname.trim());
       this.nickname = '';
       this.statusType = 'unregister_success';
       this.statusDetail = result;
       Vibrator.kata();
-
-      Logger.debug(`PushSettings unregistered with ${token}, result: ${result}`);
     } catch (e) {
       this.statusType = 'unregister_failed';
       this.statusDetail = JSON.stringify(e);
-      Logger.error('PushSettings handleUnregisterPush error: ' + JSON.stringify(e));
       Vibrator.kata();
     } finally {
       this.isUnregistering = false;

@@ -16,36 +16,41 @@ export struct ProfilePage {
 
   build() {
     NavDestination() {
-      Column() {
-        if (this.user) {
-          // 显示用户资料
-          Profile({
-            avatar: this.user.photoThumb ? this.getAvatarFromBytes(this.user.photoThumb) : "",
-            name: this.user.fullName,
-            bio: this.user.bio ?? "",
-          })
+      Scroll() {
+        Column() {
+          if (this.user) {
+            // 显示用户资料
+            Profile({
+              avatar: this.user.photoThumb ? this.getAvatarFromBytes(this.user.photoThumb) : "",
+              name: this.user.fullName,
+              bio: this.user.bio ?? "",
+            })
 
-          // 详细信息列表
-          this.showList(this.user)
-          Row().height(48)
-        } else if (!this.chatId) {
-          // 缺少参数的回退
-          Column() {
-            Text('Missing chat_id').fontSize(16)
-            Button('Go Back')
-              .margin({ top: 48 })
-              .onClick(() => this.pageInfo.pop())
-          }
-        } else {
-          // 加载中或用户未找到
-          Column() {
-            Text($r('app.string.profile_loading_chat') + this.chatId)
-              .fontSize(18).fontWeight(FontWeight.Medium)
+            // 详细信息列表
+            this.showList(this.user)
+            Row().height(48)
+          } else if (!this.chatId) {
+            // 缺少参数的回退
+            Column() {
+              Text('Missing chat_id').fontSize(16)
+              Button('Go Back')
+                .margin({ top: 48 })
+                .onClick(() => this.pageInfo.pop())
+            }
+          } else {
+            // 加载中或用户未找到
+            Column() {
+              Text($r('app.string.profile_loading_chat') + this.chatId)
+                .fontSize(18).fontWeight(FontWeight.Medium)
+            }
           }
         }
+        .width('100%')
+        .padding(16)
       }
       .width('100%')
-      .padding(16)
+      .height('100%')
+      .scrollBar(BarState.Auto)
     }
     .bindSheet($$this.showPushSettings, this.pushSettingsSheet(), {
       height: '90%',

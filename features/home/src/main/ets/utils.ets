@@ -5,14 +5,8 @@ import { Base64 } from '@ohos/base64';
 import { Logger, stringToBuffer } from '@ohos/base';
 import { getProfilePhotoPathAndCount } from 'libhomogrape.so';
 import { downloadProfilePhoto } from 'libhomogrape.so';
-import { http } from '@kit.NetworkKit';
-import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
-import { registerPush } from 'libhomogrape.so';
-
-const PUSH_NICKNAME_KEY = 'push_nickname';
-const PUSH_LAST_REGISTER_TIME_KEY = 'push_last_register_time';
-const PUSH_REGISTER_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+import { PushService } from './utils/push';
 
 export async function getThumbProfilePhotoPixelMap(
   thumb: string | undefined): Promise<image.PixelMap | undefined> {
@@ -96,138 +90,10 @@ export async function getOrDownloadProfilePhoto(chatId: number): Promise<string 
 }
 
 /**
- * Test push notification by sending a request to the backend
- * @param nickname - The user's nickname
- * @returns Response JSON string
- */
-export async function testPush(nickname: string): Promise<string> {
-  const testUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/notify`;
-
-  try {
-    Logger.debug(`testPush: Sending test notification to ${nickname}`);
-
-    const httpRequest = http.createHttp();
-    const response = await httpRequest.request(testUrl, {
-      method: http.RequestMethod.POST,
-      header: {
-        'Content-Type': 'application/json',
-      },
-      extraData: JSON.stringify({
-        nick: nickname,
-        title: 'Telegram 测试',
-        msg: '这是一条测试推送消息',
-        url: 'tg://launchohos',
-      })
-    });
-
-    Logger.debug(`testPush response: ${JSON.stringify(response.result)}`);
-
-    const resultText = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
-    const fullResponse = `状态码: ${response.responseCode}\n响应: ${resultText}`;
-
-    Logger.info(`Test push result: ${fullResponse}`);
-    httpRequest.destroy();
-
-    return fullResponse;
-  } catch (e) {
-    Logger.error(`testPush error: ${JSON.stringify(e)}`);
-    return `错误: ${JSON.stringify(e)}`;
-  }
-}
-
-/**
- * Check if push registration is needed (> 24 hours since last registration)
- * @param context - UIAbilityContext
- * @returns true if registration is needed
- */
-export async function shouldRegisterPush(context: common.UIAbilityContext): Promise<boolean> {
-  try {
-    const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-    const lastRegisterTime = await dataPreferences.get(PUSH_LAST_REGISTER_TIME_KEY, 0) as number;
-    const now = Date.now();
-
-    if (lastRegisterTime === 0) {
-      Logger.debug('shouldRegisterPush: Never registered before');
-      return true;
-    }
-
-    const elapsed = now - lastRegisterTime;
-    const shouldRegister = elapsed >= PUSH_REGISTER_INTERVAL;
-
-    Logger.debug(`shouldRegisterPush: elapsed=${elapsed}ms, shouldRegister=${shouldRegister}`);
-    return shouldRegister;
-  } catch (e) {
-    Logger.error(`shouldRegisterPush error: ${e}`);
-    return false;
-  }
-}
-
-/**
- * Get saved nickname from preferences
- * @param context - UIAbilityContext
- * @returns nickname or null
- */
-export async function getSavedNickname(context: common.UIAbilityContext): Promise<string | null> {
-  try {
-    const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-    const nickname = await dataPreferences.get(PUSH_NICKNAME_KEY, '') as string;
-    return nickname || null;
-  } catch (e) {
-    Logger.error(`getSavedNickname error: ${e}`);
-    return null;
-  }
-}
-
-/**
- * Save last register time to preferences
- * @param context - UIAbilityContext
- */
-export async function saveLastRegisterTime(context: common.UIAbilityContext): Promise<void> {
-  try {
-    const dataPreferences = await preferences.getPreferences(context, 'push_settings');
-    await dataPreferences.put(PUSH_LAST_REGISTER_TIME_KEY, Date.now());
-    await dataPreferences.flush();
-    Logger.debug('saveLastRegisterTime: saved successfully');
-  } catch (e) {
-    Logger.error(`saveLastRegisterTime error: ${e}`);
-  }
-}
-
-/**
  * Auto register push notification if needed (called on app startup)
  * @param context - UIAbilityContext
  */
 export async function autoRegisterPushIfNeeded(context: common.UIAbilityContext): Promise<void> {
-  try {
-    const nickname = await getSavedNickname(context);
-
-    if (!nickname) {
-      Logger.debug('autoRegisterPushIfNeeded: No nickname saved, skipping auto registration');
-      return;
-    }
-
-    const shouldRegister = await shouldRegisterPush(context);
-
-    if (!shouldRegister) {
-      Logger.debug('autoRegisterPushIfNeeded: Registration not needed yet');
-      return;
-    }
-
-    Logger.info(`autoRegisterPushIfNeeded: Registering push for ${nickname}`);
-    // const pushUrl = `https://gramonotify.dokodemodoor.workers.dev/tg/simplepush/${encodeURIComponent(nickname)}`;
-    const token = `{
-        "endpoint": "https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(nickname)}",
-        "keys": {
-          "p256dh": "BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY",
-          "auth": "6vUzFvnXAa9_PeOK8s-5iQ"
-        }
-      }`;
-
-    await registerPush(10, token);
-    await saveLastRegisterTime(context);
-
-    Logger.info('autoRegisterPushIfNeeded: Push registered successfully');
-  } catch (e) {
-    Logger.error(`autoRegisterPushIfNeeded error: ${e}`);
-  }
+  const pushService = new PushService(context);
+  await pushService.autoRegisterIfNeeded();
 }
