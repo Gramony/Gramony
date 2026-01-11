@@ -1,8 +1,6 @@
-import { SeenChat } from './entities/SeenChat';
 import { image } from '@kit.ImageKit';
-import { HashMap } from '@kit.ArkTS';
 import { Base64 } from '@ohos/base64';
-import { Logger, stringToBuffer } from '@ohos/base';
+import { Logger } from '@ohos/base';
 import { getProfilePhotoPathAndCount } from 'libhomogrape.so';
 import { downloadProfilePhoto } from 'libhomogrape.so';
 import { common } from '@kit.AbilityKit';

@@ -2,6 +2,7 @@ import { NativeSeenChat } from "libhomogrape.so";
 import { Profile } from "../views/Profile"
 import { ComposeListItem, IconType } from "@kit.ArkUI";
 import { PushSettings } from './PushSettings';
+import { BaseConstants } from '@ohos/base';
 
 @ComponentV2
 export struct ProfilePage {
@@ -29,20 +30,22 @@ export struct ProfilePage {
             // 详细信息列表
             this.showList(this.user)
             Row().height(48)
-          } else if (!this.chatId) {
-            // 缺少参数的回退
-            Column() {
-              Text('Missing chat_id').fontSize(16)
-              Button('Go Back')
-                .margin({ top: 48 })
-                .onClick(() => this.pageInfo.pop())
-            }
           } else {
-            // 加载中或用户未找到
-            Column() {
-              Text($r('app.string.profile_loading_chat') + this.chatId)
-                .fontSize(18).fontWeight(FontWeight.Medium)
+            // 加载中 - 显示 skeleton
+            Column({ space: 16 }) {
+              LoadingProgress()
+                .size({
+                  width: 60,
+                  height: 60
+                })
+              Text($r('app.string.profile_loading_chat'))
+                .fontSize(BaseConstants.FONT_SIZE_SIXTEEN)
+                .fontColor($r('sys.color.font_secondary'))
             }
+            .alignItems(HorizontalAlign.Center)
+            .justifyContent(FlexAlign.Center)
+            .width('100%')
+            .height('100%')
           }
         }
         .width('100%')
