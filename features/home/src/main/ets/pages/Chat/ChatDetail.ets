@@ -13,20 +13,18 @@
  * limitations under the License.
  */
 
-import { Adaptive, BaseConstants, BreakpointConstants, Logger } from '@ohos/base';
+import { BaseConstants, BreakpointConstants, Logger, Vibrator } from '@ohos/base';
 import { ChatDetailBottom } from '../../views/Chat/ChatDetailBottom';
 import ChatDetailItem from '../../views/Chat/ChatDetailItem';
 // import { ChatDetailTopSearch } from '../../views/Chat/ChatDetailTopSearch';
 import { HomeConstants } from '../../constants/HomeConstants';
-import { deviceInfo } from '@kit.BasicServicesKit';
 import { Message } from '../../entities/Message';
-import { Chat } from '../../entities/Chat';
 import { SeenChat } from '../../entities/SeenChat';
 import { HashMap } from '@kit.ArkTS';
 import { ChatDataSource } from '../../viewmodel/Chat/ChatDataSource';
 import { MessageDataSource } from '../../viewmodel/Message/MessageDataSource';
-import { ChatType, loadHistoryMessages, NativeMessage } from 'libhomogrape.so';
-import { AlertDialog, curves, LengthMetrics, LengthUnit, promptAction } from '@kit.ArkUI';
+import { ChatType, loadHistoryMessages, forwardMessages, NativeMessage, NativeSeenChat } from 'libhomogrape.so';
+import { curves, LengthMetrics, LengthUnit, promptAction } from '@kit.ArkUI';
 
 @AnimatableExtend(NavDestination)
   function animatableBlur(blurRadius: number) {
@@ -42,6 +40,7 @@ export struct ChatDetail {
   @Consume messagesOfChatMap: HashMap<string, MessageDataSource>;
   @Consume seenChatsMap: HashMap<string, SeenChat>;
   @Consume currentChatId: string;
+  @Consume me: NativeSeenChat | undefined;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @State currentChatUserName: string = '';
   @State isShowMediaSheet: boolean = false;
@@ -55,6 +54,9 @@ export struct ChatDetail {
   @State messageTransitionEffect: TransitionEffect | undefined = undefined;
   @State replyToMessageId?: number = undefined;
   @State isLoadingHistory: boolean = false;
+  @State selectedMessageId: number = -1;
+  @State hasReachedSwipeBoundary: boolean = false;
+  @State swipeResetKey: number = 0;
 
   private shouldTransferToOnScrollIndex = false;
   private beforeFinalScrollIndex: number = -1;
@@ -121,22 +123,28 @@ export struct ChatDetail {
   // }
 
   @Builder
-  replyEnd(messageId: number) {
-    Row({ space: 5 }) {
-      Button() {
-        Row({ space: 4 }) {
-          SymbolGlyph($r("sys.symbol.arrow_left"))
-            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
-          Text($r("app.string.reply"))
-            .fontFamily("HarmonyOS Sans Condensed")
-        }
-      }
-        .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
-        .height(62)
-        .width(90)
-        .fontSize(44)
-        .onClick((_) => {
-          this.replyToMessageId = messageId;
+  QuickReplyIcon() {
+    Row() {
+      SymbolGlyph($r("sys.symbol.arrow_left"))
+        .fontColor([$r('sys.color.ohos_id_color_text_primary')])
+        .fontSize(24)
+    }
+    .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
+      .height(48)
+      .width(48)
+      .justifyContent(FlexAlign.Center)
+      .borderRadius(24)
+  }
+
+  @Builder
+  MessageContextMenu() {
+    Menu() {
+      MenuItem({
+        startIcon: $r('sys.symbol.arrow_left'),
+        content: $r('app.string.reply')
+      })
+        .onClick(() => {
+          this.replyToMessageId = this.selectedMessageId;
           this.getUIContext().getPromptAction().showToast({
             message: $r("app.string.reply_selected"),
             duration: 2000,
@@ -145,19 +153,49 @@ export struct ChatDetail {
           });
         })
 
-      Button() {
-        Row({ space: 4 }) {
-          SymbolGlyph($r("sys.symbol.arrow_right"))
-            .fontColor([$r('sys.color.ohos_id_color_text_primary')])
-          Text($r("app.string.forward"))
-            .fontFamily("HarmonyOS Sans Condensed")
-        }
-      }
-    .backgroundColor(HomeConstants.MESSAGE_BACKGROUND_COLOR)
-        .height(62)
-        .width(90)
-        .fontSize(48)
-        .onClick((_) => {
+      MenuItem({
+        startIcon: $r('sys.symbol.arrowshape_turn_up_right_fill'),
+        content: $r('app.string.forward')
+      })
+        .onClick(() => {
+          this.getUIContext().getPromptAction().showToast({
+            message: $r("app.string.unsupported_functionality"),
+            duration: 2000,
+            showMode: promptAction.ToastShowMode.DEFAULT,
+            bottom: 100
+          });
+        })
+
+      MenuItem({
+        startIcon: $r('sys.symbol.heart_fill'),
+        content: $r('app.string.save_message')
+      })
+        .onClick(async () => {
+          if (!this.me?.chatId) {
+            this.getUIContext().getPromptAction().showToast({
+              message: "用户未登录",
+              duration: 2000,
+              showMode: promptAction.ToastShowMode.DEFAULT,
+              bottom: 100
+            });
+            return;
+          }
+          const result = await forwardMessages(parseInt(this.currentChatId), this.me.chatId, [this.selectedMessageId]);
+          console.info(JSON.stringify(result));
+          let success = Array.isArray(result) && result.length >= 1 && result[0] && result[0].messageId > 0;
+          this.getUIContext().getPromptAction().showToast({
+            message: success ? $r("app.string.message_saved") : $r("app.string.save_message_failed"),
+            duration: 2000,
+            showMode: promptAction.ToastShowMode.DEFAULT,
+            bottom: 100
+          });
+        })
+
+      MenuItem({
+        startIcon: $r('sys.symbol.trash'),
+        content: $r('app.string.delete_message')
+      })
+        .onClick(() => {
           this.getUIContext().getPromptAction().showToast({
             message: $r("app.string.unsupported_functionality"),
             duration: 2000,
@@ -195,20 +233,39 @@ export struct ChatDetail {
                 messageListScroller: this.messageListScroller,
                 showUserName: this.shouldShowUserName(item, index),
               })
-            }.swipeAction({
-              end: this.replyEnd.bind(this, item.messageId),
-              edgeEffect: SwipeEdgeEffect.Spring,
-              // onOffsetChange: (offset) => {
-              //   const uiCtx = this.getUIContext();
-              //   this.replyToMessageId = item.messageId;
-              //   uiCtx.showAlertDialog({
-              //     title: "回复",
-              //     message: `消息 ID： ${(this.replyToMessageId ?? "none").toString()}；
-              // Offset: ${offset}`,
-              //     autoCancel: true,
-              //   })
-              // }
-            })
+            }
+            .key(`${index}-${item.messageId}-${this.swipeResetKey}`)
+              .swipeAction({
+                end: {
+                  builder: this.QuickReplyIcon,
+                  onAction: () => {
+                    this.replyToMessageId = item.messageId;
+                    this.getUIContext().getPromptAction().showToast({
+                      message: $r("app.string.reply_selected"),
+                      duration: 2000,
+                      showMode: promptAction.ToastShowMode.DEFAULT,
+                      bottom: 100
+                    });
+                  },
+                  actionAreaDistance: 80,
+                  onEnterActionArea: () => {
+                    if (!this.hasReachedSwipeBoundary) {
+                      this.hasReachedSwipeBoundary = true;
+                      Vibrator.kata();
+                      // TODO: fix
+                    }
+                  },
+                  onExitActionArea: () => {
+                    this.hasReachedSwipeBoundary = false;
+                  }
+                },
+                edgeEffect: SwipeEdgeEffect.Spring
+              })
+              .bindContextMenu(this.MessageContextMenu, ResponseType.LongPress, {
+                onAppear: () => {
+                  this.selectedMessageId = item.messageId;
+                }
+              })
               .margin({
                 top: index === 0 ? HomeConstants.NAV_TITLE_TOP_MARGIN_MINI : 0,
                 bottom: index === this.length - 1 ? HomeConstants.NAV_SIGNAL_BAR_HEIGHT : 0
@@ -297,12 +354,16 @@ export struct ChatDetail {
     let chat = this.chatDataSource.get(this.currentChatId);
     this.chatType = chat?.chatType || ChatType.User;
     this.isGroupOrChannel = this.chatType === ChatType.Group || this.chatType === ChatType.Channel;
-    // 如果 chatDataSource 中没有，尝试从 seenChatsMap 中获取用户名
+    // 如果 chatDataSource 中没有,尝试从 seenChatsMap 中获取用户名
     if (chat?.name) {
       this.currentChatUserName = chat.name;
     } else {
-      const seenChat = this.seenChatsMap.get(this.currentChatId);
-      this.currentChatUserName = seenChat?.fullName || seenChat?.firstName || '';
+      try {
+        const seenChat = this.seenChatsMap.get(this.currentChatId);
+        this.currentChatUserName = seenChat?.fullName || seenChat?.firstName || '';
+      } catch (error) {
+        Logger.error('ChatDetail aboutToAppear: failed to get seenChat', JSON.stringify(error));
+      }
     }
     this.length = this.messageDataSource?.totalCount() || 0;
     // this.messages = (this.currentChatPinned ? this.pinnedChatsMap :

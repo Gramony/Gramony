@@ -351,6 +351,22 @@
     {
       "name": "push_return_value",
       "value": "Return value: "
+    },
+    {
+      "name": "delete_message",
+      "value": "Delete"
+    },
+    {
+      "name": "save_message",
+      "value": "Save"
+    },
+    {
+      "name": "message_saved",
+      "value": "Message saved"
+    },
+    {
+      "name": "save_message_failed",
+      "value": "Failed to save message"
     }
   ]
 }

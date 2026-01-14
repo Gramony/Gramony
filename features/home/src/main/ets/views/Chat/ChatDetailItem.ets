@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 import { ChatType } from 'libhomogrape.so';
-
-import { HomeConstants } from '../../constants/HomeConstants';
 import { Message } from '../../entities/Message';
 import { MessageBubble } from '../Message/MessageBubble';
 

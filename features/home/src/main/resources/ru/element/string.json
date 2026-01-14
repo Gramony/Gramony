@@ -68,7 +68,7 @@
       "name": "reply_selected",
       "value": "Выбран ответ на сообщение"
     },
-        {
+    {
       "name": "send_message",
       "value": "Отправить сообщение"
     },
@@ -343,6 +343,22 @@
     {
       "name": "push_return_value",
       "value": "Возвращаемое значение: "
+    },
+    {
+      "name": "delete_message",
+      "value": "Удалить"
+    },
+    {
+      "name": "save_message",
+      "value": "Сохранить"
+    },
+    {
+      "name": "message_saved",
+      "value": "Сообщение сохранено"
+    },
+    {
+      "name": "save_message_failed",
+      "value": "Не удалось сохранить сообщение"
     }
   ]
 }

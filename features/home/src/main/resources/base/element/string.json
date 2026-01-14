@@ -343,6 +343,22 @@
     {
       "name": "push_return_value",
       "value": "返回值: "
+    },
+    {
+      "name": "delete_message",
+      "value": "删除"
+    },
+    {
+      "name": "save_message",
+      "value": "收藏"
+    },
+    {
+      "name": "message_saved",
+      "value": "消息已保存"
+    },
+    {
+      "name": "save_message_failed",
+      "value": "保存消息失败"
     }
   ]
 }
