@@ -4,7 +4,6 @@ import { common } from '@kit.AbilityKit';
 import { http } from '@kit.NetworkKit';
 import { registerPush as nativeRegisterPush, unregisterPush as nativeUnregisterPush } from 'libhomogrape.so';
 
-// 常量定义
 export const PUSH_NICKNAME_KEY = 'push_nickname';
 
 export const PUSH_LAST_REGISTER_TIME_KEY = 'push_last_register_time';
@@ -27,9 +26,9 @@ const WEB_PUSH_KEYS: WebPushKey = {
 /**
  * 生成推送 token
  */
-function generatePushEndpoint(nickname: string): string {
+function generatePushEndpoint(nickname: string, fake = false): string {
   return JSON.stringify({
-    endpoint: `https://gramonotify.dokodemodoor.workers.dev/tg/webpush/${encodeURIComponent(nickname)}`,
+    endpoint: `https://gramonotify.dokodemodoor.workers.dev/tg/${fake ? 'fake' : "webpush"}/${encodeURIComponent(nickname)}`,
     keys: WEB_PUSH_KEYS
   });
 }
@@ -147,11 +146,13 @@ export class PushService {
    * 取消注册推送
    */
   async unregisterPush(nickname: string): Promise<string> {
-    const token = generatePushEndpoint(nickname);
+    let token = generatePushEndpoint(nickname);
 
     try {
       const result = await nativeUnregisterPush(10, token);
-
+      Logger.warn(`PushService unregisterPush: ` + JSON.stringify(result));
+      token = generatePushEndpoint(nickname, true);
+      await nativeRegisterPush(10, token);
       // 清除保存的数据
       const dataPreferences = await preferences.getPreferences(this.context, 'push_settings');
       await dataPreferences.delete(PUSH_NICKNAME_KEY);
