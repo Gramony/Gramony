@@ -359,6 +359,18 @@
     {
       "name": "save_message_failed",
       "value": "保存消息失败"
+    },
+    {
+      "name": "photo",
+      "value": "照片"
+    },
+    {
+      "name": "reply_message_load_failed",
+      "value": "无法加载被回复的消息"
+    },
+    {
+      "name": "message_not_found",
+      "value": "消息不存在"
     }
   ]
 }

@@ -359,6 +359,18 @@
     {
       "name": "save_message_failed",
       "value": "Не удалось сохранить сообщение"
+    },
+    {
+      "name": "photo",
+      "value": "Фото"
+    },
+    {
+      "name": "reply_message_load_failed",
+      "value": "Не удалось загрузить сообщение, на которое ответили"
+    },
+    {
+      "name": "message_not_found",
+      "value": "Сообщение не найдено"
     }
   ]
 }

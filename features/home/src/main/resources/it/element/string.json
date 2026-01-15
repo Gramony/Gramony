@@ -351,6 +351,18 @@
     {
       "name": "save_message_failed",
       "value": "Salvataggio del messaggio non riuscito"
+    },
+    {
+      "name": "photo",
+      "value": "Foto"
+    },
+    {
+      "name": "reply_message_load_failed",
+      "value": "Impossibile caricare il messaggio risposto"
+    },
+    {
+      "name": "message_not_found",
+      "value": "Messaggio non trovato"
     }
   ]
 }

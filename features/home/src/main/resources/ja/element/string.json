@@ -359,6 +359,18 @@
     {
       "name": "save_message_failed",
       "value": "メッセージの保存に失敗しました"
+    },
+    {
+      "name": "photo",
+      "value": "写真"
+    },
+    {
+      "name": "reply_message_load_failed",
+      "value": "返信先メッセージを読み込めません"
+    },
+    {
+      "name": "message_not_found",
+      "value": "メッセージが見つかりません"
     }
   ]
 }
