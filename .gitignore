@@ -18,6 +18,9 @@
 .claude
 /signing
 
+# Push configuration
+features/home/src/main/ets/utils/PushConfig.ets
+
 docs
 
 .idea/
