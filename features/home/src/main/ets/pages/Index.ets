@@ -267,7 +267,7 @@ export struct Index {
   }
 
   @Builder
-  PageMap(name: string) {
+  PageMap(name: string, param: Object) {
     if (name === 'ChatDetail') {
       ChatDetail({
         isInChatDetailPage: this.isInChatDetailPage,
@@ -282,7 +282,9 @@ export struct Index {
     } else if (name === 'ChatDetailNone') {
       ChatDetailNone();
     } else if (name === 'Profile' || name === 'ProfilePage') {
-      ProfilePage();
+      ProfilePage({
+        user: param as NativeSeenChat,
+      });
     } else if (name === 'PushSettings') {
       PushSettings();
     } else if (name === 'Login/PhoneNumber') {
@@ -421,7 +423,9 @@ export struct Index {
         (this.currentBreakpoint === BreakpointConstants.BREAKPOINT_LG ?
           HomeConstants.NAVIGATION_NAV_BAR_WIDTH_LG :
           HomeConstants.NAVIGATION_NAV_BAR_WIDTH_MD))
-      .navDestination(this.PageMap)
+      .navDestination((name: string, param: Object) => {
+        this.PageMap(name, param);
+      })
       .mode((this.currentBreakpoint === BreakpointConstants.BREAKPOINT_SM || !this.isLoggedIn) ? NavigationMode.Stack :
         NavigationMode.Split)
       .width(BaseConstants.FULL_WIDTH)

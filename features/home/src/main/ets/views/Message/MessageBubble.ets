@@ -800,10 +800,8 @@ export struct MessageBubble {
                 fs.closeSync(file);
 
                 const bytes = new Uint8Array(buffer);
-                let jsonContent = '';
-                for (let i = 0; i < bytes.length; i++) {
-                  jsonContent += String.fromCharCode(bytes[i]);
-                }
+                let textDecoder = util.TextDecoder.create('utf-8');
+                let jsonContent = textDecoder.decodeWithStream(bytes);
 
                 this.lottieJson = jsonContent;
                 this.mediaLoaded = true;
@@ -860,10 +858,8 @@ export struct MessageBubble {
 
               // 转换为字符串
               const bytes = new Uint8Array(buffer);
-              let jsonContent = '';
-              for (let i = 0; i < bytes.length; i++) {
-                jsonContent += String.fromCharCode(bytes[i]);
-              }
+              let textDecoder = util.TextDecoder.create('utf-8');
+                let jsonContent = textDecoder.decodeWithStream(bytes);
 
               this.lottieJson = jsonContent;
               this.mediaLoaded = true;
@@ -902,10 +898,8 @@ export struct MessageBubble {
 
       if (bytesRead > 0) {
         const bytes = new Uint8Array(buffer, 0, bytesRead);
-        let jsonContent = '';
-        for (let i = 0; i < bytes.length; i++) {
-          jsonContent += String.fromCharCode(bytes[i]);
-        }
+        let textDecoder = util.TextDecoder.create('utf-8');
+                let jsonContent = textDecoder.decodeWithStream(bytes);
 
         const file = await fs.open(jsonPath, fs.OpenMode.CREATE | fs.OpenMode.TRUNC | fs.OpenMode.WRITE_ONLY);
         await fs.write(file.fd, jsonContent);
