@@ -3,6 +3,7 @@ import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { http } from '@kit.NetworkKit';
 import { registerPush as nativeRegisterPush, unregisterPush as nativeUnregisterPush } from 'libhomogrape.so';
+import { WEB_PUSH_KEYS } from './PushConfig';
 
 export const PUSH_NICKNAME_KEY = 'push_nickname';
 
@@ -11,17 +12,6 @@ export const PUSH_LAST_REGISTER_TIME_KEY = 'push_last_register_time';
 export const PUSH_REGISTER_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 
 export const CHUCKFANG_APP_ID = 'com.chuckfang.meow';
-
-interface WebPushKey {
-  p256dh: string;
-  auth: string
-};
-
-// Web Push 密钥配置
-const WEB_PUSH_KEYS: WebPushKey = {
-  p256dh: 'BIo_GhL2d7bnPfWcXF-7ApQsa11I6jYZ6xRIBXCQzoEVJ3xRN56sreC9FDbeLMaTW9ubQrKEWeFuu-rUHz8PqCY',
-  auth: '6vUzFvnXAa9_PeOK8s-5iQ'
-};
 
 /**
  * 生成推送 token

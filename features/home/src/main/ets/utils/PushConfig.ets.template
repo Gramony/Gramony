@@ -1,0 +1,11 @@
+export interface WebPushKey {
+  p256dh: string;
+  auth: string
+};
+
+// Web Push 密钥配置模板
+// 请复制此文件为 PushConfig.ets 并填写您自己的密钥
+export const WEB_PUSH_KEYS: WebPushKey = {
+  p256dh: 'YOUR_P256DH_KEY',
+  auth: 'YOUR_AUTH_KEY'
+};
