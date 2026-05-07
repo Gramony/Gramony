@@ -2,15 +2,18 @@ import { BaseConstants, BreakpointConstants, Logger } from '@ohos/base';
 import { HomeConstants } from '../../../constants/HomeConstants';
 import { ParticipantItem } from '../../../views/Chat/ParticipantItem';
 import { ChatDataSource } from '../../../viewmodel/Chat/ChatDataSource';
-import { getParticipants, NativeParticipant, ChatType } from 'libhomogrape.so';
+import { SeenChat } from '../../../entities/SeenChat';
+import { getParticipants, NativeParticipant, ChatType, NativeSeenChat } from 'libhomogrape.so';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { curves } from '@kit.ArkUI';
+import { HashMap } from '@kit.ArkTS';
 
 @Component
 export struct ParticipantList {
   @StorageProp('currentBreakpoint') currentBreakpoint: string = BreakpointConstants.BREAKPOINT_SM;
   @Consume('pageInfo') pageInfo: NavPathStack;
   @Consume chatDataSource: ChatDataSource;
+  @Consume seenChatsMap: HashMap<string, SeenChat>;
   @Consume currentChatId: string;
   @State participants: NativeParticipant[] = [];
   @State isLoading: boolean = true;
@@ -69,8 +72,30 @@ export struct ParticipantList {
                   participant: participant
                 })
                   .onClick(() => {
-                    // TODO: 点击参与者跳转到个人资料页面
                     Logger.debug('ParticipantList: clicked participant ' + participant.userId);
+                    const userIdStr = participant.userId.toString();
+                    let user: NativeSeenChat;
+                    if (this.seenChatsMap.hasKey(userIdStr)) {
+                      user = this.seenChatsMap.get(userIdStr).toNative();
+                    } else {
+                      user = {
+                        chatId: participant.userId,
+                        chatType: ChatType.User,
+                        packedChat: '',
+                        isContact: false,
+                        isMutualContact: false,
+                        fullName: participant.fullName,
+                        firstName: participant.firstName,
+                        lastName: participant.lastName,
+                        username: participant.username,
+                        photoThumb: participant.photoThumb,
+                        phone: undefined,
+                        bio: undefined,
+                        dateOfBirth: undefined,
+                        forum: false
+                      };
+                    }
+                    this.pageInfo.pushPath({ name: 'ProfilePage', param: user });
                   })
               }
             }, (participant: NativeParticipant, index: number) => index + '_' + participant.userId.toString())
